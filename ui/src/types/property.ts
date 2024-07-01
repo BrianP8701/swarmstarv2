@@ -1,0 +1,44 @@
+export type PropertyType = 'residential' | 'condo' | 'coop' | 'commercial' | 'land' | 'hoa' | 'industrial' | 'rental' | 'other';
+export type PropertyStatus = 'active' | 'inactive';
+export type PropertyAttachedType = 'attached' | 'semi_attached' | 'detached';
+
+export interface Property {
+    id: number;
+    user_id: number;
+    address: string;
+    street_number: string;
+    street_name: string;
+    street_suffix: string;
+    city: string;
+    unit?: string;
+    state: string;
+    zip_code: string;
+    country: string;
+    google_place_id?: string;
+    type: PropertyType;
+    status: PropertyStatus;
+    price?: number;
+    mls_number?: string;
+    bedrooms?: number;
+    bathrooms?: number;
+    floors?: number;
+    rooms?: number;
+    kitchens?: number;
+    families?: number;
+    lot_sqft?: number;
+    building_sqft?: number;
+    year_built?: number;
+    list_start_date?: Date;
+    list_end_date?: Date;
+    expiration_date?: Date;
+    attached_type?: PropertyAttachedType;
+    section?: string;
+    school_district?: string;
+    property_tax?: number;
+    pictures?: string;
+    notes?: string;
+    description?: string;
+    created?: Date;
+    updated?: Date;
+    viewed?: Date;
+}
