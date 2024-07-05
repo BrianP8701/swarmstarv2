@@ -1,0 +1,17 @@
+{
+    "name": "monorepo",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+        "client"
+    ],
+    "scripts": {
+        "client": "cd client && yarn start",
+        "server": "cd server && uvicorn main:app --reload",
+        "dev": "concurrently \"yarn client\" \"yarn server\""
+    },
+    "devDependencies": {
+        "concurrently": "^6.0.0",
+        "vite": "^2.0.0"
+    }
+}

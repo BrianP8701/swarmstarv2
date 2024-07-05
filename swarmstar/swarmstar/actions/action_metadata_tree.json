@@ -1,0 +1,64 @@
+{
+    "root": {
+        "is_folder": true,
+        "name": "Root of Action Space",
+        "description": "This is the root of the action space",
+        "children_ids": [
+            "general",
+            "specific"
+        ]
+    },
+    "general": {
+        "is_folder": true,
+        "name": "General Actions",
+        "description": "This folder contains general actions that can be searched for by the action router.",
+        "children_ids": [
+            "general/plan"
+        ],
+        "parent_id": "root"
+    },
+    "general/plan": {
+        "name": "Plan",
+        "description": "Plan what actions to take next.",
+        "parent_id": "general",
+        "internal_file_path": "swarmstar.actions.general.plan",
+        "termination_policy": "confirm_directive_completion"
+    },
+    "specific": {
+        "is_folder": true,
+        "name": "Specific Actions",
+        "description": "This folder contains actions that need to be specifically called on. The action router won't search this folder.",
+        "children_ids": [],
+        "parent_id": "root"
+    },
+    "routers": {
+        "is_folder": true,
+        "name": "Routers",
+        "description": "This folder contains routers to search metadata trees.",
+        "children_ids": [
+            "routers/route_action"
+        ],
+        "parent_id": "root"
+    },
+    "routers/route_action": {
+        "name": "Route Action",
+        "description": "Route a directive to the appropriate action by searching the general folder.",
+        "parent_id": "routers",
+        "internal_file_path": "swarmstar.actions.routers.route_action"
+    },
+    "communication": {
+        "is_folder": true,
+        "name": "Communication",
+        "description": "This folder contains actions that are related to communication that can be searched for by the communication router.",
+        "children_ids": [
+            "communication/ask_user_questions"
+        ],
+        "parent_id": "root"
+    },
+    "communication/ask_user_questions": {
+        "name": "Ask User Questions",
+        "description": "Choose this action to ask questions to the user.",
+        "parent_id": "communication",
+        "internal_file_path": "swarmstar.actions.communication.ask_user_questions"
+    }
+}
