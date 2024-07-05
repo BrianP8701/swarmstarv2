@@ -5,16 +5,9 @@ For simplicity, swarm nodes, operation, memory and action metadata have ids like
 
 Where x represents the number of the node of that type.
 """
-import uuid
-
 from swarmstar.database import Database
-from swarmstar.context import swarm_id_var
 
 db = Database()
-
-def generate_uuid(identifier: str) -> str:
-    id = str(uuid.uuid4())
-    return id
 
 def get_available_id(collection: str) -> str:
     swarm_id = swarm_id_var.get()

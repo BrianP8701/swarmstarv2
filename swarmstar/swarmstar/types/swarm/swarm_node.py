@@ -11,9 +11,8 @@ from swarmstar.swarmstar.models.swarm_node import SwarmNodeModel
 from swarmstar.types.base_node import BaseNode
 from swarmstar.utils.misc.ids import get_available_id
 
-# Each termination policy has a unique handler in swarmstar/swarm_operations/termination_operations/main.py
 class SwarmNode(BaseNode):
-    id: Optional[str] = Field(default_factory=lambda: get_available_id("swarm_nodes"))
+    id: str = Field(default_factory=lambda: get_available_id("swarm_nodes"))
     collection: ClassVar[str] = "swarm_nodes"
     action: ActionEnum    # Swarm nodes are classified by their action id
     goal: str
@@ -21,8 +20,7 @@ class SwarmNode(BaseNode):
     termination_policy: TerminationPolicyEnum = TerminationPolicyEnum.SIMPLE
     logs: List[Any] = []              # Logs storing all messages sent to and received from an ai throughout the action's execution.
     report: Optional[str] = None                    # We should look at the node and see like, "Okay, thats what this node did." 
-    execution_memory: Optional[Dict[str, Any]] = {}     # This is where a node can store memory during the execution of an action.
-    context: Optional[Dict[str, Any]] = {}          # This is where certain nodes can store extra context about themselves.
+    context: Dict[str, Any] = {}          # This is where certain nodes can store extra context about themselves.
 
     def log(self, log_dict: Dict[str, Any], index_key: List[int] | None = None) -> List[int]:
         """
@@ -89,5 +87,5 @@ class SwarmNode(BaseNode):
                         nested_list = nested_list[index]
                     else:
                         raise ValueError("Invalid index_key. Cannot traverse non-list elements.")
-        self.update()
+        self.update(self.id, {"logs": self.logs})
         return return_index_key

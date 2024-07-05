@@ -10,87 +10,58 @@ Here we define the base class for actions, which:
         decisions are made with full context, receiving LLM completions,
         termination handlers, etc.
 """
-import traceback
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 from functools import wraps
-from typing import Any, Dict, List, Callable, Union
+from typing import Any, List, Callable
+from pydantic import BaseModel
 
-from swarmstar.types import SwarmOperation, SwarmNode, SpawnOperation, BaseNode, ActionMetadata, BlockingOperation
+from swarmstar.swarmstar.enums.actions import ActionEnum
+from swarmstar.swarmstar.enums.termination_policy import TerminationPolicyEnum
+from swarmstar.types import SwarmOperation, SwarmNode, ActionMetadata, SpawnOperation, BlockingOperation
 
-def error_handling_decorator(func):
-    @wraps(func)
-    def wrapper(self, **kwargs):
-        try:
-            return func(self, **kwargs)
-        except Exception as e:
-            error_type = type(e).__name__
-            error_message = str(e)
-            traceback_info = traceback.format_exc()
-            
-            error_details = (
-                f"Error in {func.__name__}:\n"
-                f"Type: {error_type}\n"
-                f"Message: {error_message}\n"
-                f"Traceback:\n{traceback_info}"
-            )
-            raise ValueError(error_details)
-    return wrapper
-
-class ErrorHandlingMeta(ABCMeta):
-    def __new__(mcs, name, bases, dct):
-        new_cls = super().__new__(mcs, name, bases, dct)
-        for attr_name, attr_value in dct.items():
-            if callable(attr_value) and not attr_name.startswith("__"):
-                error_wrapped = error_handling_decorator(attr_value)
-                setattr(new_cls, attr_name, error_wrapped)
-        return new_cls
-
-class BaseAction(metaclass=ErrorHandlingMeta):
+class BaseAction(BaseModel):
     """
-    All actions should inherit this class.
+    All actions inherit this class.
     """
-
-    def __init__(self, node: SwarmNode):
-        self.node = node
+    node: SwarmNode
+    action: ActionEnum
 
     @abstractmethod
-    def main(self) -> Union[SwarmOperation, List[SwarmOperation]]:
+    def main(self) -> List[SwarmOperation]:
         pass        
-    
-    def get_node(self) -> SwarmNode:
-        return SwarmNode.read(self.node.id)
-    
+
     def report(self, report: str):
         if self.node.report is not None:
             raise ValueError(f"Node {self.node.id} already has a report: {self.node.report}. Cannot update with {report}.")
         self.node.report = report
-        SwarmNode.update(self.node.id, self.node)
+        SwarmNode.update(self.node.id, {'report': report})
+
+    """ Execution memory is for nodes to store information between actions """
+
+    def update_context(self, attribute: str, value: Any):
+        self.node.context[attribute] = value
+        SwarmNode.update(self.node.id, {'context': self.node.context})
     
-    def update_termination_policy(self, termination_policy: str, termination_handler: str = None):
+    def remove_context(self, attribute: str):
+        del self.node.context[attribute]
+        SwarmNode.update(self.node.id, {'context': self.node.context})
+
+    def clear_context(self):
+        self.node.context = {}
+        SwarmNode.update(self.node.id, {'context': {}})
+
+    def update_termination_policy(self, termination_policy: TerminationPolicyEnum, termination_handler: str | None = None):
         """
-        Updates the termination policy of the node. If the termination policy is set to custom_termination_handler, 
-        the termination handler will be set to the function name passed in the termination_handler parameter.
+        Some nodes have unique termination policies, and can define their own termination handlers.
+
+        If the termination policy is custom_termination_handler, the termination handler will be set to the function name passed in the termination_handler parameter.
         """
         self.node.termination_policy = termination_policy
-        SwarmNode.update(self.node.id, self.node)
+        SwarmNode.update(self.node.id, {'termination_policy': termination_policy})
         if termination_policy == "custom_termination_handler":
-            self.replace_execution_memory(execution_memory={"__termination_handler__": termination_handler})
-    
-    def add_value_to_execution_memory(self, attribute: str, value: Any):
-        self.node.execution_memory[attribute] = value
-        SwarmNode.update(self.node.id, self.node)
-    
-    def remove_value_from_execution_memory(self, attribute: str):
-        del self.node.execution_memory[attribute]
-        SwarmNode.update(self.node.id, self.node)
+            self.update_context("__termination_handler__", termination_handler)
 
-    def replace_execution_memory(self, execution_memory: Dict[str, Any]):
-        self.node.execution_memory = execution_memory
-        SwarmNode.update(self.node.id, self.node)
-
-    def clear_execution_memory(self):
-        self.node.execution_memory = {}
-        SwarmNode.update(self.node.id, self.node)
+    """ Wrappers for handling common functionality """
 
     @staticmethod
     def custom_termination_handler(func: Callable):
@@ -230,7 +201,7 @@ class BaseAction(metaclass=ErrorHandlingMeta):
                     if context: return func(self, message, context)
                     else: return func(self, message)
             elif terminator_id: # Stage 3
-                terminator_node = BaseNode.read(terminator_id)
+                terminator_node = SwarmNode.read(terminator_id)
                 oracle_report = terminator_node.report
                 context["__message__"] += f"\n\n{oracle_report}"
                 return BlockingOperation(

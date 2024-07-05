@@ -3,7 +3,7 @@ from abc import ABC
 
 from swarmstar.database import Database
 from swarmstar.types.base_node import BaseNode
-from swarmstar.constants import node_to_identifier, collection_to_model
+from swarmstar.constants import collection_to_identifier, collection_to_model
 
 db = Database()
 
@@ -20,7 +20,7 @@ class BaseTree(ABC, BaseModel):
 
     @classmethod
     def get_root_node_id(cls, swarm_id: str) -> str:
-        return f"{swarm_id}_{node_to_identifier[cls.collection]}0"
+        return f"{swarm_id}_{collection_to_identifier[cls.collection]}0"
 
     @classmethod
     def clone(cls, old_swarm_id: str, swarm_id: str) -> None:

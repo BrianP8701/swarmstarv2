@@ -24,7 +24,7 @@ from typing import List
 from swarmstar.types.metadata.memory_metadata_tree import MemoryMetadataTree
 from swarmstar.types.metadata.action_metadata_tree import ActionMetadataTree
 from swarmstar.types.swarm.swarm_tree import SwarmTree
-from swarmstar.types.swarm.swarm_operations import SwarmOperation
+from swarmstar.swarmstar.types.swarm.swarm_operation import SwarmOperation
 
 from swarmstar.database import Database
 

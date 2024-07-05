@@ -21,24 +21,3 @@ class SwarmNodeModel(Base):
     report = Column(Text, nullable=True)
     execution_memory = Column(SQLiteJSON, default=dict)
     context = Column(SQLiteJSON, default=dict)
-
-    @classmethod
-    def create(cls, data: Dict[str, Any]) -> None:
-        db = SqliteDatabase()
-        instance = cls(**data)
-        db.create(instance)
-
-    @classmethod
-    def read(cls, node_id: str) -> Optional['SwarmNodeModel']:
-        db = SqliteDatabase()
-        return db.read(cls, node_id)
-
-    @classmethod
-    def update(cls, data: Dict[str, Any]) -> None:
-        db = SqliteDatabase()
-        db.update(cls, data)
-
-    @classmethod
-    def delete(cls, node_id: str) -> None:
-        db = SqliteDatabase()
-        db.delete(cls, node_id)

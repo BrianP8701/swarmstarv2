@@ -4,14 +4,15 @@ from .base_tree import BaseTree
 from .swarm.swarmstar_space import SwarmstarSpace
 from .swarm.swarm_tree import SwarmTree
 from .swarm.swarm_node import SwarmNode
-from .swarm.swarm_operations import (
-    SwarmOperation,
+from .swarm.swarm_operation import SwarmOperation
+from .swarm.operation_types import (
     SpawnOperation,
     TerminationOperation,
     BlockingOperation,
     UserCommunicationOperation,
     ActionOperation
 )
+
 
 from .metadata.metadata_tree import MetadataTree
 from .metadata.metadata_node import MetadataNode
