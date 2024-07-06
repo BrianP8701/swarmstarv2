@@ -11,7 +11,7 @@ I've provided a template for how you may handle those in the user_communication_
 from typing import List, Union
 import inspect
 
-from swarmstar.types import (
+from swarmstar.objects import (
     SwarmOperation,
     SpawnOperation,
     SwarmstarSpace

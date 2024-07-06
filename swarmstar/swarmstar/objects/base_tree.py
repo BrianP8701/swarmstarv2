@@ -2,8 +2,9 @@ from pydantic import BaseModel
 from abc import ABC
 
 from swarmstar.database import Database
-from swarmstar.types.base_node import BaseNode
+from swarmstar.objects.base_node import BaseNode
 from swarmstar.constants import collection_to_identifier, collection_to_model
+from swarmstar.swarmstar.enums.database_collection import DatabaseCollection
 
 db = Database()
 
@@ -16,7 +17,7 @@ class BaseTree(ABC, BaseModel):
 
     This class just provides some common functions that are shared by all trees.
     """
-    collection: str # Collection name in the database
+    collection: DatabaseCollection # Collection name in the database
 
     @classmethod
     def get_root_node_id(cls, swarm_id: str) -> str:

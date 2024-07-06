@@ -1,5 +1,6 @@
-from sqlalchemy import Column, String, Text, JSON
+from sqlalchemy import Column, String, Text
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
 
 Base = declarative_base()
 
@@ -8,16 +9,16 @@ class BlockingOperationModel(Base):
     id = Column(String, primary_key=True)
     node_id = Column(String)
     blocking_type = Column(String)
-    args = Column(JSON)
-    context = Column(JSON)
+    args = Column(SQLiteJSON) # Dict[str, Any]
+    context = Column(SQLiteJSON) # Dict[str, Any]
     next_function_to_call = Column(String)
 
 class SpawnOperationModel(Base):
     __tablename__ = 'spawn_operations'
     id = Column(String, primary_key=True)
     action_id = Column(String)
-    message = Column(JSON)
-    context = Column(JSON)
+    goal = Column(SQLiteJSON) 
+    context = Column(SQLiteJSON)
     parent_id = Column(String)
     node_id = Column(String)
 
@@ -26,19 +27,19 @@ class ActionOperationModel(Base):
     id = Column(String, primary_key=True)
     function_to_call = Column(String)
     node_id = Column(String)
-    args = Column(JSON)
+    args = Column(SQLiteJSON)
 
 class TerminationOperationModel(Base):
     __tablename__ = 'termination_operations'
     id = Column(String, primary_key=True)
     terminator_id = Column(String)
     node_id = Column(String)
-    context = Column(JSON)
+    context = Column(SQLiteJSON)
 
-class UserCommunicationOperationModel(Base):
-    __tablename__ = 'user_communication_operations'
+class CommunicationOperationModel(Base):
+    __tablename__ = 'communication_operations'
     id = Column(String, primary_key=True)
     node_id = Column(String)
     message = Column(Text)
-    context = Column(JSON)
+    context = Column(SQLiteJSON)
     next_function_to_call = Column(String)

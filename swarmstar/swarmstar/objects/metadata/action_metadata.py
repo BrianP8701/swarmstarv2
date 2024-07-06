@@ -15,13 +15,13 @@ from enum import Enum
 from typing_extensions import Literal
 from importlib import import_module
 
-from swarmstar.types.metadata.metadata_node import MetadataNode
-from swarmstar.utils.misc.ids import get_available_id
+from swarmstar.objects.metadata.metadata_node import MetadataNode
+from swarmstar.utils.misc.ids import generate_id
 
 T = TypeVar('T', bound='ActionMetadata')
 
 class ActionMetadata(MetadataNode):
-    id: Optional[str] = Field(default_factory=lambda: get_available_id("action_metadata"))
+    id: Optional[str] = Field(default_factory=lambda: generate_id("action_metadata"))
     collection: ClassVar[str] = "action_metadata"
 
     @classmethod

@@ -7,12 +7,11 @@ from pydantic import Field
 
 from swarmstar.swarmstar.enums.actions import ActionEnum
 from swarmstar.swarmstar.enums.termination_policy import TerminationPolicyEnum
-from swarmstar.swarmstar.models.swarm_node import SwarmNodeModel
-from swarmstar.types.base_node import BaseNode
-from swarmstar.utils.misc.ids import get_available_id
+from swarmstar.objects.base_node import BaseNode
+from swarmstar.utils.misc.ids import generate_id
 
 class SwarmNode(BaseNode):
-    id: str = Field(default_factory=lambda: get_available_id("swarm_nodes"))
+    id: str
     collection: ClassVar[str] = "swarm_nodes"
     action: ActionEnum    # Swarm nodes are classified by their action id
     goal: str
@@ -22,7 +21,7 @@ class SwarmNode(BaseNode):
     report: Optional[str] = None                    # We should look at the node and see like, "Okay, thats what this node did." 
     context: Dict[str, Any] = {}          # This is where certain nodes can store extra context about themselves.
 
-    def log(self, log_dict: Dict[str, Any], index_key: List[int] | None = None) -> List[int]:
+    async def log(self, log_dict: Dict[str, Any], index_key: List[int] | None = None) -> List[int]:
         """
         This function appends a log to the developer_logs list in a node or a nested list 
         within developer_logs.
@@ -87,5 +86,5 @@ class SwarmNode(BaseNode):
                         nested_list = nested_list[index]
                     else:
                         raise ValueError("Invalid index_key. Cannot traverse non-list elements.")
-        self.update(self.id, {"logs": self.logs})
+        await self.update(self.id, {"logs": self.logs})
         return return_index_key

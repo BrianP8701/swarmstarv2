@@ -5,7 +5,7 @@ path to take, the router agent will describe what type of action is needed in de
 """
 from typing import List
 
-from swarmstar.types import SpawnOperation
+from swarmstar.objects import SpawnOperation
 from swarmstar.actions.routers.base_router import BaseMetadataTreeRouter
 
 class RouteAction(BaseMetadataTreeRouter):

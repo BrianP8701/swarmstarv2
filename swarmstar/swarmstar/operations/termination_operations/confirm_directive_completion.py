@@ -12,7 +12,7 @@
 """
 from typing import Union
 
-from swarmstar.types import (
+from swarmstar.objects import (
     SpawnOperation,
     TerminationOperation,
     SwarmNode

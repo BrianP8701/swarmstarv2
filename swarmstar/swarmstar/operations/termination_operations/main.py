@@ -1,7 +1,7 @@
 from importlib import import_module
 from typing import Union
 
-from swarmstar.types import (
+from swarmstar.objects import (
     SwarmNode,
     TerminationOperation,
 )

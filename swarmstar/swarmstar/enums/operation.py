@@ -4,5 +4,5 @@ class OperationEnum(str, Enum):
     SPAWN = "spawn"
     TERMINATE = "terminate"
     BLOCKING = "blocking"
-    USER_COMMUNICATION = "user_communication"
+    COMMUNICATION = "communication"
     ACTION = "action"

@@ -5,7 +5,7 @@ are all labeled with descriptions and other metadata.
 In swarmstar we have two metadata trees: action and memory. 
 This allows us to find actions to take, and answers to questions.
 """
-from swarmstar.types.base_tree import BaseTree
+from swarmstar.objects.base_tree import BaseTree
 from swarmstar.database.internal import get_internal_sqlite
 from swarmstar.database import Database
 db = Database()

@@ -3,7 +3,7 @@ The spawn operation will create a new node in the swarm and return an ActionOper
 """
 from typing import List
 
-from swarmstar.types import (
+from swarmstar.objects import (
     SpawnOperation,
     SwarmNode,
     ActionOperation,

@@ -1,11 +1,9 @@
-from typing import Any, Dict, Optional
 from sqlalchemy import Column, String, Boolean, Enum as SQLAlchemyEnum, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
 
 from swarmstar.swarmstar.enums.actions import ActionEnum
 from swarmstar.swarmstar.enums.termination_policy import TerminationPolicyEnum
-from swarmstar.swarmstar.database.sqlite_db import SqliteDatabase
 
 Base = declarative_base()
 

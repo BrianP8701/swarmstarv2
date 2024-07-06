@@ -3,7 +3,7 @@ The spawn operation will create a new node in the swarm, and begin executing the
 """
 from typing import List, Union
 
-from swarmstar.types import (
+from swarmstar.objects import (
     SwarmOperation,
     ActionOperation,
     SwarmNode,

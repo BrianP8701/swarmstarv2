@@ -8,8 +8,8 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 from abc import ABC, abstractmethod
 
-from swarmstar.types.base_action import BaseAction
-from swarmstar.types import (
+from swarmstar.objects.base_action import BaseAction
+from swarmstar.objects import (
     BlockingOperation,
     BaseNode
 )

@@ -8,8 +8,8 @@ Throughout the conversation we maintain a "Conversation State" which is a data s
 from typing import List, Dict, Any
 from pydantic import BaseModel, Field
 
-from swarmstar.types import BlockingOperation, TerminationOperation, UserCommunicationOperation
-from swarmstar.types.base_action import BaseAction
+from swarmstar.objects import BlockingOperation, TerminationOperation, UserCommunicationOperation
+from swarmstar.objects.base_action import BaseAction
 
 class InitialQuestionAskerConversationState(BaseModel):
     questions: List[str] = Field(..., description="List of questions we need answered")

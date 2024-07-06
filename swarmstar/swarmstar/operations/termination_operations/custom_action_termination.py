@@ -6,7 +6,7 @@ This termination operation will:
 """
 from typing import Union
 
-from swarmstar.types import (
+from swarmstar.objects import (
     TerminationOperation,
     ActionOperation,
     SwarmNode,

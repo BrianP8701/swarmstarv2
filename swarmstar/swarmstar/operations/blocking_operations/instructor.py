@@ -4,7 +4,7 @@ a pydantic model and a list of messages, and will return a BlockingOperation
 which will call the next_function_to_call of the node's action with the completion
 and context.
 """
-from swarmstar.types import BlockingOperation, ActionOperation, BaseNode, ActionMetadata
+from swarmstar.objects import BlockingOperation, ActionOperation, BaseNode, ActionMetadata
 from swarmstar.utils.ai import Instructor
 
 instructor = Instructor()

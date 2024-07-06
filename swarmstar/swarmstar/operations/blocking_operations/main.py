@@ -2,7 +2,7 @@ from importlib import import_module
 from typing import List, Union
 import inspect
 
-from swarmstar.types import (
+from swarmstar.objects import (
     BlockingOperation,
     SwarmOperation
 )
