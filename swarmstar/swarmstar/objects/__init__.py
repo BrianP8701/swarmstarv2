@@ -1,11 +1,11 @@
-from .base_node import BaseNode
-from .base_tree import BaseTree
+from .nodes.base_node import BaseNode
+from .trees.base_tree import BaseTree
 
-from .swarm.swarmstar_space import SwarmstarSpace
-from .swarm.swarm_tree import SwarmTree
-from .swarm.swarm_node import SwarmNode
-from .swarm.swarm_operation import SwarmOperation
-from .swarm.operation_types import (
+from .swarmstar_space import SwarmstarSpace
+from .trees.swarm_tree import SwarmTree
+from .nodes.swarm_node import SwarmNode
+from .operations.base_operation import BaseOperation
+from ..types.operation_types import (
     SpawnOperation,
     TerminationOperation,
     BlockingOperation,
@@ -14,18 +14,18 @@ from .swarm.operation_types import (
 )
 
 
-from .metadata.metadata_tree import MetadataTree
-from .metadata.metadata_node import MetadataNode
-from .metadata.action_metadata_tree import ActionMetadataTree
-from .metadata.memory_metadata_tree import MemoryMetadataTree
-from .metadata.action_metadata import (
+from .trees.base_metadata_tree import MetadataTree
+from .nodes.base_metadata_node import BaseMetadataNode
+from .trees.action_metadata_tree import ActionMetadataTree
+from .trees.memory_metadata_tree import MemoryMetadataTree
+from .metadata.action_metadata_node import (
     ActionMetadata,
     InternalActionMetadata,
     InternalActionFolderMetadata,
     ExternalActionMetadata,
     ExternalActionFolderMetadata
 )
-from .metadata.memory_metadata import (
+from .metadata.memory_metadata_node import (
     MemoryMetadata,
     InternalMemoryMetadata,
     InternalMemoryFolderMetadata,

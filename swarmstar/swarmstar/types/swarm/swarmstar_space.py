@@ -27,13 +27,13 @@ from os import environ
 import uuid
 from pydantic import BaseModel, Field
 from typing import Dict, List
-from swarmstar.swarmstar.models.swarmstar_event import SwarmstarEventModel
+from swarmstar.swarmstar.models.swarmstar_event_model import SwarmstarEventModel
 from swarmstar.swarmstar.utils.misc.ids import generate_id
 
-from swarmstar.objects.metadata.memory_metadata_tree import MemoryMetadataTree
-from swarmstar.objects.metadata.action_metadata_tree import ActionMetadataTree
-from swarmstar.objects.swarm.swarm_tree import SwarmTree
-from swarmstar.swarmstar.objects.swarm.swarm_operation import SwarmOperation
+from swarmstar.swarmstar.objects.trees.memory_metadata_tree import MemoryMetadataTree
+from swarmstar.swarmstar.objects.trees.action_metadata_tree import ActionMetadataTree
+from swarmstar.swarmstar.objects.trees.swarm_tree import SwarmTree
+from swarmstar.swarmstar.objects.operations.base_operation import BaseOperation
 
 from swarmstar.database import Database
 
@@ -91,7 +91,7 @@ class SwarmstarSpace(BaseModel):
         if swarmstar_space.memory_count > 0: MemoryMetadataTree.delete(swarm_id)
         
         for i in range(swarmstar_space.operation_count):
-            SwarmOperation.delete(f"{swarm_id}_o{i}")
+            BaseOperation.delete(f"{swarm_id}_o{i}")
 
     @staticmethod
     @contextmanager

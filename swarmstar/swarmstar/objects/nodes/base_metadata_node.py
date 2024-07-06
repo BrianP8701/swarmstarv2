@@ -1,9 +1,9 @@
 from pydantic import Field
 from typing import Optional
 
-from swarmstar.objects.base_node import BaseNode
+from swarmstar.swarmstar.objects.nodes.base_node import BaseNode
 
-class MetadataNode(BaseNode):
+class BaseMetadataNode(BaseNode):
     """
     This is the base class for the nodes that make up the action and memory metadata trees. Metadata trees are data structures that an LLM can navigate.
     """

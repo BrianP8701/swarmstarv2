@@ -1,10 +1,9 @@
 from sqlalchemy import Column, String, Text
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
 
-Base = declarative_base()
+from swarmstar.swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
-class BlockingOperationModel(Base):
+class BlockingOperationModel(BaseSQLAlchemyModel):
     __tablename__ = 'blocking_operations'
     id = Column(String, primary_key=True)
     node_id = Column(String)
@@ -13,7 +12,7 @@ class BlockingOperationModel(Base):
     context = Column(SQLiteJSON) # Dict[str, Any]
     next_function_to_call = Column(String)
 
-class SpawnOperationModel(Base):
+class SpawnOperationModel(BaseSQLAlchemyModel):
     __tablename__ = 'spawn_operations'
     id = Column(String, primary_key=True)
     action_id = Column(String)
@@ -22,21 +21,21 @@ class SpawnOperationModel(Base):
     parent_id = Column(String)
     node_id = Column(String)
 
-class ActionOperationModel(Base):
+class ActionOperationModel(BaseSQLAlchemyModel):
     __tablename__ = 'action_operations'
     id = Column(String, primary_key=True)
     function_to_call = Column(String)
     node_id = Column(String)
     args = Column(SQLiteJSON)
 
-class TerminationOperationModel(Base):
+class TerminationOperationModel(BaseSQLAlchemyModel):
     __tablename__ = 'termination_operations'
     id = Column(String, primary_key=True)
     terminator_id = Column(String)
     node_id = Column(String)
     context = Column(SQLiteJSON)
 
-class CommunicationOperationModel(Base):
+class CommunicationOperationModel(BaseSQLAlchemyModel):
     __tablename__ = 'communication_operations'
     id = Column(String, primary_key=True)
     node_id = Column(String)

@@ -4,11 +4,11 @@ import inspect
 
 from swarmstar.objects import (
     BlockingOperation,
-    SwarmOperation
+    BaseOperation
 )
 
 
-async def blocking(blocking_operation: BlockingOperation) -> Union[SwarmOperation, List[SwarmOperation]]:
+async def blocking(blocking_operation: BlockingOperation) -> Union[BaseOperation, List[BaseOperation]]:
     blocking_operation_type_map = {
         "instructor_completion": "swarmstar.operations.blocking_operations.instructor",
         "openai_completion": "swarmstar.operations.blocking_operations.openai",
@@ -29,8 +29,8 @@ async def blocking(blocking_operation: BlockingOperation) -> Union[SwarmOperatio
     blocking_func = blocking_operation_type_module.blocking
 
     if inspect.iscoroutinefunction(blocking_func):
-        output: SwarmOperation = await blocking_func(blocking_operation)
+        output: BaseOperation = await blocking_func(blocking_operation)
     else:
-        output: SwarmOperation = blocking_func(blocking_operation)
+        output: BaseOperation = blocking_func(blocking_operation)
 
     return output

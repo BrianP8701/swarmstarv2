@@ -8,7 +8,7 @@ from swarmstar.objects import (
     SwarmNode,
     ActionOperation,
     ActionMetadata,
-    SwarmOperation
+    BaseOperation
 )
 
 def spawn(spawn_operation: SpawnOperation) ->  List[ActionOperation]:
@@ -61,4 +61,4 @@ def _update_spawn_operation(spawn_operation: SpawnOperation, node_id: str) -> No
     Update node_id attr in spawn_operation
     """
     spawn_operation.node_id = node_id
-    SwarmOperation.update(spawn_operation)
+    BaseOperation.update(spawn_operation)

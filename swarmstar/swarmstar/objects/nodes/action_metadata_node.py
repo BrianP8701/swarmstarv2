@@ -15,14 +15,14 @@ from enum import Enum
 from typing_extensions import Literal
 from importlib import import_module
 
-from swarmstar.objects.metadata.metadata_node import MetadataNode
+from swarmstar.swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 from swarmstar.utils.misc.ids import generate_id
 
 T = TypeVar('T', bound='ActionMetadata')
 
-class ActionMetadata(MetadataNode):
+class ActionMetadataNode(BaseMetadataNode):
     id: Optional[str] = Field(default_factory=lambda: generate_id("action_metadata"))
-    collection: ClassVar[str] = "action_metadata"
+    __table__: ClassVar[str] = "action_metadata"
 
     @classmethod
     def get(cls: Type[T], action_id: str) -> T:
@@ -45,7 +45,7 @@ class ActionMetadata(MetadataNode):
     @staticmethod
     def get_action_class(action_id: str):
         """ Returns an uninstantiated action class. """
-        action_metadata = ActionMetadata.get(action_id)
+        action_metadata = ActionMetadataNode.get(action_id)
         if action_metadata.is_folder:
             raise ValueError(f"You tried to get the action class of a folder {action_id}.")
         
@@ -60,7 +60,7 @@ class ActionMetadata(MetadataNode):
     @staticmethod
     def get_action_module(action_id: str):
         """ Returns the module of the action. """
-        action_metadata = ActionMetadata.get(action_id)
+        action_metadata = ActionMetadataNode.get(action_id)
         if action_metadata.is_folder:
             raise ValueError(f"You tried to get the action module of a folder {action_id}.")
         
@@ -71,7 +71,7 @@ class ActionMetadata(MetadataNode):
         else:
             raise ValueError(f"External actions are not supported yet.")
 
-class InternalActionMetadata(ActionMetadata):
+class InternalActionMetadata(ActionMetadataNode):
     is_folder: Literal[False] = Field(default=False)
     internal: Literal[True] = Field(default=True)
     children_ids: Optional[List[str]] = Field(default=None)
@@ -79,17 +79,17 @@ class InternalActionMetadata(ActionMetadata):
     termination_policy: Literal["simple", "confirm_directive_completion"] = Field(default="simple")
     internal_file_path: str
 
-class InternalActionFolderMetadata(ActionMetadata):
+class InternalActionFolderMetadata(ActionMetadataNode):
     is_folder: Literal[True] = Field(default=True)
     internal: Literal[True] = Field(default=True)
 
-class ExternalActionMetadata(ActionMetadata):
+class ExternalActionMetadata(ActionMetadataNode):
     is_folder: Literal[False] = Field(default=False)
     internal: Literal[False] = Field(default=False)
     children_ids: Optional[List[str]] = Field(default=None)
     parent_id: str
     termination_policy: Literal["simple", "confirm_directive_completion"] = Field(default="simple")
 
-class ExternalActionFolderMetadata(ActionMetadata):
+class ExternalActionFolderMetadata(ActionMetadataNode):
     is_folder: Literal[True] = Field(default=True)
     internal: Literal[False] = Field(default=False)

@@ -1,45 +1,48 @@
 from sqlalchemy import event
 from sqlalchemy.orm import Session
+from sqlalchemy.schema import Table
+import asyncio
+from swarmstar.swarmstar.enums.database_table import DatabaseTable
 
-from swarmstar.swarmstar.models.swarm_node import SwarmNodeModel
-from swarmstar.swarmstar.models.swarm_operations import (
-    BlockingOperationModel, 
-    SpawnOperationModel, 
-    ActionOperationModel,
-    TerminationOperationModel, 
-    UserCommunicationOperationModel
+from swarmstar.swarmstar.models.swarmstar_event_model import SwarmstarEventModel
+from swarmstar.swarmstar.utils.misc.ids import (
+    extract_swarm_id, 
+    generate_id, 
+    get_table_name_from_id
 )
-from swarmstar.swarmstar.models.swarmstar_space import SwarmstarSpaceModel
-from swarmstar.swarmstar.models.swarmstar_event import SwarmstarEventModel
-from swarmstar.swarmstar.utils.misc.ids import extract_swarm_id
+from swarmstar.swarmstar.constants import (
+    TABLE_ENUMS_TO_LISTEN_TO, 
+    TABLE_ENUM_TO_MODEL_CLASS
+)
+from swarmstar.database import Database
 
-all_models_excluding_history = [
-    SwarmNodeModel, 
-    SwarmstarSpaceModel, 
-    SpawnOperationModel, 
-    TerminationOperationModel, 
-    BlockingOperationModel, 
-    UserCommunicationOperationModel, 
-    ActionOperationModel
-]
+db = Database()
 
-def log_change(mapper, connection, target):
-    session = Session.object_session(target)
-    swarmstar_space_id = extract_swarm_id(target.id)
-    swarmstar_space = session.query(SwarmstarSpaceModel).filter_by(id=swarmstar_space_id).one()
-    swarmstar_space.total_event_count += 1  # Increment event_count in SwarmstarSpaceModel
+def log_swarmwstar_event_sync(mapper, connection, target):
+    loop = asyncio.get_event_loop()
+    event_name = connection.info.get('event_name')
+    loop.run_until_complete(log_swarmstar_event(mapper, connection, target, event_name))
+
+async def log_swarmstar_event(mapper, connection, target: Table, event_name: str):
+    target_id = getattr(target, 'id', None)
+    if target_id is None:
+        return
+    swarmstar_space_id = extract_swarm_id(target_id)
+    table_name = get_table_name_from_id(target_id)
+
+    id = generate_id(DatabaseTable.SWARMSTAR_EVENTS, swarmstar_space_id)
     history_entry = SwarmstarEventModel(
-        event_count=swarmstar_space.total_event_count,
-        swarmstar_space_id=swarmstar_space_id,
-        operation='update',  # or 'insert', 'delete', etc.
+        id=id,
+        operation=event_name,
         data=target.__dict__.copy(),
-        model_name=target.__class__.__name__
+        model_name=table_name
     )
-    if session:
-        session.add(history_entry)
-        session.commit()
 
-for model in all_models_excluding_history:
-    event.listen(model, 'after_insert', log_change)
-    event.listen(model, 'after_update', log_change)
-    event.listen(model, 'after_delete', log_change)
+    async with db.get_session() as session:
+        await db.create(history_entry, session)
+        await session.commit()
+
+for table_enum in TABLE_ENUMS_TO_LISTEN_TO:
+    event.listen(TABLE_ENUM_TO_MODEL_CLASS[table_enum], 'after_insert', log_swarmwstar_event_sync, named=True)
+    event.listen(TABLE_ENUM_TO_MODEL_CLASS[table_enum], 'after_update', log_swarmwstar_event_sync, named=True)
+    event.listen(TABLE_ENUM_TO_MODEL_CLASS[table_enum], 'after_delete', log_swarmwstar_event_sync, named=True)

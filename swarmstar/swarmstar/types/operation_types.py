@@ -1,9 +1,9 @@
 from pydantic import Field
 from typing import Literal, Dict, Any, Union, Optional
 
-from swarmstar.swarmstar.objects.swarm.swarm_operation import SwarmOperation
+from swarmstar.swarmstar.objects.operations.base_operation import BaseOperation
 
-class BlockingOperation(SwarmOperation):
+class BlockingOperation(BaseOperation):
     operation_type: Literal["blocking"] = Field(default="blocking")
     node_id: str
     blocking_type: Literal[
@@ -16,7 +16,7 @@ class BlockingOperation(SwarmOperation):
     next_function_to_call: str
 
 
-class SpawnOperation(SwarmOperation):
+class SpawnOperation(BaseOperation):
     operation_type: Literal["spawn"] = Field(default="spawn")
     action_id: str
     message: Union[str, Dict[str, Any]]
@@ -25,21 +25,21 @@ class SpawnOperation(SwarmOperation):
     node_id: Optional[str] = None
 
 
-class ActionOperation(SwarmOperation):
+class ActionOperation(BaseOperation):
     operation_type: Literal["action"] = Field(default="action")
     function_to_call: str
     node_id: str
     args: Dict[str, Any] = {}
 
 
-class TerminationOperation(SwarmOperation):
+class TerminationOperation(BaseOperation):
     operation_type: Literal["terminate"] = Field(default="terminate")
     terminator_id: str
     node_id: str
     context: Optional[Dict[str, Any]] = None
 
 
-class CommunicationOperation(SwarmOperation):
+class CommunicationOperation(BaseOperation):
     operation_type: Literal["communication"] = Field(default="communication")
     node_id: str
     message: str

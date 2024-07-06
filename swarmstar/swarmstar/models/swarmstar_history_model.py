@@ -1,19 +1,16 @@
 from sqlalchemy import Column, String, Integer, JSON, Enum as SQLAlchemyEnum
-from sqlalchemy.ext.declarative import declarative_base
 from contextlib import contextmanager
 
-from swarmstar.swarmstar.enums.database_collection import DatabaseCollection
+from swarmstar.swarmstar.enums.database_table import DatabaseTable
+from swarmstar.swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
-Base = declarative_base()
-
-
-class SwarmstarHistoryModel(Base):
+class SwarmstarHistoryModel(BaseSQLAlchemyModel):
     __tablename__ = 'swarmstar_history'
     id = Column(Integer, primary_key=True, autoincrement=True)
     swarmstar_space_id = Column(String)
     operation = Column(String)  # e.g., 'update', 'delete', etc.
     data = Column(JSON)  # Store the state of the model after the operation
-    model_name = Column(SQLAlchemyEnum(DatabaseCollection), nullable=False)  # Name of the model being changed
+    model_name = Column(SQLAlchemyEnum(DatabaseTable), nullable=False)  # Name of the model being changed
 
     @staticmethod
     @contextmanager

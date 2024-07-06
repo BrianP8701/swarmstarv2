@@ -2,7 +2,7 @@
 If your using swarmstar, this is the only file you need to import and interact with.
 
 First of all, make sure to have your .env file set up. You can use the .env.example file as a template.
-Then, simply instantiate the Swarmstar class with an id and goal. This will create a new swarmstar space in MongoDB and the first operation.
+Then, simply instantiate the Swarmstar class with a goal. This will create a new swarmstar space in MongoDB and the first operation.
 Following that, just keep feeding operations into the execute function and it will return the next operations to be executed.
 
 Keep in mind that you shouldn't pass UserCommunication operations into the execute function. 
@@ -11,8 +11,9 @@ I've provided a template for how you may handle those in the user_communication_
 from typing import List, Union
 import inspect
 
+from swarmstar.utils.logger_config import setup_logging
 from swarmstar.objects import (
-    SwarmOperation,
+    BaseOperation,
     SpawnOperation,
     SwarmstarSpace
 )
@@ -22,7 +23,8 @@ from swarmstar.operations import (
     terminate,
     execute_action
 )
-from swarmstar.context import swarm_id_var
+
+setup_logging()
 
 class Swarmstar:
     def __init__(self, swarm_id: str):
@@ -37,10 +39,10 @@ class Swarmstar:
             message=goal
         )
 
-        SwarmOperation.create(root_spawn_operation)
+        BaseOperation.create(root_spawn_operation)
         return root_spawn_operation
 
-    async def execute(self, swarm_operation: SwarmOperation) -> Union[List[SwarmOperation], None]:
+    async def execute(self, swarm_operation: BaseOperation) -> Union[List[BaseOperation], None]:
         """
         This function is the main entry point for the swarmstar library. It takes in a swarm configuration and a swarm operation
         and returns a list of swarm operations that should be executed next.
@@ -72,13 +74,13 @@ class Swarmstar:
 
         if output is None:
             return None
-        elif isinstance(output, SwarmOperation):
+        elif isinstance(output, BaseOperation):
             output = [output]
         elif not isinstance(output, list):
             raise ValueError(f"Unexpected return type from operation_func: {type(output)}")
 
         for operation in output:
-            SwarmOperation.create(operation)
+            BaseOperation.create(operation)
 
         return output        
 

@@ -17,7 +17,7 @@ from pydantic import BaseModel
 
 from swarmstar.swarmstar.enums.actions import ActionEnum
 from swarmstar.swarmstar.enums.termination_policy import TerminationPolicyEnum
-from swarmstar.objects import SwarmOperation, SwarmNode, ActionMetadata, SpawnOperation, BlockingOperation
+from swarmstar.objects import BaseOperation, SwarmNode, ActionMetadata, SpawnOperation, BlockingOperation
 
 class BaseAction(BaseModel):
     """
@@ -27,7 +27,7 @@ class BaseAction(BaseModel):
     action: ActionEnum
 
     @abstractmethod
-    def main(self) -> List[SwarmOperation]:
+    def main(self) -> List[BaseOperation]:
         pass        
 
     def report(self, report: str):

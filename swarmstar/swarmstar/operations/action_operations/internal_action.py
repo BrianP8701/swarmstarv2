@@ -1,9 +1,9 @@
 from importlib import import_module
 from typing import List, Union
 
-from swarmstar.objects import SwarmOperation, ActionOperation, SwarmNode, ActionMetadata
+from swarmstar.objects import BaseOperation, ActionOperation, SwarmNode, ActionMetadata
 
-def execute_action(action_operation: ActionOperation) -> Union[SwarmOperation, List[SwarmOperation]]:
+def execute_action(action_operation: ActionOperation) -> Union[BaseOperation, List[BaseOperation]]:
     """
     This handles actions that are internal to swarmstar.
     """

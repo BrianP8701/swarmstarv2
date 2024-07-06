@@ -3,16 +3,14 @@ The swarm consists of nodes. Each node is given a goal
 and a preassigned action they will execute.
 """
 from typing import Any, Dict, List, Optional, ClassVar
-from pydantic import Field
 
 from swarmstar.swarmstar.enums.actions import ActionEnum
 from swarmstar.swarmstar.enums.termination_policy import TerminationPolicyEnum
-from swarmstar.objects.base_node import BaseNode
-from swarmstar.utils.misc.ids import generate_id
+from swarmstar.swarmstar.objects.nodes.base_node import BaseNode
 
 class SwarmNode(BaseNode):
     id: str
-    collection: ClassVar[str] = "swarm_nodes"
+    __table__: ClassVar[str] = "swarm_nodes"
     action: ActionEnum    # Swarm nodes are classified by their action id
     goal: str
     alive: bool = True

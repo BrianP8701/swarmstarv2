@@ -2,26 +2,24 @@ from pydantic import BaseModel
 from abc import ABC
 
 from swarmstar.database import Database
-from swarmstar.objects.base_node import BaseNode
-from swarmstar.constants import collection_to_identifier, collection_to_model
-from swarmstar.swarmstar.enums.database_collection import DatabaseCollection
+from swarmstar.swarmstar.objects.nodes.base_node import BaseNode
+from swarmstar.constants import TABLE_ENUM_TO_ABBREVIATION, TABLE_ENUM_TO_MODEL_CLASS
+from swarmstar.swarmstar.enums.database_table import DatabaseTable
 
 db = Database()
 
 class BaseTree(ABC, BaseModel):
     """
     We use trees quite a lot in swarmstar. The actual swarm's nodes are stored in a tree.
-    Actions and memory are stored in a tree. The tree is a very useful data structure for
+    Action and memory metadata are stored in a tree. The tree is a very useful data structure for
     organizing data in a way that's easy to traverse and understand. It's also naturally
     efficient and scalable.
-
-    This class just provides some common functions that are shared by all trees.
     """
-    collection: DatabaseCollection # Collection name in the database
+    __table__: DatabaseTable
 
     @classmethod
     def get_root_node_id(cls, swarm_id: str) -> str:
-        return f"{swarm_id}_{collection_to_identifier[cls.collection]}0"
+        return f"{swarm_id}_{TABLE_ENUM_TO_ABBREVIATION[cls.__table__]}0"
 
     @classmethod
     def clone(cls, old_swarm_id: str, swarm_id: str) -> None:
@@ -54,9 +52,9 @@ class BaseTree(ABC, BaseModel):
         recursive_helper(root_node_id)
 
         if batch_copy_payload:
-            db.batch_copy(collection_to_model[cls.collection], batch_copy_payload[0], batch_copy_payload[1])
+            db.batch_copy(TABLE_ENUM_TO_MODEL_CLASS[cls.__table__], batch_copy_payload[0], batch_copy_payload[1])
         if batch_update_payload:
-            db.batch_update(collection_to_model[cls.collection], batch_update_payload)
+            db.batch_update(TABLE_ENUM_TO_MODEL_CLASS[cls.__table__], batch_update_payload)
 
     @classmethod
     def delete(cls, swarm_id: str) -> None:
@@ -75,4 +73,4 @@ class BaseTree(ABC, BaseModel):
         recursive_helper(root_node_id)
         
         if batch_delete_payload:
-            db.batch_delete(collection_to_model[cls.collection], batch_delete_payload)
+            db.batch_delete(TABLE_ENUM_TO_MODEL_CLASS[cls.__table__], batch_delete_payload)

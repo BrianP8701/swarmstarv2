@@ -1,39 +1,51 @@
 """
-For simplicity, swarm nodes, operation, memory and action metadata have ids like:
+For simplicity, nodes and operations have ids like:
 
     {swarm_id}_{x}{y}
 
-Where x represents the node's collection, and y represents the node's index within that collection.
+Where x represents the table storing the object, and y represents the object's index within that table.
 """
-import re
 import uuid
+from typing import Optional
 
 from swarmstar.database import Database
-from swarmstar.swarmstar.enums.database_collection import DatabaseCollection
-from swarmstar.swarmstar.constants import collection_to_identifier, collection_to_swarmstar_space_count_column
-from swarmstar.swarmstar.models.swarmstar_space import SwarmstarSpaceModel
+from swarmstar.swarmstar.enums.database_table import DatabaseTable
+from swarmstar.swarmstar.constants import (
+    SWARM_ID_LENGTH, 
+    TABLE_ENUM_TO_ABBREVIATION, 
+    TABLE_ENUM_TO_SWARMSTAR_SPACE_COUNT_COLUMN,
+    TABLE_ABBREVIATION_TO_ENUM,
+    TABLE_ENUM_TO_TABLE_NAME
+)
+from swarmstar.swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
 
 db = Database()
 
-def generate_id(collection: DatabaseCollection, swarm_id: str | None = None) -> str:
+async def generate_id(table: DatabaseTable, swarm_id: Optional[str] = None) -> str:
     """
     SwarmstarSpace uses uuidv4()
     All other models follow the schema:
-    {swarm_id}_{collection}_{x}
+    {swarm_id}_{table}_{x}
     """
-    if collection == DatabaseCollection.SWARMSTAR_SPACE:
+    if table == DatabaseTable.SWARMSTAR_SPACE:
         return uuid.uuid4().hex
     if swarm_id is None:
-        raise ValueError(f"swarm_id is required to create an id for {collection}")
-    identifier = collection_to_identifier[collection]
-    count_column_name = collection_to_swarmstar_space_count_column[collection]
-    with db.get_session() as session:
-        x = db.select(SwarmstarSpaceModel, swarm_id, [count_column_name], session)[count_column_name]
-        db.update(SwarmstarSpaceModel, swarm_id, {count_column_name: (x + 1)}, session)
+        raise ValueError(f"swarm_id is required to create an id for {table}")
+    identifier = TABLE_ENUM_TO_ABBREVIATION[table]
+    count_column_name = TABLE_ENUM_TO_SWARMSTAR_SPACE_COUNT_COLUMN[table]
+    async with db.get_session() as session:
+        result = await db.select(SwarmstarSpaceModel, swarm_id, [count_column_name], session)
+        x = result[count_column_name]
+        await db.update(SwarmstarSpaceModel, swarm_id, {count_column_name: (x + 1)}, session)
     return f"{swarm_id}_{identifier}{x}"
 
-def extract_swarm_id(full_id: str) -> str:
-    match = re.match(r"^(.*)_[a-z]\d+$", full_id)
-    if match:
-        return match.group(1)
-    return full_id
+def extract_swarm_id(id: str) -> str:
+    return id[:SWARM_ID_LENGTH]
+
+def get_table_enum_from_id(id: str) -> DatabaseTable:
+    table_identifier = id[SWARM_ID_LENGTH+2:SWARM_ID_LENGTH+4]
+    return TABLE_ABBREVIATION_TO_ENUM[table_identifier]
+
+def get_table_name_from_id(id: str) -> str:
+    table_enum = get_table_enum_from_id(id)
+    return TABLE_ENUM_TO_TABLE_NAME[table_enum]

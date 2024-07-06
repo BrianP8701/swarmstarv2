@@ -4,14 +4,14 @@ The spawn operation will create a new node in the swarm, and begin executing the
 from typing import List, Union
 
 from swarmstar.objects import (
-    SwarmOperation,
+    BaseOperation,
     ActionOperation,
     SwarmNode,
     ActionMetadata
 )
 from swarmstar.operations.action_operations.internal_action import execute_action as execute_internal_action
 
-def execute_action(action_operation: ActionOperation) -> Union[SwarmOperation, List[SwarmOperation]]:
+def execute_action(action_operation: ActionOperation) -> Union[BaseOperation, List[BaseOperation]]:
     """
     Handles the action and returns the next set of operations
     to perform.

@@ -1,13 +1,11 @@
 from sqlalchemy import Column, String, Boolean, Enum as SQLAlchemyEnum, Text
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
 
 from swarmstar.swarmstar.enums.actions import ActionEnum
 from swarmstar.swarmstar.enums.termination_policy import TerminationPolicyEnum
+from swarmstar.swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
-Base = declarative_base()
-
-class SwarmNodeModel(Base):
+class SwarmNodeModel(BaseSQLAlchemyModel):
     __tablename__ = 'swarm_nodes'
 
     id = Column(String, primary_key=True)

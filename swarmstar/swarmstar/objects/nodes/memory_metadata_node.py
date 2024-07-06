@@ -9,13 +9,13 @@ from pydantic import Field
 from typing_extensions import Literal
 
 from swarmstar.objects.metadata.memory_types import MemoryType
-from swarmstar.objects.metadata.metadata_node import MetadataNode
+from swarmstar.swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 from swarmstar.utils.misc.ids import generate_id
 
 T = TypeVar('T', bound='MemoryMetadata')
 
-class MemoryMetadata(MetadataNode):
-    collection: ClassVar[str] = "memory_metadata"
+class MemoryMetadataNode(BaseMetadataNode):
+    __table__: ClassVar[str] = "memory_metadata"
     id: Optional[str] = Field(default_factory=lambda: generate_id("memory_metadata"))
     type: MemoryType # These define the type of the underlying data. Each type has tools to better navigate the data
 
@@ -36,24 +36,24 @@ class MemoryMetadata(MetadataNode):
             else:
                 return ExternalMemoryMetadata(**memory_metadata_dict)
 
-class InternalMemoryMetadata(MemoryMetadata):
+class InternalMemoryMetadata(MemoryMetadataNode):
     is_folder: Literal[False] = Field(default=False)
     internal: Literal[True] = Field(default=True)
     children_ids: Optional[List[str]] = Field(default=None)
     parent_id: str
 
-class InternalMemoryFolderMetadata(MemoryMetadata):
+class InternalMemoryFolderMetadata(MemoryMetadataNode):
     is_folder: Literal[True] = Field(default=True)
     internal: Literal[True] = Field(default=True)
     children_ids: List[str]
 
-class ExternalMemoryMetadata(MemoryMetadata):
+class ExternalMemoryMetadata(MemoryMetadataNode):
     is_folder: Literal[False] = Field(default=False)
     internal: Literal[False] = Field(default=False)
     children_ids: Optional[List[str]] = Field(default=None)
     parent_id: str
 
-class ExternalMemoryFolderMetadata(MemoryMetadata):
+class ExternalMemoryFolderMetadata(MemoryMetadataNode):
     is_folder: Literal[True] = Field(default=True)
     internal: Literal[False] = Field(default=False)
     children_ids: List[str]

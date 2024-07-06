@@ -5,7 +5,7 @@ are all labeled with descriptions and other metadata.
 In swarmstar we have two metadata trees: action and memory. 
 This allows us to find actions to take, and answers to questions.
 """
-from swarmstar.objects.base_tree import BaseTree
+from swarmstar.swarmstar.objects.trees.base_tree import BaseTree
 from swarmstar.database.internal import get_internal_sqlite
 from swarmstar.database import Database
 db = Database()
@@ -36,10 +36,10 @@ class MetadataTree(BaseTree):
         And whenever we see a portal node, we'll know, just prepend the swarm_id and check
         the external database.
         """
-        print(f"Instantiating {cls.collection} tree for swarm {swarm_id}...")
+        print(f"Instantiating {cls.__table__} tree for swarm {swarm_id}...")
         
         internal_root_node_id = "root"
-        node = get_internal_sqlite(cls.collection, internal_root_node_id)
+        node = get_internal_sqlite(cls.__table__, internal_root_node_id)
 
         batch_create_payload = {} # {new_node_id: new_node}
 
@@ -49,9 +49,9 @@ class MetadataTree(BaseTree):
                 batch_create_payload[node_id] = node
             if node.get("children_ids", None):
                 for child_id in node["children_ids"]:
-                    child_node = get_internal_sqlite(cls.collection, child_id)
+                    child_node = get_internal_sqlite(cls.__table__, child_id)
                     recursive_helper(child_node)
 
         recursive_helper(node)
 
-        if batch_create_payload: db.batch_create(cls.collection, batch_create_payload)
+        if batch_create_payload: db.batch_create(cls.__table__, batch_create_payload)

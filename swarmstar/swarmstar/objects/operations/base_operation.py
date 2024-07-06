@@ -16,10 +16,9 @@ from swarmstar.swarmstar.enums.operation import OperationEnum
 from swarmstar.swarmstar.objects.base_object import BaseObject
 from swarmstar.utils.misc.ids import generate_id
 from swarmstar.database import Database
-from swarmstar.constants import operation_enum_to_class, operation_enum_to_model
 
 db = Database()
 
-class SwarmOperation(BaseObject, ABC):
+class BaseOperation(BaseObject, ABC):
     id: str
     operation_type: OperationEnum
