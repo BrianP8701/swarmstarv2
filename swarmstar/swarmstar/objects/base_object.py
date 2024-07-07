@@ -1,20 +1,23 @@
 import asyncio
-from typing import Any, Dict, List, Optional, Type, TypeVar
-from pydantic import BaseModel, Field
+from typing import Any, Dict, List, Optional, Type, TypeVar, ClassVar, Generic
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from swarmstar.swarmstar.enums.database_table import DatabaseTable
+from swarmstar.swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 from swarmstar.swarmstar.utils.misc.ids import generate_id
 from swarmstar.database import Database
-from swarmstar.constants import TABLE_ENUM_TO_MODEL_CLASS
 
 db = Database()
 
 T = TypeVar('T', bound='BaseObject')
 
-class BaseObject(BaseModel):
+class BaseObject(BaseModel, Generic[T]):
+    __table__: ClassVar[DatabaseTable] = Field(exclude=True)
+    __object_model__: ClassVar[BaseSQLAlchemyModel] = Field(exclude=True)
     id: str = ''
-    __table__: DatabaseTable = Field(exclude=True)
+
+    model_config = ConfigDict(use_enum_values=True)
 
     def __init__(self, swarm_id: Optional[str] = None, **data: Any):
         super().__init__(**data)
@@ -22,44 +25,49 @@ class BaseObject(BaseModel):
             self.id = asyncio.run(generate_id(self.__table__, swarm_id))
 
     async def create(self, session: Optional[AsyncSession] = None) -> None:
-        await db.create(TABLE_ENUM_TO_MODEL_CLASS[self.__table__](**self.model_dump()), session)
+        await db.create(self.__object_model__(**self.model_dump()), session)
 
     @classmethod
     async def read(cls: Type[T], id: str, session: Optional[AsyncSession] = None) -> T:
-        node_dict = await db.read(TABLE_ENUM_TO_MODEL_CLASS[cls.__table__], id, session)
-        return cls(**node_dict.__dict__)
+        model = await db.read(cls.__object_model__, id, session)
+        return cls(**model.__dict__)
 
     @classmethod
-    async def update(cls, id: str, data: Dict[str, Any], session: Optional[AsyncSession] = None) -> None:
-        await db.update(TABLE_ENUM_TO_MODEL_CLASS[cls.__table__], id, data, session)
+    async def update(cls: Type[T], id: str, data: Dict[str, Any], session: Optional[AsyncSession] = None) -> None:
+        await db.update(cls.__object_model__, id, data, session)
 
     @classmethod
-    async def delete(cls, id: str, session: Optional[AsyncSession] = None) -> None:
-        await db.delete(TABLE_ENUM_TO_MODEL_CLASS[cls.__table__], id, session)
+    async def delete(cls: Type[T], id: str, session: Optional[AsyncSession] = None) -> None:
+        await db.delete(cls.__object_model__, id, session)
 
     async def upsert(self, session: Optional[AsyncSession] = None) -> None:
-        await db.upsert(TABLE_ENUM_TO_MODEL_CLASS[self.__table__](**self.model_dump()), session)
+        await db.upsert(self.__object_model__(**self.model_dump()), session)
 
     @classmethod
-    async def select(cls, id: str, columns: List[str], session: Optional[AsyncSession] = None) -> Dict[str, Any]:
-        return await db.select(TABLE_ENUM_TO_MODEL_CLASS[cls.__table__], id, columns, session)
+    async def select(cls: Type[T], id: str, columns: List[str], session: Optional[AsyncSession] = None) -> Dict[str, Any]:
+        return await db.select(cls.__object_model__, id, columns, session)
 
     @classmethod
-    async def exists(cls, id: str, session: Optional[AsyncSession] = None) -> bool:
-        return await db.exists(TABLE_ENUM_TO_MODEL_CLASS[cls.__table__], id, session)
+    async def exists(cls: Type[T], id: str, session: Optional[AsyncSession] = None) -> bool:
+        return await db.exists(cls.__object_model__, id, session)
 
     @classmethod
-    async def batch_create(cls, models: List[T], session: Optional[AsyncSession] = None) -> None:
-        await db.batch_create([TABLE_ENUM_TO_MODEL_CLASS[cls.__table__](**model.model_dump()) for model in models], session)
+    async def batch_create(cls: Type[T], models: List[T], session: Optional[AsyncSession] = None) -> None:
+        await db.batch_create([cls.__object_model__(**model.model_dump()) for model in models], session)
 
     @classmethod
-    async def batch_update(cls, models: List[Dict[str, Any]], session: Optional[AsyncSession] = None) -> None:
-        await db.batch_update(TABLE_ENUM_TO_MODEL_CLASS[cls.__table__], models, session)
+    async def batch_read(cls: Type[T], ids: List[str], session: Optional[AsyncSession] = None) -> List[T]:
+        models = await db.batch_read(cls.__object_model__, ids, session)
+        return [cls(**model.__dict__) for model in models]
 
     @classmethod
-    async def batch_delete(cls, ids: List[str], session: Optional[AsyncSession] = None) -> None:
-        await db.batch_delete(TABLE_ENUM_TO_MODEL_CLASS[cls.__table__], ids, session)
+    async def batch_update(cls: Type[T], models: List[Dict[str, Any]], session: Optional[AsyncSession] = None) -> None:
+        await db.batch_update(cls.__object_model__, models, session)
 
     @classmethod
-    async def batch_copy(cls, old_ids: List[str], new_ids: List[str], session: Optional[AsyncSession] = None) -> None:
-        await db.batch_copy(TABLE_ENUM_TO_MODEL_CLASS[cls.__table__], old_ids, new_ids, session)
+    async def batch_delete(cls: Type[T], ids: List[str], session: Optional[AsyncSession] = None) -> None:
+        await db.batch_delete(cls.__object_model__, ids, session)
+
+    @classmethod
+    async def batch_copy(cls: Type[T], old_ids: List[str], new_ids: List[str], session: Optional[AsyncSession] = None) -> None:
+        await db.batch_copy(cls.__object_model__, old_ids, new_ids, session)

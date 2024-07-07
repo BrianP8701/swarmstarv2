@@ -4,21 +4,16 @@ Nodes can perform 1 of 5 "SwarmOperations":
     - ActionOperation
     - TerminationOperation
     - BlockingOperation
-    - UserCommunicationOperation
+    - CommunicationOperation
 """
-from __future__ import annotations
-from typing import Any, Dict, Literal, Optional, Union
-from pydantic import BaseModel, Field
-from pydantic import ValidationError
-from abc import ABC, abstractmethod
+from typing import Any, Dict
+from abc import ABC
 
-from swarmstar.swarmstar.enums.operation import OperationEnum
 from swarmstar.swarmstar.objects.base_object import BaseObject
-from swarmstar.utils.misc.ids import generate_id
-from swarmstar.database import Database
-
-db = Database()
+from swarmstar.swarmstar.objects.nodes.swarm_node import SwarmNode
 
 class BaseOperation(BaseObject, ABC):
-    id: str
-    operation_type: OperationEnum
+    swarm_node_id: str
+    context: Dict[str, Any] = {}
+
+    swarm_node: SwarmNode

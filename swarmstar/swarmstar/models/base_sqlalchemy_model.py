@@ -1,7 +1,6 @@
 from sqlalchemy import Column, String
 from sqlalchemy.ext.declarative import declarative_base
-from abc import ABC, abstractmethod
-from typing import Dict, Any
+from abc import ABC
 
 Base = declarative_base()
 

@@ -1,20 +1,24 @@
-"""
-Base class for nodes.
-
-Swarm nodes, action metadata nodes and memory metadata nodes are all derived from this class.
-"""
-from pydantic import ConfigDict
-from typing import List, Optional, TypeVar
+from typing import List, Optional, TypeVar, Generic
 
 from swarmstar.swarmstar.objects.base_object import BaseObject
 
 T = TypeVar('T', bound='BaseNode')
 
-class BaseNode(BaseObject):
+class BaseNode(BaseObject, Generic[T]):
     """ Base class for nodes. """
-    id: str
     name: str
-    type: str
     parent_id: Optional[str] = None
-    children_ids: Optional[List[str]] = None
-    model_config = ConfigDict(use_enum_values=True)
+    children_ids: List[str] = []
+
+    children: List[T] = []
+    parent: Optional[T] = None
+
+    async def get_parent(self) -> Optional[T]:
+        if self.parent_id:
+            return await self.read(self.parent_id)
+        return None
+
+    async def get_children(self) -> List[T]:
+        if self.children_ids:
+            return await self.batch_read(self.children_ids)
+        return []

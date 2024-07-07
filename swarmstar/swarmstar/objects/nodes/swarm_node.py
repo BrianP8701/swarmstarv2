@@ -2,18 +2,22 @@
 The swarm consists of nodes. Each node is given a goal
 and a preassigned action they will execute.
 """
-from typing import Any, Dict, List, Optional, ClassVar
+from typing import Any, Dict, List, Optional
 
 from swarmstar.swarmstar.enums.actions import ActionEnum
+from swarmstar.swarmstar.enums.database_table import DatabaseTable
 from swarmstar.swarmstar.enums.termination_policy import TerminationPolicyEnum
+from swarmstar.swarmstar.models.swarm_node_model import SwarmNodeModel
 from swarmstar.swarmstar.objects.nodes.base_node import BaseNode
 
 class SwarmNode(BaseNode):
-    id: str
-    __table__: ClassVar[str] = "swarm_nodes"
+    __table__ = DatabaseTable.SWARM_NODES
+    __object_model__ = SwarmNodeModel
+
     action: ActionEnum    # Swarm nodes are classified by their action id
     goal: str
     alive: bool = True
+    active: bool = True
     termination_policy: TerminationPolicyEnum = TerminationPolicyEnum.SIMPLE
     logs: List[Any] = []              # Logs storing all messages sent to and received from an ai throughout the action's execution.
     report: Optional[str] = None                    # We should look at the node and see like, "Okay, thats what this node did." 

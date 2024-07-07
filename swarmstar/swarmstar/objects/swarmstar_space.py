@@ -26,7 +26,9 @@ from contextlib import contextmanager
 import uuid
 from pydantic import Field
 from typing import Dict, List
+from swarmstar.swarmstar.enums.database_table import DatabaseTable
 from swarmstar.swarmstar.models.swarmstar_event_model import SwarmstarEventModel
+from swarmstar.swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
 from swarmstar.swarmstar.objects.base_object import BaseObject
 
 from swarmstar.swarmstar.objects.trees.memory_metadata_tree import MemoryMetadataTree
@@ -39,6 +41,9 @@ from swarmstar.database import Database
 db = Database()
 
 class SwarmstarSpace(BaseObject):
+    __table__ = DatabaseTable.SWARMSTAR_SPACE
+    __object_model__ = SwarmstarSpaceModel
+
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     total_event_count: int = 0
     swarm_node_count: int = 0
