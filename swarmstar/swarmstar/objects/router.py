@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 from swarmstar.instructor.instructor import Instructor
 from swarmstar.instructor.instructor_models.router_instructor_model import RouterInstructorModel
+from swarmstar.objects.operations.base_operation import BaseOperation
 
 T = TypeVar('T', bound='OptionLike')
 
@@ -25,7 +26,7 @@ class Router(BaseModel, Generic[T]):
     """
 
     @classmethod
-    async def route(cls, options: List[T], prompt: str) -> RouterResponse[T]:
+    async def route(cls, options: List[T], prompt: str, operation: BaseOperation) -> RouterResponse[T]:
         formatted_options = cls._format_options(options, prompt)
         router_response = await Instructor.completion(
             messages=[
@@ -38,7 +39,8 @@ class Router(BaseModel, Generic[T]):
                     "content": formatted_options
                 }
             ],
-            instructor_model=RouterInstructorModel
+            instructor_model=RouterInstructorModel,
+            operation=operation
         )
         best_option_index = router_response.best_option - 1
         best_option = options[best_option_index] if best_option_index >= 0 else None

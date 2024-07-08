@@ -6,8 +6,10 @@ LLMs can navigate metadata trees by descriptions to find relevant information, o
 """
 from abc import abstractmethod
 from typing import ClassVar, List, Union, Dict
+from swarmstar.enums.database_table_enum import DatabaseTable
 from swarmstar.objects.nodes.memory_metadata_node import MemoryMetadataNode
 from swarmstar.objects.nodes.swarm_node import SwarmNode
+from swarmstar.objects.operations.action_operation import ActionOperation
 from swarmstar.objects.trees.base_metadata_tree import MetadataTree, MetadataTreeSearchInput, MetadataTreeSearchState
 
 class MemoryMetadataTreeSearchInput(MetadataTreeSearchInput):
@@ -22,7 +24,9 @@ class MemoryMetadataTreeSearchState(MetadataTreeSearchState):
     original_question_index_to_answer: Dict[int, str]
 
 class MemoryMetadataTree(MetadataTree):
+    __table__: ClassVar[DatabaseTable] = DatabaseTable.MEMORY_METADATA_NODES
     __node_object__: ClassVar[MemoryMetadataNode]
+    # __node_model__: ClassVar[MemoryMetadataNodeModel]
     __branch_size_soft_limit__: ClassVar[int]
     __branch_size_hard_limit__: ClassVar[int]
 
@@ -34,9 +38,14 @@ class MemoryMetadataTree(MetadataTree):
 
     """ Search Helpers """
 
-    def _search_initialize_state(self, input: MemoryMetadataTreeSearchInput, start_node: MemoryMetadataNode, swarm_node: SwarmNode) -> MemoryMetadataTreeSearchState:
+    def _search_initialize_state(
+        self, 
+        input: MemoryMetadataTreeSearchInput, 
+        start_node: MemoryMetadataNode, 
+        action_operation: ActionOperation
+    ) -> MemoryMetadataTreeSearchState:
         return MemoryMetadataTreeSearchState(
-            swarm_node=swarm_node,
+            action_operation=action_operation,
             start_node=start_node,
             current_node=start_node,
             marked_node_ids=[start_node.id],
@@ -48,7 +57,8 @@ class MemoryMetadataTree(MetadataTree):
         )
 
     def _search_format_prompt(self, state: MemoryMetadataTreeSearchState) -> str:
-        return f"You are looking to answer the following questions: {state.original_questions} in the context of the following memory: {state.original_context}"
+        formatted_questions = "\n".join(f"{i+1}. {q}" for i, q in enumerate(state.remaining_questions))
+        return f"Choose the best path to find the answer:\n{formatted_questions}\n\nContext:\n{state.original_context}"
 
     def _search_handle_no_children(self, state: MemoryMetadataTreeSearchState) -> Union[str, MemoryMetadataNode, None]:
         pass

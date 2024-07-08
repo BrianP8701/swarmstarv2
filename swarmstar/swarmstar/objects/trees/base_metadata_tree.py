@@ -5,22 +5,23 @@ are all labeled with descriptions and other metadata.
 LLMs can navigate metadata trees by descriptions to find relevant information, or modify the tree.
 """
 from abc import abstractmethod
-from calendar import c
-from typing import ClassVar, List, Union
+from typing import ClassVar, List, Optional, Union
 from pydantic import BaseModel
 from swarmstar.enums.metadata_tree_enums import MetadataTreeSearchOutputType
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 from swarmstar.objects.nodes.swarm_node import SwarmNode
+from swarmstar.objects.operations.action_operation import ActionOperation
 from swarmstar.objects.router import Router
 from swarmstar.objects.trees.base_tree import BaseTree
+from swarmstar.utils.misc.ids import extract_swarm_id
 
 class MetadataTreeSearchInput(BaseModel):
-    swarm_node_id: str
+    action_operation: ActionOperation
     start_node_id: str | None
     output_type: MetadataTreeSearchOutputType
 
 class MetadataTreeSearchState(BaseModel):
-    swarm_node: SwarmNode
+    action_operation: ActionOperation
     start_node: BaseMetadataNode
     current_node: BaseMetadataNode
     marked_node_ids: List[str]
@@ -30,17 +31,16 @@ class MetadataTree(BaseTree):
     __branch_size_soft_limit__: ClassVar[int]
     __branch_size_hard_limit__: ClassVar[int]
 
-    async def search(self, input: MetadataTreeSearchInput) -> Union[str, BaseMetadataNode, None]:
+    async def search(self, input: MetadataTreeSearchInput) -> Optional[Union[str, BaseMetadataNode]]:
         if input.start_node_id:
             start_node = await self.__node_object__.read(input.start_node_id)
         else:
-            start_node = await self.__node_object__.read(self.get_root_node_id(input.swarm_node_id))
-        state = self._search_initialize_state(input, start_node, await SwarmNode.read(input.swarm_node_id))
+            start_node = await self.__node_object__.read(self.get_root_node_id(extract_swarm_id(input.action_operation.id)))
+        state = self._search_initialize_state(input, start_node, input.action_operation)
 
         while True:
             await self._search(state)
             # TODO: Continue the search process
-        pass
 
     def add(self):
         pass
@@ -50,7 +50,7 @@ class MetadataTree(BaseTree):
 
     """ Search Helpers """
 
-    async def _search(self, state: MetadataTreeSearchState) -> None:
+    async def _search(self, state: MetadataTreeSearchState) -> Optional[Union[str, BaseMetadataNode]]:
         children = await state.current_node.get_children()
         if len(children) == 0:
             self._search_handle_no_children(state)
@@ -59,7 +59,7 @@ class MetadataTree(BaseTree):
             state.marked_node_ids.append(state.current_node.id)
         else:
             children = self._search_filter_marked_nodes(state, children)
-            router_response = await Router.route(children, self._search_format_prompt(state))
+            router_response = await Router.route(children, self._search_format_prompt(state), state.action_operation)
             state.marked_node_ids.extend(unviable_option.id for unviable_option in router_response.unviable_options)
             if router_response.best_option:
                 state.current_node = router_response.best_option
@@ -81,13 +81,16 @@ class MetadataTree(BaseTree):
                 filtered_children = self._search_filter_marked_nodes(state, children)
                 if len(filtered_children) > 0:
                     return
-                else:
-                    continue
             else:
                 self._search_tree_level_fallback(state)
 
     @abstractmethod
-    def _search_initialize_state(self, input: MetadataTreeSearchInput, start_node: BaseMetadataNode, swarm_node: SwarmNode) -> MetadataTreeSearchState:
+    def _search_initialize_state(
+        self, 
+        input: MetadataTreeSearchInput, 
+        start_node: BaseMetadataNode, 
+        action_operation: ActionOperation
+    ) -> MetadataTreeSearchState:
         pass
 
     @abstractmethod

@@ -9,6 +9,7 @@ from swarmstar.enums.database_table_enum import DatabaseTable
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from swarmstar.models.swarm_node_model import SwarmNodeModel
 from swarmstar.objects.nodes.base_node import BaseNode
+from swarmstar.objects.base_message import BaseMessage
 
 class SwarmNode(BaseNode):
     __table__ = DatabaseTable.SWARM_NODES
@@ -23,16 +24,9 @@ class SwarmNode(BaseNode):
     report: Optional[str] = None                    # We should look at the node and see like, "Okay, thats what this node did." 
     context: Dict[str, Any] = {}          # This is where certain nodes can store extra context about themselves.
 
-    async def log(self, log_dict: Dict[str, Any], index_key: List[int] | None = None) -> List[int]:
+    async def log(self, message: BaseMessage, index_key: List[int] | None = None) -> List[int]:
         """
-        This function appends a log to the developer_logs list in a node or a nested list 
-        within developer_logs.
-
-        The log_dict should have the following format:
-        {
-            "role": (swarmstar, system, ai or user),
-            "content": "..."
-        }
+        This function appends a message to the logs in a node.
         
         If you are not doing parallel logs, you can ignore the index_key parameter.
         Parallel logs are logs that were performed in parallel. For example, if within 
@@ -66,7 +60,7 @@ class SwarmNode(BaseNode):
         """
         return_index_key = []
         if index_key is None:
-            self.logs.append(log_dict)
+            self.logs.append(message.model_dump())
             return_index_key = [len(self.logs) - 1]
         else:
             nested_list = self.logs
@@ -75,13 +69,13 @@ class SwarmNode(BaseNode):
                     raise IndexError(f"Index {index} is out of range for the current list. {nested_list}")
                 if i == len(index_key) - 1:
                     if len(nested_list) == index:
-                        nested_list.append([log_dict])
+                        nested_list.append([message.model_dump()])
                         return_index_key = index_key + [0]
                     elif isinstance(nested_list[index], list):
-                        nested_list[index].append(log_dict)
+                        nested_list[index].append(message.model_dump())
                         return_index_key = index_key + [len(nested_list[index]) - 1]
                     else:
-                        nested_list[index] = [nested_list[index], log_dict]
+                        nested_list[index] = [nested_list[index], message.model_dump()]
                         return_index_key = index_key + [1]
                 else:
                     if isinstance(nested_list[index], list):
@@ -90,3 +84,10 @@ class SwarmNode(BaseNode):
                         raise ValueError("Invalid index_key. Cannot traverse non-list elements.")
         await self.update(self.id, {"logs": self.logs})
         return return_index_key
+
+    async def log_multiple(self, messages: List[BaseMessage], index_key: List[int] | None = None) -> List[int]:
+        for message in messages:
+            index_key = await self.log(message, index_key)
+        if index_key is None:
+            raise ValueError("Index key is None after calling log. This should never happen.")
+        return index_key
