@@ -26,7 +26,7 @@ from contextlib import contextmanager
 import uuid
 from pydantic import Field
 from typing import Dict, List
-from swarmstar.enums.database_table import DatabaseTable
+from swarmstar.enums.database_table_enum import DatabaseTable
 from swarmstar.models.swarmstar_event_model import SwarmstarEventModel
 from swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
 from swarmstar.objects.base_object import BaseObject

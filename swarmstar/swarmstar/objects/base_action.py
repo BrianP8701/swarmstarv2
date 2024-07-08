@@ -15,8 +15,8 @@ from functools import wraps
 from typing import Any, List, Callable
 from pydantic import BaseModel
 
-from swarmstar.enums.actions import ActionEnum
-from swarmstar.enums.termination_policy import TerminationPolicyEnum
+from swarmstar.enums.action_enum import ActionEnum
+from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from swarmstar.objects import BaseOperation, SwarmNode, ActionMetadata, SpawnOperation, BlockingOperation
 
 class BaseAction(BaseModel):

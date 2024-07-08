@@ -21,7 +21,6 @@ from swarmstar.utils.misc.ids import generate_id
 T = TypeVar('T', bound='ActionMetadata')
 
 class ActionMetadataNode(BaseMetadataNode):
-    id: Optional[str] = Field(default_factory=lambda: generate_id("action_metadata"))
     __table__: ClassVar[str] = "action_metadata"
 
     @classmethod

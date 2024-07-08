@@ -5,35 +5,41 @@ are all labeled with descriptions and other metadata.
 LLMs can navigate metadata trees by descriptions to find relevant information, or modify the tree.
 """
 from abc import abstractmethod
-from typing import ClassVar, List
+from calendar import c
+from typing import ClassVar, List, Union
+from pydantic import BaseModel
+from swarmstar.enums.metadata_tree_enums import MetadataTreeSearchOutputType
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
+from swarmstar.objects.nodes.swarm_node import SwarmNode
+from swarmstar.objects.router import Router
 from swarmstar.objects.trees.base_tree import BaseTree
+
+class MetadataTreeSearchInput(BaseModel):
+    swarm_node_id: str
+    start_node_id: str | None
+    output_type: MetadataTreeSearchOutputType
+
+class MetadataTreeSearchState(BaseModel):
+    swarm_node: SwarmNode
+    start_node: BaseMetadataNode
+    current_node: BaseMetadataNode
+    marked_node_ids: List[str]
 
 class MetadataTree(BaseTree):
     __node_object__: ClassVar[BaseMetadataNode]
     __branch_size_soft_limit__: ClassVar[int]
     __branch_size_hard_limit__: ClassVar[int]
-    __node_level_fallback__: ClassVar[bool]
-    __tool_fallback__: ClassVar[bool]
-    
-    def search(self, ):
-        """
-        Searches the tree for a node given a description or question.
-        
-        Throughout the search, we mark nodes as visited or wrong. 
-        If we fully explore a branch we will navigate back up the tree to try
-        other paths.
-        If we exhaust all paths, we will call fallback.
-        
-        Memory nodes however are unique, in the sense that in addition to searching
-        existing nodes, every memory node type also has a toolset that can be searched.
-        
-        This can be thought of as a fallback at the memory node level. However
-        action metadata trees don't have a need for node level fallback. So node level
-        fallback should be optional.
-        
-        There's also two more considerations that need to be made.
-        """
+
+    async def search(self, input: MetadataTreeSearchInput) -> Union[str, BaseMetadataNode, None]:
+        if input.start_node_id:
+            start_node = await self.__node_object__.read(input.start_node_id)
+        else:
+            start_node = await self.__node_object__.read(self.get_root_node_id(input.swarm_node_id))
+        state = self._search_initialize_state(input, start_node, await SwarmNode.read(input.swarm_node_id))
+
+        while True:
+            await self._search(state)
+            # TODO: Continue the search process
         pass
 
     def add(self):
@@ -42,18 +48,56 @@ class MetadataTree(BaseTree):
     def remove(self):
         pass
 
-    def modify(self):
+    """ Search Helpers """
+
+    async def _search(self, state: MetadataTreeSearchState) -> None:
+        children = await state.current_node.get_children()
+        if len(children) == 0:
+            self._search_handle_no_children(state)
+        elif len(children) == 1:
+            state.current_node = children[0]
+            state.marked_node_ids.append(state.current_node.id)
+        else:
+            children = self._search_filter_marked_nodes(state, children)
+            router_response = await Router.route(children, self._search_format_prompt(state))
+            state.marked_node_ids.extend(unviable_option.id for unviable_option in router_response.unviable_options)
+            if router_response.best_option:
+                state.current_node = router_response.best_option
+                state.marked_node_ids.append(state.current_node.id)
+
+    def _search_filter_marked_nodes(self, state: MetadataTreeSearchState, children: List[BaseMetadataNode]):
+        for child in reversed(children):
+            if child.id in state.marked_node_ids:
+                children.remove(child)
+        return children
+
+    async def _search_backtrack(self, state: MetadataTreeSearchState):
+        while True:
+            parent_node = await state.current_node.get_parent()
+            if parent_node:
+                state.current_node = parent_node
+                state.marked_node_ids.append(state.current_node.id)
+                children = await state.current_node.get_children()
+                filtered_children = self._search_filter_marked_nodes(state, children)
+                if len(filtered_children) > 0:
+                    return
+                else:
+                    continue
+            else:
+                self._search_tree_level_fallback(state)
+
+    @abstractmethod
+    def _search_initialize_state(self, input: MetadataTreeSearchInput, start_node: BaseMetadataNode, swarm_node: SwarmNode) -> MetadataTreeSearchState:
         pass
 
     @abstractmethod
-    def tree_level_fallback(self):
-        """
-        Called when we exhaust all paths and reach the root of the tree.
-        """
+    def _search_format_prompt(self, state: MetadataTreeSearchState) -> str:
         pass
 
-    def node_level_fallback(self):
-        """
-        Called when a node has no options but to go up a level.
-        """
+    @abstractmethod
+    def _search_handle_no_children(self, state: MetadataTreeSearchState) -> Union[str, BaseMetadataNode, None]:
+        pass
+
+    @abstractmethod
+    def _search_tree_level_fallback(self, state: MetadataTreeSearchState):
         pass

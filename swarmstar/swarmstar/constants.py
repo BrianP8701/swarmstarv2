@@ -1,5 +1,5 @@
 from typing import Dict, List, Type
-from swarmstar.enums.database_table import DatabaseTable
+from swarmstar.enums.database_table_enum import DatabaseTable
 
 from swarmstar.models.swarmstar_event_model import SwarmstarEventModel
 from swarmstar.models.swarm_node_model import SwarmNodeModel

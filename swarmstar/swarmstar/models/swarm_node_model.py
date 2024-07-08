@@ -2,8 +2,8 @@ from sqlalchemy import Column, ForeignKey, String, Boolean, Enum as SQLAlchemyEn
 from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
 from sqlalchemy.orm import relationship
 
-from swarmstar.enums.actions import ActionEnum
-from swarmstar.enums.termination_policy import TerminationPolicyEnum
+from swarmstar.enums.action_enum import ActionEnum
+from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
 class SwarmNodeModel(BaseSQLAlchemyModel):

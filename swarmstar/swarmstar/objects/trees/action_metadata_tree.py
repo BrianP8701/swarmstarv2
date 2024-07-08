@@ -1,9 +1,51 @@
 """
-The action metadata tree allows the swarm to find actions to take.
+Think of a metadata tree as a file system, where files and folders
+are all labeled with descriptions and other metadata.
+
+LLMs can navigate metadata trees by descriptions to find relevant information, or modify the tree.
 """
-from typing import ClassVar
+from abc import abstractmethod
+from calendar import c
+from typing import ClassVar, List, Union
+from pydantic import BaseModel
+from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
+from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
+from swarmstar.objects.nodes.swarm_node import SwarmNode
+from swarmstar.objects.trees.base_metadata_tree import MetadataTreeSearchInput, MetadataTreeSearchState
+from swarmstar.objects.trees.base_tree import BaseTree
 
-from swarmstar.objects.trees.base_metadata_tree import MetadataTree
+class ActionMetadataTreeSearchInput(MetadataTreeSearchInput):
+    goal: str
 
-class ActionMetadataTree(MetadataTree):
-    __table__: ClassVar[str] = "action_metadata"
+class ActionMetadataTreeSearchState(MetadataTreeSearchState):
+    goal: str
+
+class ActionMetadataTree(BaseTree):
+    __node_object__: ClassVar[ActionMetadataNode]
+    __branch_size_soft_limit__: ClassVar[int]
+    __branch_size_hard_limit__: ClassVar[int]
+
+    def add(self):
+        pass
+
+    def remove(self):
+        pass
+
+    """ Search Helpers """
+    def _search_initialize_state(self, input: ActionMetadataTreeSearchInput, start_node: ActionMetadataNode, swarm_node: SwarmNode) -> ActionMetadataTreeSearchState:
+        return ActionMetadataTreeSearchState(
+            swarm_node=swarm_node,
+            start_node=start_node,
+            current_node=start_node,
+            marked_node_ids=[start_node.id],
+            goal=input.goal,
+        )
+
+    def _search_format_prompt(self, state: ActionMetadataTreeSearchState) -> str:
+        return f"Choose the best action path to achieve your goal.\nGoal: {state.goal}"
+
+    def _search_handle_no_children(self, state: ActionMetadataTreeSearchState) -> Union[str, ActionMetadataNode, None]:
+        pass
+
+    def _search_tree_level_fallback(self, state: ActionMetadataTreeSearchState):
+        pass

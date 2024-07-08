@@ -6,7 +6,7 @@ T = TypeVar('T', bound='BaseNode')
 
 class BaseNode(BaseObject, Generic[T]):
     """ Base class for nodes. """
-    name: str
+    title: str
     parent_id: Optional[str] = None
     children_ids: List[str] = []
 

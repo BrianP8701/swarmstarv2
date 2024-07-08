@@ -1,5 +1,5 @@
 from typing import ClassVar, Generic, List, Protocol, TypeVar
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from swarmstar.instructor.instructor import Instructor
 from swarmstar.instructor.instructor_models.router_instructor_model import RouterInstructorModel
@@ -15,16 +15,27 @@ class RouterResponse(BaseModel, Generic[T]):
     best_option: T | None
     unviable_options: List[T]
 
-class BaseRouter(BaseModel, Generic[T]):
-    __system_prompt__: ClassVar[str]
+
+class Router(BaseModel, Generic[T]):
+    __system_prompt__: ClassVar[str] = """
+    You are responsible for naviagting a hierarchical memory tree by description. 
+    You will be given a list of options and a prompt. 
+    You will need to select the best option from the list that is most relevant to the prompt.
+    You will also need to mark options as unviable if they are not relevant to the prompt.
+    """
 
     @classmethod
-    async def route(cls, options: List[T]) -> RouterResponse[T]:
+    async def route(cls, options: List[T], prompt: str) -> RouterResponse[T]:
+        formatted_options = cls._format_options(options, prompt)
         router_response = await Instructor.completion(
             messages=[
                 {
                     "role": "system",
                     "content": cls.__system_prompt__
+                },
+                {
+                    "role": "user",
+                    "content": formatted_options
                 }
             ],
             instructor_model=RouterInstructorModel
@@ -38,5 +49,8 @@ class BaseRouter(BaseModel, Generic[T]):
         )
 
     @staticmethod
-    def _format_options(options: List[OptionLike]) -> str:
-        return "\n".join([f"{i + 1}. {option.title}: {option.description}" for i, option in enumerate(options)])
+    def _format_options(options: List[T], prompt: str) -> str:
+       return "Prompt: {}\nOptions:\n{}".format(
+            prompt,
+            '\n'.join(["{}. {}: {}".format(i + 1, option.title, option.description) for i, option in enumerate(options)])
+        )

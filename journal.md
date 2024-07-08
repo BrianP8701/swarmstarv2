@@ -61,6 +61,15 @@ To balance both approaches:
 
 This way, we maintain the flow of the original search while ensuring that all potential paths are explored with the most current information.
 
+## Thinking about input and output of search
+### Input
+The simplest input to search is a single string containing questions and context. Another option is an object containing a list of questions and the context. However there's no real benefit from that - regardless of the shape of the input the final step of search is looking at the answer and input and asking, "Are all the questions answered? If not output the remaining questions." With a list of questions we can in a structured matter use a router to select the unanswered questions. We'll also be able to maintain a list original and unanswered questions - so on second thought yes we use the structured input actually.
+
+There is still yet a second consideration though. What about the scenario where the LLM is writing code or working on some specific area of the memory tree? Actually given our design on first thought it appears this edge case is covered nicely - give an optional parameter allowing you to choose where search start from. In this manner the LLM can then navigate up or down as needed but starting out in the most relevant area of memory. Yay!
+
+### Output
+We can imagine searches that expect different results. Asking questions will expect a string answer. However in the first step of writing code the decision is choosing the file to edit. When writing code you also want not a written response by an LLM but to actually also see the relevant code as it is. In terms of returning the actual code that can be part of tooling. But how do we return the file to edit? We'd have to return the memory metadata node. We can have a boolean here to switch between string versus memory node reference output.
+
 # June 27th 2024
 This is the second version of https://github.com/BrianP8701/swarmstar
 The space of possible codebases, with their different languages, setup, environments, testing and the millions of other vectors makes creating a general solution much harder. Focusing on building a code gen system for a single codebase reduces the complexity involved by many orders of magnitude.

@@ -4,9 +4,9 @@ and a preassigned action they will execute.
 """
 from typing import Any, Dict, List, Optional
 
-from swarmstar.enums.actions import ActionEnum
-from swarmstar.enums.database_table import DatabaseTable
-from swarmstar.enums.termination_policy import TerminationPolicyEnum
+from swarmstar.enums.action_enum import ActionEnum
+from swarmstar.enums.database_table_enum import DatabaseTable
+from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from swarmstar.models.swarm_node_model import SwarmNodeModel
 from swarmstar.objects.nodes.base_node import BaseNode
 

@@ -16,7 +16,6 @@ T = TypeVar('T', bound='MemoryMetadata')
 
 class MemoryMetadataNode(BaseMetadataNode):
     __table__: ClassVar[str] = "memory_metadata"
-    id: Optional[str] = Field(default_factory=lambda: generate_id("memory_metadata"))
     type: MemoryType # These define the type of the underlying data. Each type has tools to better navigate the data
 
     @classmethod

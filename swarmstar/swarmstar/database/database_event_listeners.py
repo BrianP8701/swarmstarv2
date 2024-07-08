@@ -2,7 +2,7 @@ from sqlalchemy import event
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import Table
 import asyncio
-from swarmstar.enums.database_table import DatabaseTable
+from swarmstar.enums.database_table_enum import DatabaseTable
 
 from swarmstar.models.swarmstar_event_model import SwarmstarEventModel
 from swarmstar.utils.misc.ids import (

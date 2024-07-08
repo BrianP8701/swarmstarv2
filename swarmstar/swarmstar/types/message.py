@@ -1,6 +1,5 @@
 from pydantic import BaseModel
-from swarmstar.enums.ai_model import AiModel
-from swarmstar.enums.message_role import MessageRole
+from swarmstar.enums.message_role_enum import MessageRole
 
 class Message(BaseModel):
     role: MessageRole

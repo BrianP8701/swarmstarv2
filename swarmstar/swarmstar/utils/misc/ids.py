@@ -10,7 +10,7 @@ from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from swarmstar.database import Database
-from swarmstar.enums.database_table import DatabaseTable
+from swarmstar.enums.database_table_enum import DatabaseTable
 from swarmstar.constants import (
     SWARM_ID_LENGTH, 
     TABLE_ENUM_TO_ABBREVIATION, 
