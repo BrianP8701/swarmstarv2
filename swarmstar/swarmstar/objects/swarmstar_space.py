@@ -26,15 +26,15 @@ from contextlib import contextmanager
 import uuid
 from pydantic import Field
 from typing import Dict, List
-from swarmstar.swarmstar.enums.database_table import DatabaseTable
-from swarmstar.swarmstar.models.swarmstar_event_model import SwarmstarEventModel
-from swarmstar.swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
-from swarmstar.swarmstar.objects.base_object import BaseObject
+from swarmstar.enums.database_table import DatabaseTable
+from swarmstar.models.swarmstar_event_model import SwarmstarEventModel
+from swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
+from swarmstar.objects.base_object import BaseObject
 
-from swarmstar.swarmstar.objects.trees.memory_metadata_tree import MemoryMetadataTree
-from swarmstar.swarmstar.objects.trees.action_metadata_tree import ActionMetadataTree
-from swarmstar.swarmstar.objects.trees.swarm_tree import SwarmTree
-from swarmstar.swarmstar.objects.operations.base_operation import BaseOperation
+from swarmstar.objects.trees.memory_metadata_tree import MemoryMetadataTree
+from swarmstar.objects.trees.action_metadata_tree import ActionMetadataTree
+from swarmstar.objects.trees.swarm_tree import SwarmTree
+from swarmstar.objects.operations.base_operation import BaseOperation
 
 from swarmstar.database import Database
 

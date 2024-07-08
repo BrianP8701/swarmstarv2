@@ -1,6 +1,6 @@
 from typing import List, Optional, TypeVar, Generic
 
-from swarmstar.swarmstar.objects.base_object import BaseObject
+from swarmstar.objects.base_object import BaseObject
 
 T = TypeVar('T', bound='BaseNode')
 

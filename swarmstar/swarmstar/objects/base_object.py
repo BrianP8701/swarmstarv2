@@ -3,9 +3,9 @@ from typing import Any, Dict, List, Optional, Type, TypeVar, ClassVar, Generic
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from swarmstar.swarmstar.enums.database_table import DatabaseTable
-from swarmstar.swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
-from swarmstar.swarmstar.utils.misc.ids import generate_id
+from swarmstar.enums.database_table import DatabaseTable
+from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from swarmstar.utils.misc.ids import generate_id
 from swarmstar.database import Database
 
 db = Database()

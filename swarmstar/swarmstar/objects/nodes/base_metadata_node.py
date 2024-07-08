@@ -1,7 +1,7 @@
 from pydantic import Field
 from typing import Optional
 
-from swarmstar.swarmstar.objects.nodes.base_node import BaseNode
+from swarmstar.objects.nodes.base_node import BaseNode
 
 class BaseMetadataNode(BaseNode):
     """

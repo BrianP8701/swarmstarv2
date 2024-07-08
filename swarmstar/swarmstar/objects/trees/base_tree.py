@@ -6,11 +6,11 @@ import asyncio
 from sqlalchemy.orm import aliased
 from sqlalchemy import select
 
-from swarmstar.swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
-from swarmstar.swarmstar.objects.nodes.base_node import BaseNode
+from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from swarmstar.objects.nodes.base_node import BaseNode
 from swarmstar.constants import TABLE_ENUM_TO_ABBREVIATION
-from swarmstar.swarmstar.enums.database_table import DatabaseTable
-from swarmstar.swarmstar.utils.misc.ids import get_all_swarm_object_ids
+from swarmstar.enums.database_table import DatabaseTable
+from swarmstar.utils.misc.ids import get_all_swarm_object_ids
 
 class BaseTree(ABC, BaseModel):
     """

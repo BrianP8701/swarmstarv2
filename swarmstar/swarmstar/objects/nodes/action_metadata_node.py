@@ -15,7 +15,7 @@ from enum import Enum
 from typing_extensions import Literal
 from importlib import import_module
 
-from swarmstar.swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
+from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 from swarmstar.utils.misc.ids import generate_id
 
 T = TypeVar('T', bound='ActionMetadata')

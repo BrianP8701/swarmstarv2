@@ -3,7 +3,7 @@ The memory metadata tree allows the swarm to find answers to questions.
 """
 from typing import ClassVar
 
-from swarmstar.swarmstar.objects.trees.base_metadata_tree import MetadataTree
+from swarmstar.objects.trees.base_metadata_tree import MetadataTree
 
 class MemoryMetadataTree(MetadataTree):
     __table__: ClassVar[str] = "memory_metadata"

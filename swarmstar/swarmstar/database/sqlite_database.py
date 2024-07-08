@@ -9,8 +9,8 @@ import threading
 from dotenv import load_dotenv
 import os
 
-from swarmstar.swarmstar.database.abstract_database import AbstractDatabase
-from swarmstar.swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from swarmstar.database.abstract_database import AbstractDatabase
+from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
 load_dotenv()
 SQLITE_DB_FILE_PATH = os.getenv("SQLITE_DB_FILE_PATH")
@@ -41,7 +41,7 @@ class SqliteDatabase(AbstractDatabase):
         self.create_all_tables()
 
     def create_all_tables(self):
-        from swarmstar.swarmstar.constants import ALL_DATABASE_MODEL_CLASSES
+        from swarmstar.constants import ALL_DATABASE_MODEL_CLASSES
         for model in ALL_DATABASE_MODEL_CLASSES:
             model.metadata.create_all(bind=self.engine)
 

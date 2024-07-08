@@ -1,8 +1,8 @@
 from sqlalchemy import Column, String, Integer, JSON, Enum as SQLAlchemyEnum
 from contextlib import contextmanager
 
-from swarmstar.swarmstar.enums.database_table import DatabaseTable
-from swarmstar.swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from swarmstar.enums.database_table import DatabaseTable
+from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
 class SwarmstarHistoryModel(BaseSQLAlchemyModel):
     __tablename__ = 'swarmstar_history'

@@ -2,7 +2,7 @@ from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
 
-from swarmstar.swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
 class BaseOperationModel(BaseSQLAlchemyModel):
     __tablename__ = 'operations'

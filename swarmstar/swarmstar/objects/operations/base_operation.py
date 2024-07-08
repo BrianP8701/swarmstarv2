@@ -9,8 +9,8 @@ Nodes can perform 1 of 5 "SwarmOperations":
 from typing import Any, Dict
 from abc import ABC
 
-from swarmstar.swarmstar.objects.base_object import BaseObject
-from swarmstar.swarmstar.objects.nodes.swarm_node import SwarmNode
+from swarmstar.objects.base_object import BaseObject
+from swarmstar.objects.nodes.swarm_node import SwarmNode
 
 class BaseOperation(BaseObject, ABC):
     swarm_node_id: str

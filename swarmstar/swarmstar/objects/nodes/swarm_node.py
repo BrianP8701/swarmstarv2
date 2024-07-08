@@ -4,11 +4,11 @@ and a preassigned action they will execute.
 """
 from typing import Any, Dict, List, Optional
 
-from swarmstar.swarmstar.enums.actions import ActionEnum
-from swarmstar.swarmstar.enums.database_table import DatabaseTable
-from swarmstar.swarmstar.enums.termination_policy import TerminationPolicyEnum
-from swarmstar.swarmstar.models.swarm_node_model import SwarmNodeModel
-from swarmstar.swarmstar.objects.nodes.base_node import BaseNode
+from swarmstar.enums.actions import ActionEnum
+from swarmstar.enums.database_table import DatabaseTable
+from swarmstar.enums.termination_policy import TerminationPolicyEnum
+from swarmstar.models.swarm_node_model import SwarmNodeModel
+from swarmstar.objects.nodes.base_node import BaseNode
 
 class SwarmNode(BaseNode):
     __table__ = DatabaseTable.SWARM_NODES

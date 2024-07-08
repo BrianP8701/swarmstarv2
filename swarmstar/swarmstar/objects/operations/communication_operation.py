@@ -1,6 +1,6 @@
 from typing import ClassVar, Dict, Any
-from swarmstar.swarmstar.models.swarm_operation_models import CommunicationOperationModel
-from swarmstar.swarmstar.objects.operations.base_operation import BaseOperation
+from swarmstar.models.swarm_operation_models import CommunicationOperationModel
+from swarmstar.objects.operations.base_operation import BaseOperation
 
 
 class CommunicationOperation(BaseOperation):

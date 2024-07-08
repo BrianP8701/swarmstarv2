@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, JSON, Enum as SQLAlchemyEnum
 
-from swarmstar.swarmstar.enums.database_table import DatabaseTable
-from swarmstar.swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from swarmstar.enums.database_table import DatabaseTable
+from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
 class SwarmstarEventModel(BaseSQLAlchemyModel):
     __tablename__ = 'swarmstar_events'

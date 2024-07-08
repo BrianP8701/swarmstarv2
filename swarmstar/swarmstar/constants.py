@@ -1,10 +1,10 @@
 from typing import Dict, List, Type
-from swarmstar.swarmstar.enums.database_table import DatabaseTable
+from swarmstar.enums.database_table import DatabaseTable
 
-from swarmstar.swarmstar.models.swarmstar_event_model import SwarmstarEventModel
-from swarmstar.swarmstar.models.swarm_node_model import SwarmNodeModel
-from swarmstar.swarmstar.models.swarm_operation_models import SpawnOperationModel, TerminationOperationModel, CommunicationOperationModel, ActionOperationModel
-from swarmstar.swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
+from swarmstar.models.swarmstar_event_model import SwarmstarEventModel
+from swarmstar.models.swarm_node_model import SwarmNodeModel
+from swarmstar.models.swarm_operation_models import SpawnOperationModel, TerminationOperationModel, CommunicationOperationModel, ActionOperationModel
+from swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
 
 TABLE_PROPERTIES = {
     DatabaseTable.SWARM_NODES: {

@@ -10,15 +10,15 @@ from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from swarmstar.database import Database
-from swarmstar.swarmstar.enums.database_table import DatabaseTable
-from swarmstar.swarmstar.constants import (
+from swarmstar.enums.database_table import DatabaseTable
+from swarmstar.constants import (
     SWARM_ID_LENGTH, 
     TABLE_ENUM_TO_ABBREVIATION, 
     TABLE_ENUM_TO_SWARMSTAR_SPACE_COUNT_COLUMN,
     TABLE_ABBREVIATION_TO_ENUM,
     TABLE_ENUM_TO_TABLE_NAME
 )
-from swarmstar.swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
+from swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
 
 db = Database()
 

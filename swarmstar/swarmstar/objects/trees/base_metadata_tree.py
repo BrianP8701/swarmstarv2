@@ -6,8 +6,8 @@ LLMs can navigate metadata trees by descriptions to find relevant information, o
 """
 from abc import abstractmethod
 from typing import ClassVar, List
-from swarmstar.swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
-from swarmstar.swarmstar.objects.trees.base_tree import BaseTree
+from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
+from swarmstar.objects.trees.base_tree import BaseTree
 
 class MetadataTree(BaseTree):
     __node_object__: ClassVar[BaseMetadataNode]
@@ -15,8 +15,6 @@ class MetadataTree(BaseTree):
     __branch_size_hard_limit__: ClassVar[int]
     __node_level_fallback__: ClassVar[bool]
     __tool_fallback__: ClassVar[bool]
-    
-    def route(self, options: List[str], )
     
     def search(self, ):
         """
