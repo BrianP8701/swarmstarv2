@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, List
 
 load_dotenv()
 db_connection_string = os.getenv("DB_CONNECTION_STRING")
@@ -36,6 +36,17 @@ class AbstractDatabase(ABC):
         :param table_name: The table name.
         :param id: The identifier of the data.
         :return: The deserialized dictionary representing the data.
+        """
+        pass
+
+    @abstractmethod
+    def update(self, table_name: str, id: str, data: Dict[str, Any]) -> None:
+        """
+        Updates a data entry in the specified table.
+        
+        :param table_name: The table name.
+        :param id: The identifier of the data.
+        :param data: The dictionary containing the updated data.
         """
         pass
 
@@ -96,3 +107,66 @@ class AbstractDatabase(ABC):
         """
         pass
 
+    @abstractmethod
+    def select(self, table_name: str, id: str, columns: List[str]) -> Dict[str, Any]:
+        """
+        Selects specific columns from a data entry in the specified table.
+        
+        :param table_name: The table name.
+        :param id: The identifier of the data.
+        :param columns: The list of columns to select.
+        :return: A dictionary containing the selected columns and their values.
+        """
+        pass
+
+    @abstractmethod
+    def batch_create(self, table_name: str, data_list: List[Dict[str, Any]]) -> None:
+        """
+        Inserts multiple data entries into the specified table.
+        
+        :param table_name: The table name.
+        :param data_list: A list of dictionaries to be serialized and stored.
+        """
+        pass
+
+    @abstractmethod
+    def batch_read(self, table_name: str, ids: List[str]) -> List[Dict[str, Any]]:
+        """
+        Queries the database for multiple data entries by their identifiers.
+        
+        :param table_name: The table name.
+        :param ids: A list of identifiers of the data.
+        :return: A list of deserialized dictionaries representing the data.
+        """
+        pass
+
+    @abstractmethod
+    def batch_update(self, table_name: str, data_list: List[Dict[str, Any]]) -> None:
+        """
+        Updates multiple data entries in the specified table.
+        
+        :param table_name: The table name.
+        :param data_list: A list of dictionaries containing the updated data.
+        """
+        pass
+
+    @abstractmethod
+    def batch_delete(self, table_name: str, ids: List[str]) -> None:
+        """
+        Deletes multiple data entries from the specified table using their identifiers.
+        
+        :param table_name: The table name.
+        :param ids: A list of identifiers of the data to delete.
+        """
+        pass
+
+    @abstractmethod
+    def batch_copy(self, table_name: str, old_ids: List[str], new_ids: List[str]) -> None:
+        """
+        Copies multiple data entries in the specified table to new identifiers.
+        
+        :param table_name: The table name.
+        :param old_ids: A list of old identifiers of the data.
+        :param new_ids: A list of new identifiers for the copied data.
+        """
+        pass

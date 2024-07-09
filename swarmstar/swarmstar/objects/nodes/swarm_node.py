@@ -4,7 +4,7 @@ and a preassigned action they will execute.
 """
 from typing import Any, Dict, List, Optional
 
-from swarmstar.enums.action_enum import ActionEnum
+from swarmstar.enums.action_type_enum import ActionTypeEnum
 from swarmstar.enums.database_table_enum import DatabaseTable
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from swarmstar.models.swarm_node_model import SwarmNodeModel
@@ -15,7 +15,7 @@ class SwarmNode(BaseNode):
     __table__ = DatabaseTable.SWARM_NODES
     __object_model__ = SwarmNodeModel
 
-    action: ActionEnum    # Swarm nodes are classified by their action id
+    action: ActionTypeEnum    # Swarm nodes are classified by their action id
     goal: str
     alive: bool = True
     active: bool = True

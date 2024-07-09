@@ -35,7 +35,7 @@ REVIEW_PLAN_INSTRUCTIONS = (
     "ensure each action can be executed independently."
 )
 
-class Action(BaseAction):
+class Plan(BaseAction):
     def main(self):
         message = (
             f"{PLAN_INSTRUCTIONS}"

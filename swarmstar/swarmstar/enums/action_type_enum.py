@@ -1,6 +1,6 @@
 from enum import Enum
 
-class ActionEnum(str, Enum):
+class ActionTypeEnum(str, Enum):
     PLAN = 'plan'
     CODE = 'code'
     SEARCH = 'search'

@@ -1,10 +1,13 @@
 from typing import Dict, List, Type
+from swarmstar.actions.general.plan import Plan
+from swarmstar.enums.action_type_enum import ActionTypeEnum
 from swarmstar.enums.database_table_enum import DatabaseTable
 
 from swarmstar.models.swarmstar_event_model import SwarmstarEventModel
 from swarmstar.models.swarm_node_model import SwarmNodeModel
 from swarmstar.models.swarm_operation_models import SpawnOperationModel, TerminationOperationModel, CommunicationOperationModel, ActionOperationModel
 from swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
+from swarmstar.objects.base_action import BaseAction
 
 TABLE_PROPERTIES = {
     DatabaseTable.SWARM_NODES: {
@@ -77,3 +80,7 @@ ALL_DATABASE_MODEL_CLASSES = [
 ]
 
 SWARM_ID_LENGTH = 32
+
+ACTION_ENUM_TO_ACTION_CLASS: Dict[ActionTypeEnum, Type[BaseAction]] = {
+    ActionTypeEnum.PLAN: Plan
+}

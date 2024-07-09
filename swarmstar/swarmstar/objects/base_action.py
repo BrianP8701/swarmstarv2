@@ -15,7 +15,7 @@ from functools import wraps
 from typing import Any, List, Callable
 from pydantic import BaseModel
 
-from swarmstar.enums.action_enum import ActionEnum
+from swarmstar.enums.action_type_enum import ActionTypeEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from swarmstar.objects import BaseOperation, SwarmNode, ActionMetadata, SpawnOperation, BlockingOperation
 
@@ -24,7 +24,7 @@ class BaseAction(BaseModel):
     All actions inherit this class.
     """
     node: SwarmNode
-    action: ActionEnum
+    action: ActionTypeEnum
 
     @abstractmethod
     def main(self) -> List[BaseOperation]:
