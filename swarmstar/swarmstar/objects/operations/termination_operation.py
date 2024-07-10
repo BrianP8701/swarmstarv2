@@ -29,6 +29,9 @@ class TerminationOperation(BaseOperation):
         return await termination_handler_function(swarm_node)
 
     async def _terminate_simple(self, swarm_node: SwarmNode) -> List['TerminationOperation']:
+        """
+        Terminate the node and return a new termination operation for the parent node.
+        """
         swarm_node.status = SwarmNodeStatusEnum.TERMINATED
         await swarm_node.upsert()
         parent_node_id = swarm_node.parent_id
@@ -43,6 +46,11 @@ class TerminationOperation(BaseOperation):
             return []
 
     async def _terminate_custom_termination_handler(self, swarm_node: SwarmNode) -> List[ActionOperation]:
+        """
+        Nodes can implement their own termination handlers.
+        They can signal that that they want to use their own termination handler by updating their termination policy
+        to CUSTOM_TERMINATION_HANDLER and adding a __termination_handler__ key to their context.
+        """
         context = swarm_node.context
         termination_handler = context.get("__termination_handler__", None)
         if termination_handler:
