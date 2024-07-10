@@ -34,9 +34,10 @@ class Instructor:
         operation: BaseOperation,
         max_retries: int = 3,
     ) -> T:
+        swarm_node = await SwarmNode.read(operation.swarm_node_id)
         log_index_key = operation.context.get("log_index_key", [])
         request_log_messages = [BaseMessage(role=MessageRole(m["role"]), **m) for m in messages]
-        log_index_key = await operation.swarm_node.log_multiple(request_log_messages, log_index_key)
+        log_index_key = await swarm_node.log_multiple(request_log_messages, log_index_key)
 
         completion: T = await cls.aclient.chat.completions.create(
             model="gpt-4o",
@@ -51,8 +52,8 @@ class Instructor:
             role=MessageRole.ASSISTANT,
             content=completion.model_dump_json()
         )
-        log_index_key = await operation.swarm_node.log(response_message, log_index_key)
+        log_index_key = await swarm_node.log(response_message, log_index_key)
         operation.context["log_index_key"] = log_index_key
-        await operation.update(operation.id, {"context": operation.context})
+        await operation.upsert()
 
         return completion

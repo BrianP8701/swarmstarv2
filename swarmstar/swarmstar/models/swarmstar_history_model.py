@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Integer, JSON, Enum as SQLAlchemyEnum
 from contextlib import contextmanager
 
-from swarmstar.enums.database_table_enum import DatabaseTable
+from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
 class SwarmstarHistoryModel(BaseSQLAlchemyModel):
@@ -10,7 +10,7 @@ class SwarmstarHistoryModel(BaseSQLAlchemyModel):
     swarmstar_space_id = Column(String)
     operation = Column(String)  # e.g., 'update', 'delete', etc.
     data = Column(JSON)  # Store the state of the model after the operation
-    model_name = Column(SQLAlchemyEnum(DatabaseTable), nullable=False)  # Name of the model being changed
+    model_name = Column(SQLAlchemyEnum(DatabaseTableEnum), nullable=False)  # Name of the model being changed
 
     @staticmethod
     @contextmanager

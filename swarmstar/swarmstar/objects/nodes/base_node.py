@@ -1,10 +1,11 @@
-from typing import List, Optional, TypeVar, Generic
+from abc import ABC
+from typing import List, Optional, Type, TypeVar, Generic
 
 from swarmstar.objects.base_object import BaseObject
 
 T = TypeVar('T', bound='BaseNode')
 
-class BaseNode(BaseObject, Generic[T]):
+class BaseNode(BaseObject[T], Generic[T], ABC):
     """ Base class for nodes. """
     title: str
     parent_id: Optional[str] = None
@@ -13,12 +14,12 @@ class BaseNode(BaseObject, Generic[T]):
     children: List[T] = []
     parent: Optional[T] = None
 
-    async def get_parent(self) -> Optional[T]:
+    async def get_parent(self: T) -> Optional[T]:
         if self.parent_id:
             return await self.read(self.parent_id)
         return None
 
-    async def get_children(self) -> List[T]:
+    async def get_children(self: T) -> List[T]:
         if self.children_ids:
             return await self.batch_read(self.children_ids)
         return []

@@ -16,7 +16,7 @@ from swarmstar.models.action_metadata_node_model import ActionMetadataNodeModel
 from swarmstar.objects.base_action import BaseAction
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 
-class ActionMetadataNode(BaseMetadataNode):
+class ActionMetadataNode(BaseMetadataNode['ActionMetadataNode']):
     __table__: ClassVar[str] = "action_metadata_nodes"
     __object_model__: ClassVar[Type['ActionMetadataNodeModel']] = ActionMetadataNodeModel
 

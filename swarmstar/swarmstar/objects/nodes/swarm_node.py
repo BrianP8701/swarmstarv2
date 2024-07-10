@@ -5,20 +5,20 @@ and a preassigned action they will execute.
 from typing import Any, Dict, List, Optional
 
 from swarmstar.enums.action_type_enum import ActionTypeEnum
-from swarmstar.enums.database_table_enum import DatabaseTable
+from swarmstar.enums.database_table_enum import DatabaseTableEnum
+from swarmstar.enums.swarm_node_status_enum import SwarmNodeStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from swarmstar.models.swarm_node_model import SwarmNodeModel
 from swarmstar.objects.nodes.base_node import BaseNode
 from swarmstar.objects.base_message import BaseMessage
 
-class SwarmNode(BaseNode):
-    __table__ = DatabaseTable.SWARM_NODES
+class SwarmNode(BaseNode['SwarmNode']):
+    __table__ = DatabaseTableEnum.SWARM_NODES
     __object_model__ = SwarmNodeModel
 
-    action: ActionTypeEnum    # Swarm nodes are classified by their action id
+    action_type: ActionTypeEnum    # Swarm nodes are classified by their action id
     goal: str
-    alive: bool = True
-    active: bool = True
+    status: SwarmNodeStatusEnum = SwarmNodeStatusEnum.ACTIVE
     termination_policy: TerminationPolicyEnum = TerminationPolicyEnum.SIMPLE
     logs: List[Any] = []              # Logs storing all messages sent to and received from an ai throughout the action's execution.
     report: Optional[str] = None                    # We should look at the node and see like, "Okay, thats what this node did." 
@@ -32,18 +32,6 @@ class SwarmNode(BaseNode):
         Parallel logs are logs that were performed in parallel. For example, if within 
         one node we have multiple conversations in parallel, we don't want these to 
         overlap in the logs.
-        
-        Example:
-
-        [log0, log1, log2, [log3.0, log3.1, log3.2], log4]
-            log3.0, log3.1, log3.2 are grouped.
-
-        or even,
-
-        [log0, log1, [[log2.0.0, log2.0.1, log2.0.2], [log2.1.0, log2.1.1]], log3]
-            log2.0.0, log2.0.1, log2.0.2 are grouped.
-            log2.1.0, log2.1.1 are grouped.
-            log2.0 and log2.1 are performed in parallel.
 
         If index_key is None, the log will be appended to the developer_logs list.
         If an index_key is provided, the log will be appended to the nested list at the index_key.
@@ -82,7 +70,7 @@ class SwarmNode(BaseNode):
                         nested_list = nested_list[index]
                     else:
                         raise ValueError("Invalid index_key. Cannot traverse non-list elements.")
-        await self.update(self.id, {"logs": self.logs})
+        await self.upsert()
         return return_index_key
 
     async def log_multiple(self, messages: List[BaseMessage], index_key: List[int] | None = None) -> List[int]:

@@ -1,32 +1,7 @@
-"""
-Swarmstar space describes the entirety of what makes up a swarm: 
-    - Swarm nodes
-    - Swarm operations
-    - Memory tree
-    - Action tree
-The SwarmstarSpace class provides a high level interface to instantiate,
-clone and delete swarmstar spaces.
-
-Every object in the swarmstar space follows a common format for their ids
-    {swarm_id}_{x}{y}
-where x is a marker for the type of object:
-    - sn: swarm node
-    - to: termination operation
-    - so: spawn operation
-    - bo: blocking operation
-    - co: communication operation
-    - ao: action operation
-    - mm: memory
-    - am: action
-and y is simply the number, taken in order of creation
-
-This id convention makes it easier to manage everything
-"""
-from contextlib import contextmanager
 import uuid
 from pydantic import Field
 from typing import Dict, List
-from swarmstar.enums.database_table_enum import DatabaseTable
+from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.models.swarmstar_event_model import SwarmstarEventModel
 from swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
 from swarmstar.objects.base_object import BaseObject
@@ -41,7 +16,12 @@ from swarmstar.database import Database
 db = Database()
 
 class SwarmstarSpace(BaseObject):
-    __table__ = DatabaseTable.SWARMSTAR_SPACE
+    """
+    A comprehensive collection of all objects that constitute a swarm. 
+    This includes nodes, metadata, operations, and other related entities, 
+    encapsulating the entire state and behavior of the swarm.
+    """
+    __table__ = DatabaseTableEnum.SWARMSTAR_SPACE
     __object_model__ = SwarmstarSpaceModel
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -49,6 +29,7 @@ class SwarmstarSpace(BaseObject):
     swarm_node_count: int = 0
     action_metadata_node_count: int = 0
     memory_metadata_node_count: int = 0
+    tool_metadata_node_count: int = 0
     spawn_operation_count: int = 0
     termination_operation_count: int = 0
     blocking_operation_count: int = 0
@@ -91,36 +72,26 @@ class SwarmstarSpace(BaseObject):
             BaseOperation.delete(f"{swarm_id}_o{i}")
 
     @staticmethod
-    @contextmanager
     def rollback_to_event(session, swarm_id: str, event_index: int):
         """
-        Temporarily roll back the swarmstar space to the state at the specified event index.
+        Temporarily roll back the entire swarmstar space to the state at the specified event index.
 
         :param session: SQLAlchemy session
         :param swarm_id: The ID of the swarmstar space
         :param event_index: The event index to roll back to
         """
-        # Save the current state
-        current_state = SwarmstarSpace.read(swarm_id).__dict__.copy()
+        # Rollback to the specified event
+        history_entries = session.query(SwarmstarEventModel).filter_by(
+            swarmstar_space_id=swarm_id
+        ).order_by(SwarmstarEventModel.event_count).all()
 
-        try:
-            # Rollback to the specified event
-            history_entries = session.query(SwarmstarEventModel).filter_by(
-                swarmstar_space_id=swarm_id
-            ).order_by(SwarmstarEventModel.event_count).all()
-
-            for entry in history_entries:
-                if entry.event_count > event_index:
-                    break
-                for key, value in entry.data.items():
-                    setattr(SwarmstarSpace, key, value)
-            session.commit()
-            yield
-        finally:
-            # Restore the most recent state
-            for key, value in current_state.items():
+        for entry in history_entries:
+            if entry.event_count > event_index:
+                break
+            for key, value in entry.data.items():
                 setattr(SwarmstarSpace, key, value)
-            session.commit()
+        session.commit()
+
 
     @staticmethod
     def advance_to_present(session, swarm_id: str):

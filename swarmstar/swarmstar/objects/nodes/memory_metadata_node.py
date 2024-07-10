@@ -10,7 +10,7 @@ from swarmstar.enums.memory_type_enum import MemoryTypeEnum
 from swarmstar.models.memory_metadata_node_model import MemoryMetadataNodeModel
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 
-class MemoryMetadataNode(BaseMetadataNode):
+class MemoryMetadataNode(BaseMetadataNode['MemoryMetadataNode']):
     __table__: ClassVar[str] = "memory_metadata"
     __object_model__: ClassVar[Type['MemoryMetadataNodeModel']] = MemoryMetadataNodeModel
     

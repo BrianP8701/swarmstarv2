@@ -9,7 +9,7 @@ from sqlalchemy import select
 from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 from swarmstar.objects.nodes.base_node import BaseNode
 from swarmstar.constants import TABLE_ENUM_TO_ABBREVIATION
-from swarmstar.enums.database_table_enum import DatabaseTable
+from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.utils.misc.ids import get_all_swarm_object_ids
 
 class BaseTree(ABC, BaseModel):
@@ -19,7 +19,7 @@ class BaseTree(ABC, BaseModel):
     organizing data in a way that's easy to traverse and understand. It's also naturally
     efficient and scalable.
     """
-    __table__: ClassVar[DatabaseTable]
+    __table__: ClassVar[DatabaseTableEnum]
     __node_model__: ClassVar[BaseSQLAlchemyModel]
     __node_object__: ClassVar[BaseNode]
 

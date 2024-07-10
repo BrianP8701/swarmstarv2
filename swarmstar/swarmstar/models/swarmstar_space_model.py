@@ -1,5 +1,4 @@
-from typing import Any, Dict, Optional
-from sqlalchemy import Column, Integer, String, Boolean, Enum as SQLAlchemyEnum, Text
+from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
 
@@ -12,6 +11,7 @@ class SwarmstarSpaceModel(Base):
     swarm_node_count = Column(Integer)
     action_metadata_node_count = Column(Integer)
     memory_metadata_node_count = Column(Integer)
+    tool_metadata_node_count = Column(Integer)
     spawn_operation_count = Column(Integer)
     termination_operation_count = Column(Integer)
     blocking_operation_count = Column(Integer)

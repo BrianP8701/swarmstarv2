@@ -2,7 +2,7 @@ from sqlalchemy import event
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import Table
 import asyncio
-from swarmstar.enums.database_table_enum import DatabaseTable
+from swarmstar.enums.database_table_enum import DatabaseTableEnum
 
 from swarmstar.models.swarmstar_event_model import SwarmstarEventModel
 from swarmstar.utils.misc.ids import (
@@ -30,7 +30,7 @@ async def log_swarmstar_event(mapper, connection, target: Table, event_name: str
     swarmstar_space_id = extract_swarm_id(target_id)
     table_name = get_table_name_from_id(target_id)
 
-    id = generate_id(DatabaseTable.SWARMSTAR_EVENTS, swarmstar_space_id)
+    id = generate_id(DatabaseTableEnum.SWARMSTAR_EVENTS, swarmstar_space_id)
     history_entry = SwarmstarEventModel(
         id=id,
         operation=event_name,

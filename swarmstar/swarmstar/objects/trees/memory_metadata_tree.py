@@ -6,7 +6,7 @@ LLMs can navigate metadata trees by descriptions to find relevant information, o
 """
 from abc import abstractmethod
 from typing import ClassVar, List, Union, Dict
-from swarmstar.enums.database_table_enum import DatabaseTable
+from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.objects.nodes.memory_metadata_node import MemoryMetadataNode
 from swarmstar.objects.nodes.swarm_node import SwarmNode
 from swarmstar.objects.operations.action_operation import ActionOperation
@@ -24,7 +24,7 @@ class MemoryMetadataTreeSearchState(MetadataTreeSearchState):
     original_question_index_to_answer: Dict[int, str]
 
 class MemoryMetadataTree(MetadataTree):
-    __table__: ClassVar[DatabaseTable] = DatabaseTable.MEMORY_METADATA_NODES
+    __table__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.MEMORY_METADATA_NODES
     __node_object__: ClassVar[MemoryMetadataNode]
     # __node_model__: ClassVar[MemoryMetadataNodeModel]
     __branch_size_soft_limit__: ClassVar[int]

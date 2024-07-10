@@ -62,7 +62,7 @@ function AuthWrapper({ children }: { children: React.ReactNode }) {
           dispatch(setCurrentPage(pathName));
         }
       } else {
-        router.push("/signin")
+        router.push("/home")
       }
     };
 

@@ -19,7 +19,7 @@ class RouterResponse(BaseModel, Generic[T]):
 
 class Router(BaseModel, Generic[T]):
     __system_prompt__: ClassVar[str] = """
-    You are responsible for naviagting a hierarchical memory tree by description. 
+    You are responsible for naviagting a tree by descriptions. 
     You will be given a list of options and a prompt. 
     You will need to select the best option from the list that is most relevant to the prompt.
     You will also need to mark options as unviable if they are not relevant to the prompt.

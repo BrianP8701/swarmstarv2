@@ -8,7 +8,7 @@ from abc import abstractmethod
 from calendar import c
 from typing import ClassVar, List, Union
 from pydantic import BaseModel
-from swarmstar.enums.database_table_enum import DatabaseTable
+from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 from swarmstar.objects.nodes.swarm_node import SwarmNode
@@ -23,7 +23,7 @@ class ActionMetadataTreeSearchState(MetadataTreeSearchState):
     goal: str
 
 class ActionMetadataTree(BaseTree):
-    __table__: ClassVar[DatabaseTable] = DatabaseTable.ACTION_METADATA_NODES
+    __table__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.ACTION_METADATA_NODES
     __node_object__: ClassVar[ActionMetadataNode]
     # __node_model__: ClassVar[ActionMetadataNodeModel]
     __branch_size_soft_limit__: ClassVar[int]

@@ -4,7 +4,7 @@ The action metadata tree allows the swarm to find actions to take.
 from typing import ClassVar
 
 from swarmstar.objects.trees.base_tree import BaseTree
-from swarmstar.enums.database_table_enum import DatabaseTable
+from swarmstar.enums.database_table_enum import DatabaseTableEnum
 
 class SwarmTree(BaseTree):
-    __table__: ClassVar[DatabaseTable] = DatabaseTable.SWARM_NODES
+    __table__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.SWARM_NODES
