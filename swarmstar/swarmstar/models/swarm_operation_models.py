@@ -7,7 +7,6 @@ from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 class BaseOperationModel(BaseSQLAlchemyModel):
     __tablename__ = 'operations'
     id = Column(String, primary_key=True)
-    type = Column(String)
     swarm_node_id = Column(String, ForeignKey('swarm_nodes.id'))
     context = Column(SQLiteJSON)
     __mapper_args__ = {

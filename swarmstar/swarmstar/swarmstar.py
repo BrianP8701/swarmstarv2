@@ -11,7 +11,6 @@ I've provided a template for how you may handle those in the user_communication_
 from typing import List, Union
 import inspect
 
-from swarmstar.utils.logger_config import setup_logging
 from swarmstar.objects import (
     BaseOperation,
     SpawnOperation,
@@ -23,8 +22,6 @@ from swarmstar.operations import (
     terminate,
     execute_action
 )
-
-setup_logging()
 
 class Swarmstar:
     def __init__(self, swarm_id: str):

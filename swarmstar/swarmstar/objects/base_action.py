@@ -11,13 +11,17 @@ Here we define the base class for actions, which:
         termination handlers, etc.
 """
 from abc import abstractmethod
+from ast import Dict
 from functools import wraps
-from typing import Any, List, Callable
+from typing import Any, List, Callable, Optional
 from pydantic import BaseModel
+from swarmstar.constants import INSTRUCTOR_MODEL_TITLE_TO_CLASS
 
 from swarmstar.enums.action_type_enum import ActionTypeEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
-from swarmstar.objects import BaseOperation, SwarmNode, ActionMetadata, SpawnOperation, BlockingOperation
+from swarmstar.objects import BaseOperation, SwarmNode
+from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
+from swarmstar.objects.operations.action_operation import ActionOperation
 
 class BaseAction(BaseModel):
     """
@@ -30,36 +34,36 @@ class BaseAction(BaseModel):
     def main(self) -> List[BaseOperation]:
         pass        
 
-    def report(self, report: str):
+    async def report(self, report: str):
         if self.node.report is not None:
             raise ValueError(f"Node {self.node.id} already has a report: {self.node.report}. Cannot update with {report}.")
         self.node.report = report
-        SwarmNode.update(self.node.id, {'report': report})
+        await self.node.upsert()
 
     """ Execution memory is for nodes to store information between actions """
 
-    def update_context(self, attribute: str, value: Any):
+    async def update_context(self, attribute: str, value: Any):
         self.node.context[attribute] = value
-        SwarmNode.update(self.node.id, {'context': self.node.context})
+        await self.node.upsert()
     
-    def remove_context(self, attribute: str):
+    async def remove_context(self, attribute: str):
         del self.node.context[attribute]
-        SwarmNode.update(self.node.id, {'context': self.node.context})
+        await self.node.upsert()
 
-    def clear_context(self):
+    async def clear_context(self):
         self.node.context = {}
-        SwarmNode.update(self.node.id, {'context': {}})
+        await self.node.upsert()
 
-    def update_termination_policy(self, termination_policy: TerminationPolicyEnum, termination_handler: str | None = None):
+    async def update_termination_policy(self, termination_policy: TerminationPolicyEnum, termination_handler: str | None = None):
         """
         Some nodes have unique termination policies, and can define their own termination handlers.
 
         If the termination policy is custom_termination_handler, the termination handler will be set to the function name passed in the termination_handler parameter.
         """
         self.node.termination_policy = termination_policy
-        SwarmNode.update(self.node.id, {'termination_policy': termination_policy})
+        await self.node.upsert()
         if termination_policy == "custom_termination_handler":
-            self.update_context("__termination_handler__", termination_handler)
+            await self.update_context("__termination_handler__", termination_handler)
 
     """ Wrappers for handling common functionality """
 
@@ -108,14 +112,13 @@ class BaseAction(BaseModel):
             """
             completion = kwargs.get("completion", None)
             context = kwargs.get("context", None)
-            instructor_model_name = kwargs.pop("instructor_model_name", None)
+            instructor_model_title = kwargs.pop("instructor_model_title", None)
 
-            if not instructor_model_name or not completion:
+            if not instructor_model_title or not completion:
                 raise ValueError(f"instructor_model_name and completion are required parameters for receive_instructor_completion_handler. Error in {self.node.id} at function {func.__name__}")
 
-            if type(completion) is dict and instructor_model_name:
-                models_module = ActionMetadata.get_action_module(self.node.type)
-                instructor_model = getattr(models_module, instructor_model_name)
+            if type(completion) is dict and instructor_model_title:
+                instructor_model = INSTRUCTOR_MODEL_TITLE_TO_CLASS[instructor_model_title]
                 completion = instructor_model.model_validate(completion)
 
             if context:
@@ -125,7 +128,7 @@ class BaseAction(BaseModel):
         return wrapper
 
     @staticmethod
-    def ask_questions_wrapper(func: Callable):
+    def ask_questions_wrapper(func: Callable[[str, Optional[dict[str, Any]]], Any]):
         """        
         The wrapped function needs to accept:
             - message: str
@@ -133,35 +136,30 @@ class BaseAction(BaseModel):
         
         The message should be a directive, decision or task. This wrapper will force an additional step,
         to ask questions, before the wrapped function is called. This is to ensure that the LLM has
-        full context before performing any action. Questions are answered by the oracle.
+        full context before performing any action.
 
-        The oracle is responsible for answering questions and has access to the swarm's memory,
-        the internet, and can communicate with the user as a last resort. 
-    
-        This abstracts the RAG problem away from actions. To ensure any action is performed
-        with full context, we tell the LLM to ask questions. The answering of these questions
-        is the oracle's responsibility.
+        This abstracts the RAG problem away from actions.
 
         Functionality:
         This wrapper will be called multiple times, and at each step will be in one of the following stages.
         This wrapper will know which stage it is in by checking the received parameters.
 
-        1. Giving the LLM the option to ask questions:
+        1. Give the LLM the option to ask questions:
             Expected parameters: message: str, Optional[context: Dict[str, Any]]
-        - Saves original message in operational context
+        - Saves original payload in operational context
         - Returns a Blocking Operation of type "ask_questions" with the message and context.
 
-        2. Accessing the oracle:
+        2. If the LLM asks questions, spawn a search node to answer them:
             Expected parameters: (completion: Any, context: Dict[str, Any])
         - Checks if the `questions` field in the completion is None.
         - If the `questions` field in the completion is None, call the wrapped function.
-        - If not None, spawns an oracle node to answer the questions and set 
+        - If not None, spawns a search node to answer the questions and set 
         this node's termination handler to the wrapped function so that we can
-        handle the oracle's response.
+        handle the search node's response.
 
-        3. Handling the oracle's completion:
+        3. Receive the search result and resume the original action:
             Expected parameters: (terminator_id: str, context: Dict[str, Any])
-        - Appends the report from the oracle node to the message in context.
+        - Appends the report from the search node to the message in context.
         - Returns a Blocking Operation of type "ask_questions" with the message and context.
  
         This process repeats until the LLM has no more questions.
@@ -177,9 +175,9 @@ class BaseAction(BaseModel):
             if message: # Stage 1
                 if context is None: context = {}
                 context["__message__"] = message
-                return BlockingOperation(
-                    node_id=self.node.id,
-                    blocking_type="ask_questions",
+                return ActionOperation(
+                    swarm_node_id=self.node.id,
+                    function_to_call="ask_questions",
                     args={"message": message},
                     context=context,
                     next_function_to_call=func.__name__

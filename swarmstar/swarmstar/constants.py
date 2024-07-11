@@ -1,7 +1,9 @@
 from typing import Dict, List, Type
+from pydantic import BaseModel
 from swarmstar.actions.general.plan import Plan
 from swarmstar.enums.action_type_enum import ActionTypeEnum
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
+from swarmstar.instructor.instructor_models.router_instructor_model import RouterInstructorModel
 from swarmstar.models.action_metadata_node_model import ActionMetadataNodeModel
 from swarmstar.models.memory_metadata_node_model import MemoryMetadataNodeModel
 
@@ -110,4 +112,8 @@ SWARM_ID_LENGTH = 32
 
 ACTION_ENUM_TO_ACTION_CLASS: Dict[ActionTypeEnum, Type[BaseAction]] = {
     ActionTypeEnum.PLAN: Plan
+}
+
+INSTRUCTOR_MODEL_TITLE_TO_CLASS: Dict[str, Type[BaseModel]] = {
+    "Router": RouterInstructorModel
 }

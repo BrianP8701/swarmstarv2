@@ -2,6 +2,7 @@ import uuid
 from pydantic import Field
 from typing import Dict, List
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
+from swarmstar.enums.swarm_status_enum import SwarmStatusEnum
 from swarmstar.models.swarmstar_event_model import SwarmstarEventModel
 from swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
 from swarmstar.objects.base_object import BaseObject
@@ -36,11 +37,11 @@ class SwarmstarSpace(BaseObject):
     communication_operation_count: int = 0
     action_operation_count: int = 0
     queued_operation_ids: List[str] = []
-    goal_id: str
+    goal: str
     swarm_title: str
     memory_title: str
     environment_vars: Dict[str, str] = {}
-    active: bool = True
+    status: SwarmStatusEnum = SwarmStatusEnum.WAITING_FOR_USER_INPUT
 
     @classmethod
     def instantiate_swarmstar_space(cls, swarm_id: str):
