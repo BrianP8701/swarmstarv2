@@ -18,7 +18,7 @@ class SwarmNodeModel(BaseSQLAlchemyModel):
     goal = Column(Text, nullable=False)
     status = Column(SQLAlchemyEnum(SwarmNodeStatusEnum), default=SwarmNodeStatusEnum.ACTIVE)
     termination_policy = Column(SQLAlchemyEnum(TerminationPolicyEnum), default=TerminationPolicyEnum.SIMPLE)
-    logs = Column(SQLiteJSON, default=list)
+    message_ids = Column(SQLiteJSON, default=list)
     report = Column(Text, nullable=True)
     context = Column(SQLiteJSON, default=dict)
 

@@ -1,14 +1,7 @@
-"""
-Think of a metadata tree as a file system, where files and folders
-are all labeled with descriptions and other metadata.
-
-LLMs can navigate metadata trees by descriptions to find relevant information, or modify the tree.
-"""
-from abc import abstractmethod
 from typing import ClassVar, List, Union, Dict
+from data.models.memory_metadata_node_model import MemoryMetadataNodeModel
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.objects.nodes.memory_metadata_node import MemoryMetadataNode
-from swarmstar.objects.nodes.swarm_node import SwarmNode
 from swarmstar.objects.operations.action_operation import ActionOperation
 from swarmstar.objects.trees.base_metadata_tree import MetadataTree, MetadataTreeSearchInput, MetadataTreeSearchState
 
@@ -26,7 +19,7 @@ class MemoryMetadataTreeSearchState(MetadataTreeSearchState):
 class MemoryMetadataTree(MetadataTree):
     __table__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.MEMORY_METADATA_NODES
     __node_object__: ClassVar[MemoryMetadataNode]
-    # __node_model__: ClassVar[MemoryMetadataNodeModel]
+    __node_model__: ClassVar[MemoryMetadataNodeModel]
     __branch_size_soft_limit__: ClassVar[int]
     __branch_size_hard_limit__: ClassVar[int]
 

@@ -1,6 +1,7 @@
 import uuid
 from pydantic import Field
 from typing import Dict, List
+from swarmstar.constants import DEFAULT_SWARMSTAR_ID
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.enums.swarm_status_enum import SwarmStatusEnum
 from data.models.swarmstar_event_model import SwarmstarEventModel
@@ -13,6 +14,7 @@ from swarmstar.objects.trees.swarm_tree import SwarmTree
 from swarmstar.objects.operations.base_operation import BaseOperation
 
 from data.database import Database
+from swarmstar.objects.trees.tool_metadata_tree import ToolMetadataTree
 
 db = Database()
 
@@ -43,34 +45,24 @@ class SwarmstarSpace(BaseObject):
     environment_vars: Dict[str, str] = {}
     status: SwarmStatusEnum = SwarmStatusEnum.WAITING_FOR_USER_INPUT
 
-    @classmethod
-    def instantiate_swarmstar_space(cls, swarm_id: str):
-        if cls.exists(swarm_id):
-            raise ValueError(f"Swarmstar space with id {swarm_id} already exists")
+    async def instantiate(self, swarm_id: str):
+        await MemoryMetadataTree.clone(DEFAULT_SWARMSTAR_ID, swarm_id)
+        await ActionMetadataTree.clone(DEFAULT_SWARMSTAR_ID, swarm_id)
+        await ToolMetadataTree.clone(DEFAULT_SWARMSTAR_ID, swarm_id)
 
-        swarmstar_space = cls(
-            
-        )
+        default_swarmstar_space = await SwarmstarSpace.read(DEFAULT_SWARMSTAR_ID)
+        self.memory_metadata_node_count = default_swarmstar_space.memory_metadata_node_count
+        self.action_metadata_node_count = default_swarmstar_space.action_metadata_node_count
+        self.tool_metadata_node_count = default_swarmstar_space.tool_metadata_node_count
 
-        MemoryMetadataTree.instantiate(swarm_id)
-        ActionMetadataTree.instantiate(swarm_id)
-
-        cls.create()
+        await self.upsert()
 
     @staticmethod
-    def delete_swarmstar_space(swarm_id: str):
-        if not db.exists("admin", swarm_id):
-            raise ValueError(f"Swarmstar space with id {swarm_id} does not exist")
-
-        swarmstar_space = SwarmstarSpace.read(swarm_id)
-        db.delete("admin", swarm_id)
-        
-        if swarmstar_space.node_count > 0: SwarmTree.delete(swarm_id)
-        if swarmstar_space.action_count > 0: ActionMetadataTree.delete(swarm_id)
-        if swarmstar_space.memory_count > 0: MemoryMetadataTree.delete(swarm_id)
-        
-        for i in range(swarmstar_space.operation_count):
-            BaseOperation.delete(f"{swarm_id}_o{i}")
+    async def delete_swarmstar_space(swarm_id: str):
+        await MemoryMetadataTree.delete(swarm_id)
+        await ActionMetadataTree.delete(swarm_id)
+        await ToolMetadataTree.delete(swarm_id)
+        await SwarmTree.delete(swarm_id)
 
     @staticmethod
     def rollback_to_event(session, swarm_id: str, event_index: int):

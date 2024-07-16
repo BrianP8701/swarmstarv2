@@ -13,7 +13,7 @@ from typing import Type, ClassVar
 from swarmstar.constants import ACTION_ENUM_TO_ACTION_CLASS
 from swarmstar.enums.action_type_enum import ActionTypeEnum
 from data.models.action_metadata_node_model import ActionMetadataNodeModel
-from swarmstar.objects.base_action import BaseAction
+from swarmstar.actions.base_action import BaseAction
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 
 class ActionMetadataNode(BaseMetadataNode['ActionMetadataNode']):

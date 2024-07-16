@@ -13,13 +13,12 @@ class SpawnOperation(BaseOperation):
     __object_model__: ClassVar[SpawnOperationModel] = SpawnOperationModel
 
     goal: str
-    parent_swarm_node_id: str
     action_type: ActionTypeEnum
 
     async def _execute(self) -> List['ActionOperation']:
         new_node = SwarmNode(
             title=enum_to_string(self.action_type),
-            parent_id=self.parent_swarm_node_id,
+            parent_id=self.swarm_node_id,
             action_type=self.action_type,
             goal=self.goal,
         )

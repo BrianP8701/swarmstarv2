@@ -22,6 +22,7 @@ from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from swarmstar.objects import BaseOperation, SwarmNode
 from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
 from swarmstar.objects.operations.action_operation import ActionOperation
+from swarmstar.objects.operations.spawn_operation import SpawnOperation
 
 class BaseAction(BaseModel):
     """
@@ -128,28 +129,22 @@ class BaseAction(BaseModel):
         return wrapper
 
     @staticmethod
-    def ask_questions_wrapper(func: Callable[[str, Optional[dict[str, Any]]], Any]):
-        """        
+    async def ask_questions_wrapper(func: Callable[[str, Optional[dict[str, Any]]], Any]):
+        """
         The wrapped function needs to accept:
-            - message: str
+            - goal: str
             - context: Optional[Dict[str, Any]]
-        
-        The message should be a directive, decision or task. This wrapper will force an additional step,
-        to ask questions, before the wrapped function is called. This is to ensure that the LLM has
-        full context before performing any action.
 
-        This abstracts the RAG problem away from actions.
-
-        Functionality:
-        This wrapper will be called multiple times, and at each step will be in one of the following stages.
-        This wrapper will know which stage it is in by checking the received parameters.
+        This wrapper abstracts search away from actions.
 
         1. Give the LLM the option to ask questions:
-            Expected parameters: message: str, Optional[context: Dict[str, Any]]
+            Expected parameters: goal: str, Optional[context: Dict[str, Any]]
         - Saves original payload in operational context
-        - Returns a Blocking Operation of type "ask_questions" with the message and context.
+        - Allows an LLM to ask questions for more context before performing an action.
+        - Returns a Search ActionOperation if questions are asked.
+        - Calls the function normally if questions are not asked.
 
-        2. If the LLM asks questions, spawn a search node to answer them:
+        2. If the LLM asks questions, spawn a Search node to answer them:
             Expected parameters: (completion: Any, context: Dict[str, Any])
         - Checks if the `questions` field in the completion is None.
         - If the `questions` field in the completion is None, call the wrapped function.
@@ -165,7 +160,7 @@ class BaseAction(BaseModel):
         This process repeats until the LLM has no more questions.
         """
         @wraps(func)
-        def wrapper(self, **kwargs):
+        async def wrapper(self, **kwargs):
             message = kwargs.pop("message", None)
             context = kwargs.pop("context", None)
             completion = kwargs.get("completion", None)
@@ -180,39 +175,34 @@ class BaseAction(BaseModel):
                     function_to_call="ask_questions",
                     args={"message": message},
                     context=context,
-                    next_function_to_call=func.__name__
                 )
             elif completion: # Stage 2
                 if completion["questions"]:
                     self.update_termination_policy(termination_policy="custom_termination_handler", termination_handler=func.__name__)
                     return SpawnOperation(
-                        parent_id=self.node.id,
-                        action_id="specific/oracle",
-                        message={
-                            "questions": completion["questions"], 
-                            "context": completion["context"]
-                        },
+                        swarm_node_id=self.node.id,
+                        action_type=ActionTypeEnum.SEARCH,
+                        goal=f"{completion['questions']}\n\n{completion['context']}",
                         context=context
                     )
                 else:
                     message = context.pop("__message__")
-                    if context: return func(self, message, context)
-                    else: return func(self, message)
+                    return func(message, context)
             elif terminator_id: # Stage 3
-                terminator_node = SwarmNode.read(terminator_id)
+                terminator_node = await SwarmNode.read(terminator_id)
                 oracle_report = terminator_node.report
                 context["__message__"] += f"\n\n{oracle_report}"
-                return BlockingOperation(
-                    node_id=self.node.id,
-                    blocking_type="ask_questions",
-                    args={"message": message},
+                return ActionOperation(
+                    swarm_node_id=self.node.id,
                     context=context,
-                    next_function_to_call=func.__name__
+                    function_to_call=func.__name__,
+                    args={"message": message},
                 )
             else:
                 raise ValueError(f"ask_questions wrapper called with invalid parameters: {kwargs}")
         return wrapper
 
+    async def _
 
 # Look at this again later # TODO for some reason its repeating stuff and outputs a ton of shit
 # def error_handling_decorator(func):
