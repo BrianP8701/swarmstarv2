@@ -4,7 +4,7 @@ from sqlalchemy.schema import Table
 import asyncio
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 
-from swarmstar.models.swarmstar_event_model import SwarmstarEventModel
+from data.models.swarmstar_event_model import SwarmstarEventModel
 from swarmstar.utils.misc.ids import (
     extract_swarm_id, 
     generate_id, 
@@ -14,7 +14,7 @@ from swarmstar.constants import (
     TABLE_ENUMS_TO_LISTEN_TO, 
     TABLE_ENUM_TO_MODEL_CLASS
 )
-from swarmstar.database import Database
+from data.database import Database
 
 db = Database()
 

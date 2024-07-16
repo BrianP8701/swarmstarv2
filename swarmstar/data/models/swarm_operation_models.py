@@ -2,7 +2,7 @@ from sqlalchemy import Column, ForeignKey, String, Enum as SqlAlchemyEnum
 from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
 from swarmstar.enums.action_type_enum import ActionTypeEnum
 
-from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
 class BaseOperationModel(BaseSQLAlchemyModel):
     __tablename__ = 'operations'

@@ -7,7 +7,7 @@ tools in swarmstar/actions/memory_tools
 from typing import Type, ClassVar
 
 from swarmstar.enums.memory_type_enum import MemoryTypeEnum
-from swarmstar.models.memory_metadata_node_model import MemoryMetadataNodeModel
+from data.models.memory_metadata_node_model import MemoryMetadataNodeModel
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 
 class MemoryMetadataNode(BaseMetadataNode['MemoryMetadataNode']):

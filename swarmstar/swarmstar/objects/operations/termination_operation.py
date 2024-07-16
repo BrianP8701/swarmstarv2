@@ -2,7 +2,7 @@ from typing import ClassVar, Dict, List
 from swarmstar.enums.action_type_enum import ActionTypeEnum
 from swarmstar.enums.swarm_node_status_enum import SwarmNodeStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
-from swarmstar.models.swarm_operation_models import TerminationOperationModel
+from data.models.swarm_operation_models import TerminationOperationModel
 from swarmstar.objects.nodes.swarm_node import SwarmNode
 from swarmstar.objects.operations.action_operation import ActionOperation
 from swarmstar.objects.operations.base_operation import BaseOperation

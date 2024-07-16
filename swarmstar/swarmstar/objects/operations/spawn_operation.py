@@ -1,6 +1,6 @@
 from typing import ClassVar, List
 from swarmstar.enums.action_type_enum import ActionTypeEnum
-from swarmstar.models.swarm_operation_models import SpawnOperationModel
+from data.models.swarm_operation_models import SpawnOperationModel
 from swarmstar.objects.nodes.swarm_node import SwarmNode
 from swarmstar.objects.operations.action_operation import ActionOperation
 from swarmstar.objects.operations.base_operation import BaseOperation

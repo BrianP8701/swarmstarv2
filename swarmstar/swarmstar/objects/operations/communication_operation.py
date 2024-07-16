@@ -1,6 +1,6 @@
 from typing import ClassVar, Dict, Any
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
-from swarmstar.models.swarm_operation_models import CommunicationOperationModel
+from data.models.swarm_operation_models import CommunicationOperationModel
 from swarmstar.objects.base_message import BaseMessage
 from swarmstar.objects.nodes.swarm_node import SwarmNode
 from swarmstar.objects.operations.base_operation import BaseOperation

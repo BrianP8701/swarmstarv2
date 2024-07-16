@@ -3,7 +3,7 @@ from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
 from sqlalchemy.orm import relationship
 
 from swarmstar.enums.tool_type_enum import ToolTypeEnum
-from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
 class ToolMetadataNodeModel(BaseSQLAlchemyModel):
     __tablename__ = 'tool_metadata_nodes'

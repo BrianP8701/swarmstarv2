@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import instructor 
 from pydantic import BaseModel
 from openai import AsyncOpenAI
-from swarmstar.enums.message_role_enum import MessageRole
+from swarmstar.enums.message_role_enum import MessageRoleEnum
 from swarmstar.objects.base_message import BaseMessage
 from swarmstar.objects.nodes.swarm_node import SwarmNode
 from swarmstar.objects.operations.base_operation import BaseOperation
@@ -36,7 +36,7 @@ class Instructor:
     ) -> T:
         swarm_node = await SwarmNode.read(operation.swarm_node_id)
         log_index_key = operation.context.get("log_index_key", [])
-        request_log_messages = [BaseMessage(role=MessageRole(m["role"]), **m) for m in messages]
+        request_log_messages = [BaseMessage(role=MessageRoleEnum(m["role"]), **m) for m in messages]
         log_index_key = await swarm_node.log_multiple(request_log_messages, log_index_key)
 
         completion: T = await cls.aclient.chat.completions.create(
@@ -49,7 +49,7 @@ class Instructor:
         ) # type: ignore
 
         response_message = BaseMessage(
-            role=MessageRole.ASSISTANT,
+            role=MessageRoleEnum.ASSISTANT,
             content=completion.model_dump_json()
         )
         log_index_key = await swarm_node.log(response_message, log_index_key)

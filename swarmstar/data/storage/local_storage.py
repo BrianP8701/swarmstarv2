@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 from dotenv import load_dotenv
 from threading import Lock
 
-from swarmstar.database.abstract_storage import AbstractStorage
+from data.database.abstract_storage import AbstractStorage
 
 load_dotenv()
 STORAGE_FOLDER_PATH = os.getenv("STORAGE_FOLDER_PATH")

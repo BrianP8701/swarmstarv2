@@ -12,3 +12,4 @@ class DatabaseTableEnum(Enum, str):
     BLOCKING_OPERATIONS = "blocking_operations"
     COMMUNICATION_OPERATIONS = "communication_operations"
     ACTION_OPERATIONS = "action_operations"
+    MESSAGES = "messages"

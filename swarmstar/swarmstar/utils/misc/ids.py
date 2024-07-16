@@ -2,7 +2,7 @@ import uuid
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from swarmstar.database import Database
+from data.database import Database
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.constants import (
     SWARM_ID_LENGTH, 
@@ -12,7 +12,7 @@ from swarmstar.constants import (
     TABLE_ABBREVIATION_TO_ENUM,
     TABLE_ENUM_TO_TABLE_NAME
 )
-from swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
+from data.models.swarmstar_space_model import SwarmstarSpaceModel
 from swarmstar.objects.operations.base_operation import BaseOperation
 
 db = Database()

@@ -6,7 +6,7 @@ import asyncio
 from sqlalchemy.orm import aliased
 from sqlalchemy import select
 
-from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 from swarmstar.objects.nodes.base_node import BaseNode
 from swarmstar.constants import TABLE_ENUM_TO_ABBREVIATION
 from swarmstar.enums.database_table_enum import DatabaseTableEnum

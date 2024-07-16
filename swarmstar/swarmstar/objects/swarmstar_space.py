@@ -3,8 +3,8 @@ from pydantic import Field
 from typing import Dict, List
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.enums.swarm_status_enum import SwarmStatusEnum
-from swarmstar.models.swarmstar_event_model import SwarmstarEventModel
-from swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
+from data.models.swarmstar_event_model import SwarmstarEventModel
+from data.models.swarmstar_space_model import SwarmstarSpaceModel
 from swarmstar.objects.base_object import BaseObject
 
 from swarmstar.objects.trees.memory_metadata_tree import MemoryMetadataTree
@@ -12,7 +12,7 @@ from swarmstar.objects.trees.action_metadata_tree import ActionMetadataTree
 from swarmstar.objects.trees.swarm_tree import SwarmTree
 from swarmstar.objects.operations.base_operation import BaseOperation
 
-from swarmstar.database import Database
+from data.database import Database
 
 db = Database()
 

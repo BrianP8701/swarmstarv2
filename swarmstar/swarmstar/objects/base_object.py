@@ -5,9 +5,9 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
-from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 from swarmstar.utils.misc.ids import generate_id
-from swarmstar.database import Database
+from data.database import Database
 
 db = Database()
 

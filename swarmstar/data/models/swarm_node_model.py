@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from swarmstar.enums.action_type_enum import ActionTypeEnum
 from swarmstar.enums.swarm_node_status_enum import SwarmNodeStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
-from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
 class SwarmNodeModel(BaseSQLAlchemyModel):
     __tablename__ = 'swarm_nodes'

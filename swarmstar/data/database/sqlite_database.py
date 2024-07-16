@@ -9,8 +9,8 @@ import threading
 from dotenv import load_dotenv
 import os
 
-from swarmstar.database.abstract_database import AbstractDatabase
-from swarmstar.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from data.database.abstract_database import AbstractDatabase
+from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
 load_dotenv()
 SQLITE_DB_FILE_PATH = os.getenv("SQLITE_DB_FILE_PATH")

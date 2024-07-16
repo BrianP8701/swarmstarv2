@@ -1,18 +1,20 @@
 from typing import Dict, List, Type
+from data.models.message import MessageModel
 from pydantic import BaseModel
 from swarmstar.actions.general.plan import Plan
 from swarmstar.enums.action_type_enum import ActionTypeEnum
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.instructor.instructor_models.router_instructor_model import RouterInstructorModel
-from swarmstar.models.action_metadata_node_model import ActionMetadataNodeModel
-from swarmstar.models.memory_metadata_node_model import MemoryMetadataNodeModel
+from data.models.action_metadata_node_model import ActionMetadataNodeModel
+from data.models.memory_metadata_node_model import MemoryMetadataNodeModel
 
-from swarmstar.models.swarmstar_event_model import SwarmstarEventModel
-from swarmstar.models.swarm_node_model import SwarmNodeModel
-from swarmstar.models.swarm_operation_models import SpawnOperationModel, TerminationOperationModel, CommunicationOperationModel, ActionOperationModel
-from swarmstar.models.swarmstar_space_model import SwarmstarSpaceModel
-from swarmstar.models.tool_metadata_node_model import ToolMetadataNodeModel
+from data.models.swarmstar_event_model import SwarmstarEventModel
+from data.models.swarm_node_model import SwarmNodeModel
+from data.models.swarm_operation_models import SpawnOperationModel, TerminationOperationModel, CommunicationOperationModel, ActionOperationModel
+from data.models.swarmstar_space_model import SwarmstarSpaceModel
+from data.models.tool_metadata_node_model import ToolMetadataNodeModel
 from swarmstar.objects.base_action import BaseAction
+from swarmstar.objects.message import Message
 from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
 from swarmstar.objects.nodes.memory_metadata_node import MemoryMetadataNode
 from swarmstar.objects.nodes.swarm_node import SwarmNode
@@ -85,6 +87,13 @@ TABLE_PROPERTIES = {
         "model_class": ToolMetadataNodeModel,
         "table_name": "tool_metadata_nodes",
         "object_class": ToolMetadataNode
+    },
+    DatabaseTableEnum.MESSAGES: {
+        "abbreviation": "ms",
+        "count_column": "message_count",
+        "model_class": MessageModel,
+        "table_name": "messages",
+        "object_class": Message
     }
 }
 
