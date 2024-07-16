@@ -24,7 +24,7 @@ class SwarmNode(BaseNode['SwarmNode']):
     report: Optional[str] = None                                        # We should look at the node and see like, "Okay, thats what this node did." 
     context: Dict[str, Any] = {}                                        # This is where nodes can store extra context about themselves.
 
-    async def log(self, message: Message, keys: Optional[List[int]] = None) -> None:
+    async def log(self, message: Message, keys: Optional[List[int]] = None) -> List[int]:
         """
         Appends a message to the logs. If keys are provided, the log will be added to the nested parallel logs.
 
@@ -38,7 +38,37 @@ class SwarmNode(BaseNode['SwarmNode']):
             self.message_ids.append(message.id)
         await self.upsert()
 
-    def _get_nested_message_ids(self, keys: List[int]) -> List[str]:
+        if keys:
+            keys[-1] += 1
+            return keys
+        else:
+            return [len(self.message_ids) - 1]
+
+    async def log_multiple(self, messages: List[Message], keys: Optional[List[int]] = None) -> List[int]:
+        """
+        Logs multiple messages to the node.
+        """
+        for message in messages:
+            keys = await self.log(message, keys)
+
+        if keys:
+            return keys
+        else:
+            return [len(self.message_ids) - 1]
+
+    def create_nested_log(self, keys: Optional[List[int]] = None) -> List[int]:
+        """
+        Creates a nested log.
+        """
+        if keys:
+            log = self._get_nested_message_ids(keys)
+            log.append([])
+            return keys + [len(log) - 1]
+        else:
+            self.message_ids.append([])
+            return []
+
+    def _get_nested_message_ids(self, keys: List[int]) -> List[Union[List[str], str]]:
         """
         Retrieve a nested message id list based on the provided keys.
         
@@ -53,7 +83,7 @@ class SwarmNode(BaseNode['SwarmNode']):
                 raise ValueError(f"Invalid log structure in swarm node {self.id}. Attempted to follow key path: {keys}")
         
         if isinstance(nested_log, list) and all(isinstance(item, str) for item in nested_log):
-            return cast(List[str], nested_log)
+            return cast(List[Union[List[str], str]], nested_log)
         else:
             raise ValueError(f"Expected a list of strings at the end of the key path: {keys}")
 

@@ -11,11 +11,9 @@ Here we define the base class for actions, which:
         termination handlers, etc.
 """
 from abc import abstractmethod
-from ast import Dict
 from functools import wraps
-from typing import Any, List, Callable, Optional
+from typing import Any, ClassVar, List, Callable, Optional
 from pydantic import BaseModel
-from swarmstar.constants import INSTRUCTOR_MODEL_TITLE_TO_CLASS
 
 from swarmstar.enums.action_type_enum import ActionTypeEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
@@ -28,8 +26,9 @@ class BaseAction(BaseModel):
     """
     All actions inherit this class.
     """
+    __action_type__: ClassVar[ActionTypeEnum]
     node: SwarmNode
-    action: ActionTypeEnum
+    operation: ActionOperation
 
     @abstractmethod
     def main(self) -> List[BaseOperation]:
@@ -161,8 +160,16 @@ class BaseAction(BaseModel):
         """
         @wraps(func)
         async def wrapper(self, **kwargs):
-            message = kwargs.pop("message", None)
+            quesion_wrapper_stage = self.operation.context.get("__question_wrapper_stage__", 1)  
+            goal = kwargs.pop("goal", None)
             context = kwargs.pop("context", None)
+
+            if quesion_wrapper_stage == 1:
+                self.operation.context["__question_wrapper_stage__"] = 2
+                self.operation.function_to_call = "ask_questions"
+                return self.operation
+            
+
             completion = kwargs.get("completion", None)
             if type(completion) is not dict and completion: completion = completion.model_dump()
             terminator_id = kwargs.get("terminator_id", None)
@@ -202,7 +209,7 @@ class BaseAction(BaseModel):
                 raise ValueError(f"ask_questions wrapper called with invalid parameters: {kwargs}")
         return wrapper
 
-    async def _
+    async def _ask_questions()
 
 # Look at this again later # TODO for some reason its repeating stuff and outputs a ton of shit
 # def error_handling_decorator(func):

@@ -125,10 +125,14 @@ ACTION_ENUM_TO_ACTION_CLASS: Dict[ActionTypeEnum, Type[BaseAction]] = {
     ActionTypeEnum.PLAN: Plan
 }
 
-
 DEFAULT_SWARMSTAR_ID = "swarmstar"
 
-INSTRUCTOR_ENUM_TO_MODEL_CLASS: Dict[InstructorEnum, Type[BaseModel]] = {
+INSTRUCTOR_ENUM_TO_CLASS: Dict[InstructorEnum, Type[BaseModel]] = {
     InstructorEnum.ROUTER_INSTRUCTOR: RouterInstructor,
     InstructorEnum.SEARCH_INSTRUCTOR: SearchInstructor
+}
+
+INSTRUCTOR_CLASS_TO_ENUM: Dict[Type[BaseModel], InstructorEnum] = {
+    RouterInstructor: InstructorEnum.ROUTER_INSTRUCTOR,
+    SearchInstructor: InstructorEnum.SEARCH_INSTRUCTOR
 }

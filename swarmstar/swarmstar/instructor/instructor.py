@@ -1,5 +1,4 @@
-from math import log
-from typing import Dict, List, Type, TypeVar, cast
+from typing import List, Type, TypeVar, cast
 import os
 from dotenv import load_dotenv
 
@@ -7,7 +6,7 @@ import instructor
 from pydantic import BaseModel
 from openai import AsyncOpenAI
 from swarmstar.enums.message_role_enum import MessageRoleEnum
-from swarmstar.objects.base_message import BaseMessage
+from swarmstar.objects.message import Message
 from swarmstar.objects.nodes.swarm_node import SwarmNode
 from swarmstar.objects.operations.base_operation import BaseOperation
 
@@ -29,31 +28,35 @@ class Instructor:
     @classmethod
     async def completion(
         cls,
-        messages: List[Dict[str, str]],
+        messages: List[Message],
         instructor_model: Type[T],
         operation: BaseOperation,
         max_retries: int = 3,
+        logging: bool = True,
     ) -> T:
-        swarm_node = await SwarmNode.read(operation.swarm_node_id)
-        log_index_key = operation.context.get("log_index_key", [])
-        request_log_messages = [BaseMessage(role=MessageRoleEnum(m["role"]), **m) for m in messages]
-        log_index_key = await swarm_node.log_multiple(request_log_messages, log_index_key)
-
         completion: T = await cls.aclient.chat.completions.create(
             model="gpt-4o",
-            messages=messages,
+            messages=[message.convert_to_openai_message() for message in messages],
             temperature=0.0,
             seed=69,
             max_retries=max_retries,
             response_model=instructor_model
         ) # type: ignore
 
-        response_message = BaseMessage(
+        response_message = Message(
             role=MessageRoleEnum.ASSISTANT,
             content=completion.model_dump_json()
         )
-        log_index_key = await swarm_node.log(response_message, log_index_key)
-        operation.context["log_index_key"] = log_index_key
-        await operation.upsert()
+
+        if logging:
+            await cls._log_instructor_call(messages + [response_message], operation)
 
         return completion
+
+    @staticmethod
+    async def _log_instructor_call(messages: List[Message], operation: BaseOperation) -> None:
+        swarm_node = await SwarmNode.read(operation.swarm_node_id)
+        log_index_key = operation.context.get("log_index_key", [])
+        log_index_key = await swarm_node.log_multiple(messages, log_index_key)
+        operation.context["log_index_key"] = log_index_key
+        await operation.upsert()
