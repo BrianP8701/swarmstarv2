@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from data.database import Database
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
-from swarmstar.constants import (
+from swarmstar.constants.constants import (
     SWARM_ID_LENGTH, 
     TABLE_ENUM_TO_ABBREVIATION,
     TABLE_ENUM_TO_OBJECT_CLASS, 

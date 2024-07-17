@@ -2,7 +2,7 @@ from typing import ClassVar, Generic, List, Protocol, TypeVar
 from pydantic import BaseModel
 
 from swarmstar.instructor.instructor import Instructor
-from swarmstar.instructor.instructor_models.router_instructor import RouterInstructorModel
+from swarmstar.instructor.instructors.router_instructor import RouterInstructorModel
 from swarmstar.objects.operations.base_operation import BaseOperation
 
 T = TypeVar('T', bound='OptionLike')

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from abc import ABC, abstractmethod
 
 from swarmstar.objects.base_object import BaseObject
@@ -8,7 +8,7 @@ from swarmstar.utils.misc.ids import get_operation_class_from_id
 class BaseOperation(BaseObject, ABC):
     swarm_node_id: str
     context: Dict[str, Any] = {}
-
+    
     @staticmethod
     async def execute(operation_id: str) -> List[str]:
         """ 

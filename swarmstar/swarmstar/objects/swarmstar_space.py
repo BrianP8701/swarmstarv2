@@ -1,7 +1,7 @@
 import uuid
 from pydantic import Field
 from typing import Dict, List
-from swarmstar.constants import DEFAULT_SWARMSTAR_ID
+from swarmstar.constants.constants import DEFAULT_SWARMSTAR_ID
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.enums.swarm_status_enum import SwarmStatusEnum
 from data.models.swarmstar_event_model import SwarmstarEventModel

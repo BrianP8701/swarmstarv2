@@ -41,7 +41,7 @@ class SqliteDatabase(AbstractDatabase):
         self.create_all_tables()
 
     def create_all_tables(self):
-        from swarmstar.constants import ALL_DATABASE_MODEL_CLASSES
+        from swarmstar.constants.constants import ALL_DATABASE_MODEL_CLASSES
         for model in ALL_DATABASE_MODEL_CLASSES:
             model.metadata.create_all(bind=self.engine)
 

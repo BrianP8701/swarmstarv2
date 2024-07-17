@@ -10,7 +10,7 @@ from swarmstar.utils.misc.ids import (
     generate_id, 
     get_table_name_from_id
 )
-from swarmstar.constants import (
+from swarmstar.constants.constants import (
     TABLE_ENUMS_TO_LISTEN_TO, 
     TABLE_ENUM_TO_MODEL_CLASS
 )

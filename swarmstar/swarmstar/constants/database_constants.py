@@ -1,21 +1,15 @@
-from typing import Dict, List, Type
-from data.models.message import MessageModel
-from pydantic import BaseModel
-from swarmstar.actions.general.plan import Plan
-from swarmstar.enums.action_type_enum import ActionTypeEnum
+from typing import List
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
-from swarmstar.enums.instructor_enum import InstructorEnum
-from swarmstar.instructor.instructors.router_instructor import RouterInstructor
+
+from data.models.message import MessageModel
 from data.models.action_metadata_node_model import ActionMetadataNodeModel
 from data.models.memory_metadata_node_model import MemoryMetadataNodeModel
-
 from data.models.swarmstar_event_model import SwarmstarEventModel
 from data.models.swarm_node_model import SwarmNodeModel
 from data.models.swarm_operation_models import SpawnOperationModel, TerminationOperationModel, CommunicationOperationModel, ActionOperationModel
 from data.models.swarmstar_space_model import SwarmstarSpaceModel
 from data.models.tool_metadata_node_model import ToolMetadataNodeModel
-from swarmstar.actions.base_action import BaseAction
-from swarmstar.instructor.instructors.question_instructor import QuestionInstructor
+
 from swarmstar.objects.message import Message
 from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
 from swarmstar.objects.nodes.memory_metadata_node import MemoryMetadataNode
@@ -99,7 +93,6 @@ TABLE_PROPERTIES = {
     }
 }
 
-# Generate the required dictionaries from the single source of truth
 TABLE_ENUM_TO_ABBREVIATION = {k: v["abbreviation"] for k, v in TABLE_PROPERTIES.items()}
 TABLE_ABBREVIATION_TO_ENUM = {v["abbreviation"]: k for k, v in TABLE_PROPERTIES.items()}
 TABLE_ENUM_TO_SWARMSTAR_SPACE_COUNT_COLUMN = {k: v["count_column"] for k, v in TABLE_PROPERTIES.items()}
@@ -118,20 +111,3 @@ ALL_DATABASE_MODEL_CLASSES = [
     CommunicationOperationModel, 
     ActionOperationModel
 ]
-
-SWARM_ID_LENGTH = 32
-
-ACTION_ENUM_TO_ACTION_CLASS: Dict[ActionTypeEnum, Type[BaseAction]] = {
-    ActionTypeEnum.PLAN: Plan
-}
-
-DEFAULT_SWARMSTAR_ID = "swarmstar"
-
-INSTRUCTOR_ENUM_TO_CLASS: Dict[InstructorEnum, Type[BaseModel]] = {
-    InstructorEnum.ROUTER_INSTRUCTOR: RouterInstructor,
-    InstructorEnum.QUESTION_INSTRUCTOR: QuestionInstructor
-}
-
-INSTRUCTOR_CLASS_TO_ENUM: Dict[Type[BaseModel], InstructorEnum] = {
-    v: k for k, v in INSTRUCTOR_ENUM_TO_CLASS.items()
-}

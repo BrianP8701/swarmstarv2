@@ -8,7 +8,7 @@ class BaseOperationModel(BaseSQLAlchemyModel):
     __tablename__ = 'operations'
     id = Column(String, primary_key=True)
     swarm_node_id = Column(String, ForeignKey('swarm_nodes.id'))
-    context = Column(SQLiteJSON)
+    context = Column(SQLiteJSON, default={})
     __mapper_args__ = {
         'polymorphic_identity': 'operation',
         'polymorphic_on': type
@@ -19,7 +19,6 @@ class SpawnOperationModel(BaseOperationModel):
     id = Column(String, ForeignKey('operations.id'), primary_key=True)
     goal = Column(String)
     action_type = Column(SqlAlchemyEnum(ActionTypeEnum))
-    parent_swarm_node_id = Column(String)
     __mapper_args__ = {
         'polymorphic_identity': 'spawn_operation',
     }
@@ -27,8 +26,8 @@ class SpawnOperationModel(BaseOperationModel):
 class ActionOperationModel(BaseOperationModel):
     __tablename__ = 'action_operations'
     id = Column(String, ForeignKey('operations.id'), primary_key=True)
+    goal = Column(String)
     function_to_call = Column(String)
-    args = Column(SQLiteJSON)
     __mapper_args__ = {
         'polymorphic_identity': 'action_operation',
     }

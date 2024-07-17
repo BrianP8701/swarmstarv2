@@ -80,7 +80,6 @@ class TerminationOperation(BaseOperation):
                         swarm_node_id=swarm_node.id, 
                         action_type=ActionTypeEnum.REVIEW_GOAL_PROGRESS,
                         goal=swarm_node.goal,
-                        parent_swarm_node_id=swarm_node.id
                     )
                 ]
         else:

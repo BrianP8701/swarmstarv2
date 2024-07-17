@@ -26,7 +26,7 @@ class Instructor:
         return cls._instance
 
     @classmethod
-    async def completion(
+    async def instruct(
         cls,
         messages: List[Message],
         instructor_model: Type[T],

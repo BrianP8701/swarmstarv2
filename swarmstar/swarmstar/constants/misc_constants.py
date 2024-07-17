@@ -1,0 +1,2 @@
+DEFAULT_SWARMSTAR_ID = "swarmstar"
+SWARM_ID_LENGTH = 32

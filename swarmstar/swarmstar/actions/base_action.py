@@ -12,15 +12,19 @@ Here we define the base class for actions, which:
 """
 from abc import abstractmethod
 from functools import wraps
-from typing import Any, ClassVar, List, Callable, Optional
+from typing import Any, ClassVar, List, Callable, Optional, Tuple
 from pydantic import BaseModel
+from swarmstar.actions.contexts.question_context import QuestionContext
 
 from swarmstar.enums.action_type_enum import ActionTypeEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
+from swarmstar.instructor.instructor import Instructor
+from swarmstar.instructor.instructors.question_instructor import QuestionInstructor
 from swarmstar.objects import BaseOperation, SwarmNode
-from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
 from swarmstar.objects.operations.action_operation import ActionOperation
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
+
+instructor = Instructor()
 
 class BaseAction(BaseModel):
     """
@@ -91,163 +95,39 @@ class BaseAction(BaseModel):
         return wrapper
 
     @staticmethod
-    def receive_instructor_completion_handler(func: Callable):
-        @wraps(func)
-        def wrapper(self, **kwargs):
-            """
-            This wrapper is used on any action function that is meant 
-            to handle the completion of an instructor_completion.
-            
-            The function should accept two parameters as keyword arguments:
-                - completion: The completion of the instructor_completion of type defined by the instructor_model_name
-                - context: Context persisted through the blocking operation. Optional.
-            
-            (Skip this if not interested)
-            In an action we'll output a blocking operation. When this operation is executed, it'll
-            return an action operation with the response. Instructor completions return a response
-            following the specified Pydantic model. However, if we pause the swarm, the action operation
-            will get serialized, converting the completion into a dictionary. This wrapper merely ensures
-            that the completion is converted back into the Pydantic model before being passed to the function
-            in case of this scenario.
-            """
-            completion = kwargs.get("completion", None)
-            context = kwargs.get("context", None)
-            instructor_model_title = kwargs.pop("instructor_model_title", None)
-
-            if not instructor_model_title or not completion:
-                raise ValueError(f"instructor_model_name and completion are required parameters for receive_instructor_completion_handler. Error in {self.node.id} at function {func.__name__}")
-
-            if type(completion) is dict and instructor_model_title:
-                instructor_model = INSTRUCTOR_MODEL_TITLE_TO_CLASS[instructor_model_title]
-                completion = instructor_model.model_validate(completion)
-
-            if context:
-                return func(self, completion, context)
-            else:
-                return func(self, completion)
-        return wrapper
-
-    @staticmethod
-    async def ask_questions_wrapper(func: Callable[[str, Optional[dict[str, Any]]], Any]):
+    async def question_wrapper(func: Callable[..., Any]):
         """
-        The wrapped function needs to accept:
-            - goal: str
-            - context: Optional[Dict[str, Any]]
-
         This wrapper abstracts search away from actions.
-
-        1. Give the LLM the option to ask questions:
-            Expected parameters: goal: str, Optional[context: Dict[str, Any]]
-        - Saves original payload in operational context
-        - Allows an LLM to ask questions for more context before performing an action.
-        - Returns a Search ActionOperation if questions are asked.
-        - Calls the function normally if questions are not asked.
-
-        2. If the LLM asks questions, spawn a Search node to answer them:
-            Expected parameters: (completion: Any, context: Dict[str, Any])
-        - Checks if the `questions` field in the completion is None.
-        - If the `questions` field in the completion is None, call the wrapped function.
-        - If not None, spawns a search node to answer the questions and set 
-        this node's termination handler to the wrapped function so that we can
-        handle the search node's response.
-
-        3. Receive the search result and resume the original action:
-            Expected parameters: (terminator_id: str, context: Dict[str, Any])
-        - Appends the report from the search node to the message in context.
-        - Returns a Blocking Operation of type "ask_questions" with the message and context.
- 
-        This process repeats until the LLM has no more questions.
         """
         @wraps(func)
-        async def wrapper(self, **kwargs):
-            quesion_wrapper_stage = self.operation.context.get("__question_wrapper_stage__", 1)  
-            goal = kwargs.pop("goal", None)
-            context = kwargs.pop("context", None)
-
-            if quesion_wrapper_stage == 1:
-                self.operation.context["__question_wrapper_stage__"] = 2
-                self.operation.function_to_call = "ask_questions"
-                return self.operation
-            
-
-            completion = kwargs.get("completion", None)
-            if type(completion) is not dict and completion: completion = completion.model_dump()
-            terminator_id = kwargs.get("terminator_id", None)
-            
-            if message: # Stage 1
-                if context is None: context = {}
-                context["__message__"] = message
-                return ActionOperation(
-                    swarm_node_id=self.node.id,
-                    function_to_call="ask_questions",
-                    args={"message": message},
-                    context=context,
-                )
-            elif completion: # Stage 2
-                if completion["questions"]:
-                    self.update_termination_policy(termination_policy="custom_termination_handler", termination_handler=func.__name__)
-                    return SpawnOperation(
-                        swarm_node_id=self.node.id,
-                        action_type=ActionTypeEnum.SEARCH,
-                        goal=f"{completion['questions']}\n\n{completion['context']}",
-                        context=context
-                    )
-                else:
-                    message = context.pop("__message__")
-                    return func(message, context)
-            elif terminator_id: # Stage 3
-                terminator_node = await SwarmNode.read(terminator_id)
-                oracle_report = terminator_node.report
-                context["__message__"] += f"\n\n{oracle_report}"
-                return ActionOperation(
-                    swarm_node_id=self.node.id,
-                    context=context,
-                    function_to_call=func.__name__,
-                    args={"message": message},
-                )
+        async def wrapper(self):
+            do_we_need_search, search_operation = await self._ask_questions()
+            if do_we_need_search:
+                return [search_operation]
             else:
-                raise ValueError(f"ask_questions wrapper called with invalid parameters: {kwargs}")
+                return await func(self)
+            
         return wrapper
 
-    async def _ask_questions()
-
-# Look at this again later # TODO for some reason its repeating stuff and outputs a ton of shit
-# def error_handling_decorator(func):
-#     @wraps(func)
-#     def wrapper(self, *args, **kwargs):
-#         try:
-#             return func(self, *args, **kwargs)
-#         except Exception as e:
-#             exc_type, exc_value, exc_traceback = sys.exc_info()
-#             traceback_str = ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+    async def _ask_questions(self) -> Tuple[bool, SpawnOperation | None]:
+        question_instructor_output = await Instructor.instruct(
+            QuestionInstructor.generate_instruction(self.node.goal),
+            QuestionInstructor,
+            self.operation
+        )
+        if question_instructor_output.do_we_need_search:
+            if question_instructor_output.questions is None:
+                raise ValueError(f"QuestionInstructor returned None for questions despite do_we_need_search being True in swarm node {self.node.id} at operation {self.operation.id}")
             
-#             # Capture local variables
-#             frame = inspect.trace()[-1][0]
-#             local_vars = frame.f_locals
-            
-#             error_details = {
-#                 'exc_type': exc_type.__name__,
-#                 'exc_value': str(exc_value),
-#                 'exc_traceback': traceback_str,
-#                 'local_variables': {key: repr(value) for key, value in local_vars.items()},
-#                 'error_line': frame.f_lineno,
-#                 'error_module': frame.f_code.co_filename
-#             }
-            
-#             error_message = (
-#                 f"Error in {func.__name__}:\n{str(e)}\n\n"
-#                 f"Traceback:\n{traceback_str}\n\n"
-#                 f"Local Variables:\n{json.dumps(error_details['local_variables'], indent=2)}"
-#             )
-            
-#             raise ValueError(error_message)
-#             # return SpawnOperation(
-#             #     parent_id=self.node.id,
-#             #     node_embryo=NodeEmbryo(
-#             #         action_id="swarmstar/actions/swarmstar/handle_failure",
-#             #         message=error_message,
-#             #         context={'error_details': error_details}
-#             #     )
-#             # )
-    
-#     return wrapper
+            questions_string = "\t-" + "\n\t-".join(question_instructor_output.questions)
+            return True, SpawnOperation(
+                swarm_node_id=self.node.id,
+                action_type=ActionTypeEnum.SEARCH,
+                goal=f'Find answers to the following questions:\n{questions_string}',
+                context=QuestionContext(
+                    **self.operation.context, 
+                    questions=question_instructor_output.questions
+                ).model_dump()
+            )
+        else:
+            return False, None
