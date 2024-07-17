@@ -14,7 +14,7 @@ from abc import abstractmethod
 from functools import wraps
 from typing import Any, ClassVar, List, Callable, Optional, Tuple
 from pydantic import BaseModel
-from swarmstar.actions.contexts.question_context import QuestionContext
+from swarmstar.contexts.question_context import QuestionContext
 
 from swarmstar.enums.action_type_enum import ActionTypeEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum

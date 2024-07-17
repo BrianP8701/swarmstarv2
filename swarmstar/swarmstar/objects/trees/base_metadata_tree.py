@@ -7,7 +7,7 @@ LLMs can navigate metadata trees by descriptions to find relevant information, o
 from abc import abstractmethod
 from typing import ClassVar, List, Optional, Union
 from pydantic import BaseModel
-from swarmstar.constants.constants import DEFAULT_SWARMSTAR_ID
+from swarmstar.constants import DEFAULT_SWARMSTAR_ID
 from swarmstar.enums.metadata_tree_enums import MetadataTreeSearchOutputType
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 from swarmstar.objects.nodes.swarm_node import SwarmNode
@@ -31,10 +31,6 @@ class MetadataTree(BaseTree):
     __node_object__: ClassVar[BaseMetadataNode]
     __branch_size_soft_limit__: ClassVar[int]
     __branch_size_hard_limit__: ClassVar[int]
-
-    @classmethod
-    async def instantiate(cls, swarm_id: str):
-        count = get_swarm_object_count(DEFAULT_SWARMSTAR_ID, cls.__node_object__.__table__)
 
     async def search(self, input: MetadataTreeSearchInput) -> Optional[Union[str, BaseMetadataNode]]:
         if input.start_node_id:

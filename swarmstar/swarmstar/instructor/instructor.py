@@ -3,9 +3,9 @@ import os
 from dotenv import load_dotenv
 
 import instructor 
-from pydantic import BaseModel
 from openai import AsyncOpenAI
 from swarmstar.enums.message_role_enum import MessageRoleEnum
+from swarmstar.instructor.instructors.base_instructor import BaseInstructor
 from swarmstar.objects.message import Message
 from swarmstar.objects.nodes.swarm_node import SwarmNode
 from swarmstar.objects.operations.base_operation import BaseOperation
@@ -13,7 +13,7 @@ from swarmstar.objects.operations.base_operation import BaseOperation
 load_dotenv()
 OPENAI_KEY = os.getenv("OPENAI_KEY")
 
-T = TypeVar('T', bound=BaseModel)
+T = TypeVar('T', bound=BaseInstructor)
 
 class Instructor:
     _instance = None

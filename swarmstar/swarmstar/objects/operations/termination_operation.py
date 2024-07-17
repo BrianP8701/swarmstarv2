@@ -57,7 +57,7 @@ class TerminationOperation(BaseOperation):
             return [ActionOperation(
                 swarm_node_id=swarm_node.id,
                 function_to_call=termination_handler,
-                args={"terminator_id": self.terminator_id, "context": context},
+                context=self.context
             )]
         else:
             raise ValueError(f"No termination handler found for action type {swarm_node.action_type} in swarm node {swarm_node.id}")

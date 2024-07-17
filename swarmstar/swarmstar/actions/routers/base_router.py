@@ -4,32 +4,28 @@ Routers are used to navigate a metadata tree to find a node.
 This is a base class to easily create routers over any MetadataTree, 
 starting from any chosen root node.
 """
-from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import ClassVar, List, Dict, Any
 from abc import ABC, abstractmethod
 
 from swarmstar.actions.base_action import BaseAction
-from swarmstar.objects import (
-    BlockingOperation,
-    BaseNode
-)
+from swarmstar.objects import BaseNode
+from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 from swarmstar.utils.ai.instructor_models import NextPath
 
 
-class BaseMetadataTreeRouter(BaseAction, BaseModel, ABC):
+class BaseRouter(BaseAction, ABC):
     ROUTE_INSTRUCTIONS: str
     root_node_id: str
+    __node_class__: ClassVar[BaseMetadataNode]
 
-    @classmethod
-    def main(self) -> BlockingOperation:
+    def main(self):
         return self.route(self.root_node_id)
 
-    @BaseAction.receive_instructor_completion_handler
-    def handle_routing_decision(self, completion: NextPath, context: Dict[str, Any]):
+    async def handle_routing_decision(self, completion: NextPath, context: Dict[str, Any]):
         """ This function repeatedly gets called until we reach a leaf node. """
         children_ids = context["children_ids"]
         if completion.index is not None:
-            next_node = BaseNode.read(children_ids[completion.index])
+            next_node = await self.__node_class__.read(children_ids[completion.index])
             if next_node.is_folder:
                 return self.route(next_node.id)
             else:
@@ -47,8 +43,8 @@ class BaseMetadataTreeRouter(BaseAction, BaseModel, ABC):
         """ Handle the case where we have reached a leaf node. """
         pass
 
-    def route(self, node_id: str):
-        node = BaseNode.read(node_id)
+    async def route(self, node_id: str):
+        node = await self.__node_class__.read(node_id)
         children = self._get_children(node)
         children_ids = [child.id for child in children]
         children_descriptions = self._get_children_descriptions(children)

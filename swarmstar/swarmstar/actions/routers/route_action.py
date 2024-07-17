@@ -6,9 +6,9 @@ path to take, the router agent will describe what type of action is needed in de
 from typing import List
 
 from swarmstar.objects import SpawnOperation
-from swarmstar.actions.routers.base_router import BaseMetadataTreeRouter
+from swarmstar.actions.routers.base_router import BaseRouter
 
-class RouteAction(BaseMetadataTreeRouter):
+class RouteAction(BaseRouter):
     ROUTE_INSTRUCTIONS = (
         "Decide what action path to take based on the directive and the available actions. "
         "If there is no good action path to take, describe what type of action is needed "
