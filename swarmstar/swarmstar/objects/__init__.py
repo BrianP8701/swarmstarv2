@@ -7,7 +7,7 @@ from .nodes.swarm_node import SwarmNode
 from .operations.base_operation import BaseOperation
 
 
-from .trees.base_metadata_tree import MetadataTree
+from .trees.base_metadata_tree import BaseMetadataTree
 from .nodes.base_metadata_node import BaseMetadataNode
 from .trees.action_metadata_tree import ActionMetadataTree
 from .trees.memory_metadata_tree import MemoryMetadataTree

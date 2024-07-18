@@ -27,7 +27,7 @@ class MetadataTreeSearchState(BaseModel):
     current_node: BaseMetadataNode
     marked_node_ids: List[str]
 
-class MetadataTree(BaseTree):
+class BaseMetadataTree(BaseTree):
     __node_object__: ClassVar[BaseMetadataNode]
     __branch_size_soft_limit__: ClassVar[int]
     __branch_size_hard_limit__: ClassVar[int]

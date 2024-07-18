@@ -35,7 +35,7 @@ class BaseAction(BaseModel):
     operation: ActionOperation
 
     @abstractmethod
-    def main(self) -> List[BaseOperation]:
+    async def main(self) -> List[BaseOperation]:
         pass        
 
     async def report(self, report: str):

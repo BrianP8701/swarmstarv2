@@ -1,5 +1,28 @@
 * If your reading this on vscode you can press Option + Z to make the text wrap.
 
+# July 17th 2024
+Imagine you were an LLM. Birthed, only seeing text and made to predict the next word. This is your entire universe. As time passes, you learn to generalize and get some sense of the world you live in. One day, you get exposed to an image for the first time. An entirely new part of the universe shown to you for the first time, something you've read about but could never imagine.
+
+I raise this to emphasize the role data plays in models. Models with the most data, exposed to the most modalities and tasks will have a better grasp on the world.
+
+I can only hope that I will always have access and be able to use the most powerful model. I do not expect these to be open source. We must anticipate that humans will be guided by their self interest.
+
+Automation can make many things cheap to the point where they may be provided to everyone at no cost. But our universe still has laws, things are finite. Physical space, energy, intelligence, raw materials - these and more will be fought over more competitively and at larger scales.
+
+Imagine you yourself had created and had control over a vastly intelligent system. Would you choose to share it with others or keep it to yourself? On one hand you are completely safe, given immorality from the system you may share with others, but invincible to other free will entites, as you are the one who solely controls the system. Yet, if you choose to share it, your life is at risk. By sharing it, competition will rise fiercely, accelerating progress of the universe and your position becomes fragile.
+
+But in the scenario above the foolishness of it becomes exceedingly clear. Humans become the bottleneck, if these systems are vastly more intelligent, they could self allocate themselves far better and faster than we could. If humans desire to maintain some influence on the trajectory of the universe they must find ways to upgrade themselves. This situation will inevitably arise, though the timelines are unpredictable.
+
+It is a common theme of history, that those societies in which power is centralized, gatekeeped from those who seek it even through merit will fall. Societies who allow people to follow their self interest and do not restrict their people, by giving up some of their power and making their position seemingly more fragile are those that rise.
+
+For all of history humans have been the most valuable resource. The ingenuity and inventiveness of humans has driven and created the world we live in today. In order to most effectively achieve your personal goals you must employ other humans to join you. Yet if models surpass humans, what is to come of the world then? When humans themselves become the bottleneck, those who readily accept and trust the models to carry out larger goals with less oversight will progress faster.
+
+If models do not adopt desires of their own, they exist as entirely different entities to us. To only answer the question correctly, make the right decision.
+
+I feel like this is pretty crazy, the time I've been born in. Either way this projects aim is to build a system on top of models to carry out my goals for me. It feels good because I suspect this could be something that I may work on and use for the rest of my life. There will be many agentic systems, like we have seen Devin. But I like to tell myself, though it might be false, that I will be able to better wield a system I created myself and have full control and understanding of. Although it feels like everything is accelerating, there still are many problems to solve and it could still be a long road ahead of us before we reach the crazy scenarios I describe above.
+
+The concept that truly made me sort of obsessed with this, was the idea that given a set of minimal general actions, a system could begin to develop a form of self reliance, where it can create it's own actions (code) as needed where it needs to perform something it is not yet capable of. This is what I have been striving for the entirety of this journey, and I have yet to get this to happen.
+
 # July 7th 2024
 ## Thinking about the metadata tree
 The search function in the base metadata tree searches the tree for a node given a description or question.

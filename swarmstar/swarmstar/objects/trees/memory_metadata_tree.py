@@ -3,7 +3,7 @@ from data.models.memory_metadata_node_model import MemoryMetadataNodeModel
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.objects.nodes.memory_metadata_node import MemoryMetadataNode
 from swarmstar.objects.operations.action_operation import ActionOperation
-from swarmstar.objects.trees.base_metadata_tree import MetadataTree, MetadataTreeSearchInput, MetadataTreeSearchState
+from swarmstar.objects.trees.base_metadata_tree import BaseMetadataTree, MetadataTreeSearchInput, MetadataTreeSearchState
 
 class MemoryMetadataTreeSearchInput(MetadataTreeSearchInput):
     questions: List[str]
@@ -16,7 +16,7 @@ class MemoryMetadataTreeSearchState(MetadataTreeSearchState):
     risk_of_incorrect_node_mark: bool
     original_question_index_to_answer: Dict[int, str]
 
-class MemoryMetadataTree(MetadataTree):
+class MemoryMetadataTree(BaseMetadataTree):
     __table__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.MEMORY_METADATA_NODES
     __node_object__: ClassVar[MemoryMetadataNode]
     __node_model__: ClassVar[MemoryMetadataNodeModel]

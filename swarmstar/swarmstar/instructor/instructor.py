@@ -1,4 +1,4 @@
-from typing import List, Type, TypeVar, cast
+from typing import List, Optional, Type, TypeVar, cast
 import os
 from dotenv import load_dotenv
 
@@ -30,7 +30,7 @@ class Instructor:
         cls,
         messages: List[Message],
         instructor_model: Type[T],
-        operation: BaseOperation,
+        operation: Optional[BaseOperation] = None,
         max_retries: int = 3,
         logging: bool = True,
     ) -> T:
@@ -48,7 +48,7 @@ class Instructor:
             content=completion.model_dump_json()
         )
 
-        if logging:
+        if logging and operation is not None:
             await cls._log_instructor_call(messages + [response_message], operation)
 
         return completion
