@@ -1,7 +1,9 @@
 from enum import Enum
 
-class ActionTypeEnum(str, Enum):
-    PLAN = 'plan'
+class ActionEnum(str, Enum):
+    FOLDER = 'folder'
+    PARALLEL_PLAN = 'parallel_plan'
+    SEQUENTIAL_PLAN = 'sequential_plan'
     ROUTE_ACTION = 'route_action'
     CODE = 'code'
     SEARCH = 'search'

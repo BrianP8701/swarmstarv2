@@ -11,9 +11,6 @@ class BaseNode(BaseObject[T], Generic[T], ABC):
     parent_id: Optional[str] = None
     children_ids: List[str] = []
 
-    children: List[T] = []
-    parent: Optional[T] = None
-
     async def get_parent(self: T) -> Optional[T]:
         if self.parent_id:
             return await self.read(self.parent_id)

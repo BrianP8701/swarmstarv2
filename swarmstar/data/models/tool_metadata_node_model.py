@@ -12,7 +12,7 @@ class ToolMetadataNodeModel(BaseSQLAlchemyModel):
     title = Column(String, nullable=False)
     description = Column(Text, nullable=False)
     parent_id = Column(String, ForeignKey('tool_metadata_nodes.id'), nullable=True)
-    children_ids = Column(SQLiteJSON, default=list)
+    children_ids = Column(SQLiteJSON, default=lambda: [])
     tool_type = Column(SQLAlchemyEnum(ToolTypeEnum), nullable=False)
 
     children = relationship("ToolMetadataNodeModel", backref='parent', remote_side=[id])

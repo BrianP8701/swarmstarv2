@@ -11,7 +11,7 @@ class RouterInstructor(BaseInstructor):
     unviable_options: List[int] = Field(description="The indices of the options that are unviable")
 
     @staticmethod
-    def generate_instruction(children: List[BaseMetadataNode], content: str, system_message: str) -> List[Message]:
+    def generate_instructions(children: List[BaseMetadataNode], content: str, system_message: str) -> List[Message]:
         options = [f"{i}. {child.title}: {child.description}" for i, child in enumerate(children)]
         options = "\n".join(options)
         return [

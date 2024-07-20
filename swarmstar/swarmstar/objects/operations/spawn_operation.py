@@ -1,5 +1,5 @@
 from typing import Any, ClassVar, Dict, List
-from swarmstar.enums.action_type_enum import ActionTypeEnum
+from swarmstar.enums.action_enum import ActionEnum
 from data.models.swarm_operation_models import SpawnOperationModel
 from swarmstar.objects.nodes.swarm_node import SwarmNode
 from swarmstar.objects.operations.action_operation import ActionOperation
@@ -13,13 +13,13 @@ class SpawnOperation(BaseOperation):
     __object_model__: ClassVar[SpawnOperationModel] = SpawnOperationModel
 
     goal: str
-    action_type: ActionTypeEnum
+    action_enum: ActionEnum
 
     async def _execute(self) -> List['ActionOperation']:
         new_node = SwarmNode(
-            title=enum_to_string(self.action_type),
+            title=enum_to_string(self.action_enum),
             parent_id=self.swarm_node_id,
-            action_type=self.action_type,
+            action_enum=self.action_enum,
             goal=self.goal,
         )
 

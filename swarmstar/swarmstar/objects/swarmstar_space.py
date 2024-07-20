@@ -1,7 +1,7 @@
 import uuid
 from pydantic import Field
 from typing import Dict, List
-from swarmstar.constants.constants import DEFAULT_SWARMSTAR_ID
+from swarmstar.constants.misc_constants import DEFAULT_SWARMSTAR_ID
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.enums.swarm_status_enum import SwarmStatusEnum
 from data.models.swarmstar_event_model import SwarmstarEventModel
@@ -29,7 +29,7 @@ class SwarmstarSpace(BaseObject):
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     total_event_count: int = 0
-    swarm_node_count: int = 0
+    action_count: int = 0
     action_metadata_node_count: int = 0
     memory_metadata_node_count: int = 0
     tool_metadata_node_count: int = 0

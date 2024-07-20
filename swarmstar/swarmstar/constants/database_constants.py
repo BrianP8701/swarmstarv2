@@ -5,7 +5,6 @@ from data.models.message import MessageModel
 from data.models.action_metadata_node_model import ActionMetadataNodeModel
 from data.models.memory_metadata_node_model import MemoryMetadataNodeModel
 from data.models.swarmstar_event_model import SwarmstarEventModel
-from data.models.swarm_node_model import SwarmNodeModel
 from data.models.swarm_operation_models import SpawnOperationModel, TerminationOperationModel, CommunicationOperationModel, ActionOperationModel
 from data.models.swarmstar_space_model import SwarmstarSpaceModel
 from data.models.tool_metadata_node_model import ToolMetadataNodeModel
@@ -13,7 +12,6 @@ from data.models.tool_metadata_node_model import ToolMetadataNodeModel
 from swarmstar.objects.message import Message
 from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
 from swarmstar.objects.nodes.memory_metadata_node import MemoryMetadataNode
-from swarmstar.objects.nodes.swarm_node import SwarmNode
 from swarmstar.objects.nodes.tool_metadata_node import ToolMetadataNode
 from swarmstar.objects.operations.action_operation import ActionOperation
 from swarmstar.objects.operations.communication_operation import CommunicationOperation
@@ -21,13 +19,7 @@ from swarmstar.objects.operations.spawn_operation import SpawnOperation
 from swarmstar.objects.operations.termination_operation import TerminationOperation
 
 TABLE_PROPERTIES = {
-    DatabaseTableEnum.SWARM_NODES: {
-        "abbreviation": "sn",
-        "count_column": "node_count",
-        "model_class": SwarmNodeModel,
-        "table_name": "swarm_nodes",
-        "object_class": SwarmNode
-    },
+    
     DatabaseTableEnum.ACTION_METADATA_NODES: {
         "abbreviation": "am",
         "count_column": "action_metadata_node_count",

@@ -7,6 +7,6 @@ class BaseInstructor(ABC, BaseModel):
 
     @abstractmethod
     @staticmethod
-    def generate_instruction(**kwargs) -> List[Message]:
+    def generate_instructions(**kwargs) -> List[Message]:
         pass
     

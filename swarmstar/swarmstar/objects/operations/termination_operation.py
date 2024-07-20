@@ -1,6 +1,6 @@
 from typing import ClassVar, Dict, List
-from swarmstar.enums.action_type_enum import ActionTypeEnum
-from swarmstar.enums.swarm_node_status_enum import SwarmNodeStatusEnum
+from swarmstar.enums.action_enum import ActionEnum
+from swarmstar.enums.swarm_node_status_enum import ActionStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from data.models.swarm_operation_models import TerminationOperationModel
 from swarmstar.objects.nodes.swarm_node import SwarmNode
@@ -32,7 +32,7 @@ class TerminationOperation(BaseOperation):
         """
         Terminate the node and return a new termination operation for the parent node.
         """
-        swarm_node.status = SwarmNodeStatusEnum.TERMINATED
+        swarm_node.status = ActionStatusEnum.TERMINATED
         await swarm_node.upsert()
         parent_node_id = swarm_node.parent_id
         if parent_node_id:
@@ -60,7 +60,7 @@ class TerminationOperation(BaseOperation):
                 context=self.context
             )]
         else:
-            raise ValueError(f"No termination handler found for action type {swarm_node.action_type} in swarm node {swarm_node.id}")
+            raise ValueError(f"No termination handler found for action type {swarm_node.action_enum} in swarm node {swarm_node.id}")
 
     async def _terminate_confirm_directive_completion(self, swarm_node: SwarmNode):
         """            
@@ -70,15 +70,15 @@ class TerminationOperation(BaseOperation):
                 terminate the node.
         """
         children_swarm_nodes = await swarm_node.get_children()
-        if all(child.status == SwarmNodeStatusEnum.TERMINATED for child in children_swarm_nodes):
-            node_has_been_reviewed = next((child for child in children_swarm_nodes if child.action_type == ActionTypeEnum.REVIEW_GOAL_PROGRESS), False)
+        if all(child.status == ActionStatusEnum.TERMINATED for child in children_swarm_nodes):
+            node_has_been_reviewed = next((child for child in children_swarm_nodes if child.action_enum == ActionEnum.REVIEW_GOAL_PROGRESS), False)
             if node_has_been_reviewed:
                 return await self._terminate_simple(swarm_node)
             else:
                 return [
                     SpawnOperation(
                         swarm_node_id=swarm_node.id, 
-                        action_type=ActionTypeEnum.REVIEW_GOAL_PROGRESS,
+                        action_enum=ActionEnum.REVIEW_GOAL_PROGRESS,
                         goal=swarm_node.goal,
                     )
                 ]

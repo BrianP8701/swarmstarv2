@@ -11,7 +11,7 @@ class QuestionInstructor(BaseInstructor):
     context: Optional[str] = Field(description="Context for the node that will perform a search to answer the questions. If questions are asked.")
     
     @staticmethod
-    def generate_instruction(content: str) -> List[Message]:
+    def generate_instructions(content: str) -> List[Message]:
         return [
             Message(role=MessageRoleEnum.SYSTEM, content="Ask questions if needed to execute the goal."),
             Message(role=MessageRoleEnum.USER, content=content)

@@ -1,5 +1,6 @@
-from typing import Any, Dict, List, Optional
+from typing import List
 from abc import ABC, abstractmethod
+from swarmstar.contexts.base_context import BaseContext
 
 from swarmstar.objects.base_object import BaseObject
 from swarmstar.objects.nodes.swarm_node import SwarmNode
@@ -7,7 +8,7 @@ from swarmstar.utils.misc.ids import get_operation_class_from_id
 
 class BaseOperation(BaseObject, ABC):
     swarm_node_id: str
-    context: Dict[str, Any] = {}
+    context: BaseContext
     
     @staticmethod
     async def execute(operation_id: str) -> List[str]:

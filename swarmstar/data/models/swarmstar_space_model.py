@@ -11,7 +11,7 @@ class SwarmstarSpaceModel(Base):
     goal = Column(String)
     swarm_title = Column(String)
     memory_title = Column(String)
-    environment_vars = Column(SQLiteJSON, default=dict)
+    environment_vars = Column(SQLiteJSON, default=lambda: {})
     status = Column(SqlAlchemyEnum(SwarmStatusEnum), default=SwarmStatusEnum.WAITING_FOR_USER_INPUT)
 
     total_event_count = Column(Integer, nullable=False) # total number of events in the space, used for rollbacks
@@ -24,4 +24,4 @@ class SwarmstarSpaceModel(Base):
     blocking_operation_count = Column(Integer)
     communication_operation_count = Column(Integer)
     action_operation_count = Column(Integer)
-    queued_operation_ids = Column(SQLiteJSON, default=list)
+    queued_operation_ids = Column(SQLiteJSON, default=lambda: [])

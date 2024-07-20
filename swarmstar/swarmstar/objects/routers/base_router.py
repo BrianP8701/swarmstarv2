@@ -29,7 +29,7 @@ class BaseRouter(ABC):
     ) -> RouteDecision:
         children = await node.get_children()
         router_decision = await instructor.instruct(
-            messages=RouterInstructor.generate_instruction(
+            messages=RouterInstructor.generate_instructions(
                 children,
                 content,
                 self.__system_instructions__

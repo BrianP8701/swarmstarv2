@@ -10,11 +10,10 @@ from pydantic import BaseModel
 from swarmstar.constants import DEFAULT_SWARMSTAR_ID
 from swarmstar.enums.metadata_tree_enums import MetadataTreeSearchOutputType
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
-from swarmstar.objects.nodes.swarm_node import SwarmNode
 from swarmstar.objects.operations.action_operation import ActionOperation
-from swarmstar.actions.router import Router
+from swarmstar.objects.router import Router
 from swarmstar.objects.trees.base_tree import BaseTree
-from swarmstar.utils.misc.ids import extract_swarm_id, get_swarm_object_count
+from swarmstar.utils.misc.ids import extract_swarm_id
 
 class MetadataTreeSearchInput(BaseModel):
     action_operation: ActionOperation

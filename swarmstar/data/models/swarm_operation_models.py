@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, String, Enum as SqlAlchemyEnum
 from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
-from swarmstar.enums.action_type_enum import ActionTypeEnum
+from swarmstar.enums.action_enum import ActionEnum
 
 from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
@@ -8,7 +8,7 @@ class BaseOperationModel(BaseSQLAlchemyModel):
     __tablename__ = 'operations'
     id = Column(String, primary_key=True)
     swarm_node_id = Column(String, ForeignKey('swarm_nodes.id'))
-    context = Column(SQLiteJSON, default={})
+    context = Column(SQLiteJSON, default=lambda: {})
     __mapper_args__ = {
         'polymorphic_identity': 'operation',
         'polymorphic_on': type
@@ -18,7 +18,7 @@ class SpawnOperationModel(BaseOperationModel):
     __tablename__ = 'spawn_operations'
     id = Column(String, ForeignKey('operations.id'), primary_key=True)
     goal = Column(String)
-    action_type = Column(SqlAlchemyEnum(ActionTypeEnum))
+    action_enum = Column(SqlAlchemyEnum(ActionEnum))
     __mapper_args__ = {
         'polymorphic_identity': 'spawn_operation',
     }

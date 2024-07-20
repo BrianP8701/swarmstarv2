@@ -2,7 +2,6 @@ from typing import ClassVar, Dict, Any, List
 from swarmstar.constants.action_constants import ACTION_ENUM_TO_ACTION_CLASS
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from data.models.swarm_operation_models import ActionOperationModel
-from swarmstar.objects.nodes.swarm_node import SwarmNode
 from swarmstar.objects.operations.base_operation import BaseOperation
 
 
