@@ -1,6 +1,6 @@
 from typing import ClassVar, List
 from swarmstar.constants.misc_constants import MAX_PLAN_ATTEMPTS
-from swarmstar.contexts.plan_context import ParallelPlanContext
+from swarmstar.shapes.contexts.parallel_plan_context import ParallelPlanContext
 from swarmstar.enums.action_enum import ActionEnum
 from swarmstar.enums.message_role_enum import MessageRoleEnum
 from swarmstar.instructor.instructor import Instructor
@@ -22,21 +22,19 @@ class ParallelPlan(BaseActionNode):
     Suitable for tasks that can be parallelized to optimize time and resource usage. 
     The goal is to create a set of concurrent tasks that contribute to the overall objective.
     """
+    
+    context: ParallelPlanContext
 
     async def main(self) -> List[SpawnOperation]:
-        while self.node.context.attempts < MAX_PLAN_ATTEMPTS:
-            plan_instructor_response = await instructor.instruct(
-                messages=self.node_context.conversation,
-                instructor_model=ParallelPlanInstructor,
-                operation=self.operation
-            )
+        while self.context.attempts < MAX_PLAN_ATTEMPTS:
+            plan = await self.generate_plan(self.goal)
             review_plan_instructor_response = await instructor.instruct(
-                messages=ReviewParallelPlanInstructor.generate_instructions(plan_instructor_response.plan),
+                messages=ReviewParallelPlanInstructor.generate_instructions(plan.plan),
                 instructor_model=ReviewParallelPlanInstructor,
                 operation=self.operation
             )
 
-            plan = plan_instructor_response.plan
+            plan = plan.plan
             is_plan_complete = review_plan_instructor_response.confirmation
 
             if is_plan_complete:
@@ -64,6 +62,13 @@ class ParallelPlan(BaseActionNode):
 
         raise Exception(f"Plan exceeded max attempts on swarm node {self.node.id}")
 
-    @BaseActionNode.question_wrapper()
-    async def generate_plan(self) -> List[SpawnOperation]:
-        return await self.main()
+    @BaseActionNode.question_wrapper
+    async def generate_plan(self, content: str) -> ParallelPlanInstructor:
+        instructions = ParallelPlanInstructor.generate_instructions(content)
+        self.context.conversation.extend(instructions)
+        return await instructor.instruct(
+            messages=self.context.conversation,
+            instructor_model=ParallelPlanInstructor,
+            operation=self.operation
+        )
+    

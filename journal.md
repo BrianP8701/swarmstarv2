@@ -1,5 +1,8 @@
 * If your reading this on vscode you can press Option + Z to make the text wrap.
 
+# July 21th 2024
+Well. This is awkward. We have to revert back to the original design of seemingly excessive blocking operations. This is because it allows easy exit and reentry points. Without seemingly excessive blocking operations we have, well less operations. I also thought it would allow the action code to become more concise. But question wrappers need to return it's operations directly back to the source. This basically means we want functions that directly return Operations. This brings back the question of how do we pass args between these functions. 
+
 # July 20th 2024
 ## Thinking about context
 The question about context on my mind right now is more of a question of typing. There are two kinds of context: Operational and Node context. At the moment context is stored as a JSON column. The reason for this was because all the arguments being passed between actions became messy. But having unknown types is even worst. We could imagine for each ActionEnum defining a Pydantic type for it's node level context and it's spawn operation context. What about action and termination operations? In the first iteration we decoupled by every blocking operation, which wasn't strictly necessary. Now the only time we consider a node being "blocked" is when it needs to perform a search. And for a search node it's when it needs to ask the user questions. Those are two very specific points in the system and other than that I believe we can count on not having to think of blocking operations? Yet that is not true. We can easily imagine there being many more blocking operations and we need a standard way to handle them. So I think we might want to consider bringing back the Blocking Operation. In fact now we only have one Blocking Operation. Performing a search is a Spawn Operation.
@@ -7,6 +10,9 @@ The question about context on my mind right now is more of a question of typing.
 For the sake of brute simplicity I'm going to stop thinking about this and just strongly type all contexts and reintroduce Blocking Operations. It is ultimately going to be better. Although, the question remains of the database representation for context? We'd have to spread the context object and reassemble it. No let's just leave that as JSON and strongly type in the code layer.
 
 We have different tables for operations. Should we create seperate tables for actions? This would enforce type safety all the way down to the database which could solve lot's of problems.
+
+## Thinking about search again
+I think it's acceptable to constrain the input to search to be a list of questions + context. 
 
 # July 17th 2024
 Imagine you were an LLM. Birthed, only seeing text and made to predict the next word. This is your entire universe. As time passes, you learn to generalize and get some sense of the world you live in. One day, you get exposed to an image for the first time. An entirely new part of the universe shown to you for the first time, something you've read about but could never imagine.

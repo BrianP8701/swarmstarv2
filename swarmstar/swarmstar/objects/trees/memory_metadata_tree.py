@@ -2,7 +2,7 @@ from typing import ClassVar, List, Union, Dict
 from data.models.memory_metadata_node_model import MemoryMetadataNodeModel
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.objects.nodes.memory_metadata_node import MemoryMetadataNode
-from swarmstar.objects.operations.action_operation import ActionOperation
+from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
 from swarmstar.objects.trees.base_metadata_tree import BaseMetadataTree, MetadataTreeSearchInput, MetadataTreeSearchState
 
 class MemoryMetadataTreeSearchInput(MetadataTreeSearchInput):
@@ -35,7 +35,7 @@ class MemoryMetadataTree(BaseMetadataTree):
         self, 
         input: MemoryMetadataTreeSearchInput, 
         start_node: MemoryMetadataNode, 
-        action_operation: ActionOperation
+        action_operation: FunctionCallOperation
     ) -> MemoryMetadataTreeSearchState:
         return MemoryMetadataTreeSearchState(
             action_operation=action_operation,

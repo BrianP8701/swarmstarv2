@@ -14,5 +14,5 @@ class QuestionInstructor(BaseInstructor):
     def generate_instructions(content: str) -> List[Message]:
         return [
             Message(role=MessageRoleEnum.SYSTEM, content="Ask questions if needed to execute the goal."),
-            Message(role=MessageRoleEnum.USER, content=content)
+            Message(role=MessageRoleEnum.USER, content=f"Goal: {content}")
         ]

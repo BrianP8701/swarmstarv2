@@ -24,7 +24,6 @@ from swarmstar.instructor.instructors.question_instructor import QuestionInstruc
 from swarmstar.objects import BaseOperation
 from swarmstar.objects.message import Message
 from swarmstar.objects.nodes.base_node import BaseNode
-from swarmstar.objects.operations.action_operation import ActionOperation
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
 
 instructor = Instructor()
@@ -42,8 +41,8 @@ class BaseActionNode(BaseNode['BaseActionNode'], ABC):
     termination_policy: TerminationPolicyEnum = TerminationPolicyEnum.SIMPLE
     message_ids: List[Union[List[str], str]] = []                       # Structure of ids of messages that have been sent to and received from this node.
     report: Optional[str] = None                                        # We should look at the node and see like, "Okay, thats what this node did." 
-    context: BaseContext                                                # This is where nodes can store extra context about themselves.
-    operation: ActionOperation
+    context: Optional[BaseContext] = None                                # This is where nodes can store extra context about themselves.
+    operation: BaseOperation
 
     @abstractmethod
     async def main(self) -> List[BaseOperation]:
@@ -80,23 +79,29 @@ class BaseActionNode(BaseNode['BaseActionNode'], ABC):
         return wrapper
 
     @staticmethod
-    async def question_wrapper(func: Callable[..., Any]):
+    def question_wrapper(func: Callable[..., Any]):
         """
         This wrapper abstracts search away from actions.
+
+        It can be applied to instance methods that accept a string "content" as an argument.
         """
         @wraps(func)
-        async def wrapper(self):
-            do_we_need_search, search_operation = await self._ask_questions()
+        async def wrapper(self, *args, **kwargs):
+            content = kwargs.get('content', args[0] if args else None)
+            if content is None:
+                raise ValueError("Content argument is required to use question_wrapper.")
+
+            do_we_need_search, search_operation = await self._ask_questions(content)
             if do_we_need_search:
                 return [search_operation]
             else:
-                return await func(self)
+                return await func(self, *args, **kwargs)
 
         return wrapper
 
-    async def _ask_questions(self, goal: str) -> Tuple[bool, SpawnOperation | None]:
+    async def _ask_questions(self, content: str) -> Tuple[bool, SpawnOperation | None]:
         questions = await Instructor.instruct(
-            QuestionInstructor.generate_instructions(goal),
+            QuestionInstructor.generate_instructions(content),
             QuestionInstructor,
             self.operation
         )
@@ -106,11 +111,11 @@ class BaseActionNode(BaseNode['BaseActionNode'], ABC):
 
             questions_string = "\t-" + "\n\t-".join(questions.questions)
             return True, SpawnOperation(
-                swarm_node_id=self.id,
+                action_node_id=self.id,
                 action_enum=ActionEnum.SEARCH,
                 goal=f'Find answers to the following questions:\n{questions_string}',
                 context=QuestionContext(
-                    **self.operation.context, 
+                    **self.operation.context.model_dump() if self.operation.context else {},
                     questions=questions.questions
                 ).model_dump()
             )

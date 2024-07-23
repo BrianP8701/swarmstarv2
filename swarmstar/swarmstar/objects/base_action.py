@@ -24,7 +24,7 @@ from swarmstar.instructor.instructors.question_instructor import QuestionInstruc
 from swarmstar.objects import BaseOperation
 from swarmstar.objects.message import Message
 from swarmstar.objects.nodes.base_node import BaseNode
-from swarmstar.objects.operations.action_operation import ActionOperation
+from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
 
 instructor = Instructor()
@@ -43,7 +43,7 @@ class BaseAction(BaseNode['BaseAction'], ABC):
     message_ids: List[Union[List[str], str]] = []                       # Structure of ids of messages that have been sent to and received from this node.
     report: Optional[str] = None                                        # We should look at the node and see like, "Okay, thats what this node did." 
     context: BaseContext                                                # This is where nodes can store extra context about themselves.
-    operation: ActionOperation
+    operation: FunctionCallOperation
 
     @abstractmethod
     async def main(self) -> List[BaseOperation]:

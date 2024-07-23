@@ -5,7 +5,7 @@ from data.models.message import MessageModel
 from data.models.action_metadata_node_model import ActionMetadataNodeModel
 from data.models.memory_metadata_node_model import MemoryMetadataNodeModel
 from data.models.swarmstar_event_model import SwarmstarEventModel
-from data.models.swarm_operation_models import SpawnOperationModel, TerminationOperationModel, CommunicationOperationModel, ActionOperationModel
+from data.models.swarm_operation_models import SpawnOperationModel, TerminationOperationModel, CommunicationOperationModel, FunctionCallOperationModel
 from data.models.swarmstar_space_model import SwarmstarSpaceModel
 from data.models.tool_metadata_node_model import ToolMetadataNodeModel
 
@@ -13,7 +13,7 @@ from swarmstar.objects.message import Message
 from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
 from swarmstar.objects.nodes.memory_metadata_node import MemoryMetadataNode
 from swarmstar.objects.nodes.tool_metadata_node import ToolMetadataNode
-from swarmstar.objects.operations.action_operation import ActionOperation
+from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
 from swarmstar.objects.operations.communication_operation import CommunicationOperation
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
 from swarmstar.objects.operations.termination_operation import TerminationOperation
@@ -65,9 +65,9 @@ TABLE_PROPERTIES = {
     DatabaseTableEnum.ACTION_OPERATIONS: {
         "abbreviation": "ao",
         "count_column": "action_operation_count",
-        "model_class": ActionOperationModel,
+        "model_class": FunctionCallOperationModel,
         "table_name": "action_operations",
-        "object_class": ActionOperation
+        "object_class": FunctionCallOperation
     },
     DatabaseTableEnum.TOOL_METADATA_NODES: {
         "abbreviation": "tm",
@@ -95,11 +95,10 @@ TABLE_ENUM_TO_OBJECT_CLASS = {k: v["object_class"] for k, v in TABLE_PROPERTIES.
 TABLE_ENUMS_TO_LISTEN_TO: List[DatabaseTableEnum] = list(TABLE_PROPERTIES.keys())
 
 ALL_DATABASE_MODEL_CLASSES = [
-    SwarmNodeModel, 
     SwarmstarEventModel, 
     SwarmstarSpaceModel, 
     SpawnOperationModel, 
     TerminationOperationModel, 
     CommunicationOperationModel, 
-    ActionOperationModel
+    FunctionCallOperationModel
 ]

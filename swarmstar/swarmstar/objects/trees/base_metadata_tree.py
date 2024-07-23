@@ -10,18 +10,18 @@ from pydantic import BaseModel
 from swarmstar.constants import DEFAULT_SWARMSTAR_ID
 from swarmstar.enums.metadata_tree_enums import MetadataTreeSearchOutputType
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
-from swarmstar.objects.operations.action_operation import ActionOperation
+from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
 from swarmstar.objects.router import Router
 from swarmstar.objects.trees.base_tree import BaseTree
 from swarmstar.utils.misc.ids import extract_swarm_id
 
 class MetadataTreeSearchInput(BaseModel):
-    action_operation: ActionOperation
+    action_operation: FunctionCallOperation
     start_node_id: str | None
     output_type: MetadataTreeSearchOutputType
 
 class MetadataTreeSearchState(BaseModel):
-    action_operation: ActionOperation
+    action_operation: FunctionCallOperation
     start_node: BaseMetadataNode
     current_node: BaseMetadataNode
     marked_node_ids: List[str]
@@ -89,7 +89,7 @@ class BaseMetadataTree(BaseTree):
         self, 
         input: MetadataTreeSearchInput, 
         start_node: BaseMetadataNode, 
-        action_operation: ActionOperation
+        action_operation: FunctionCallOperation
     ) -> MetadataTreeSearchState:
         pass
 

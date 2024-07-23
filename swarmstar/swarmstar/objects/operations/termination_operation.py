@@ -4,7 +4,7 @@ from swarmstar.enums.swarm_node_status_enum import ActionStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from data.models.swarm_operation_models import TerminationOperationModel
 from swarmstar.objects.nodes.swarm_node import SwarmNode
-from swarmstar.objects.operations.action_operation import ActionOperation
+from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
 from swarmstar.objects.operations.base_operation import BaseOperation
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
@@ -45,7 +45,7 @@ class TerminationOperation(BaseOperation):
         else:
             return []
 
-    async def _terminate_custom_termination_handler(self, swarm_node: SwarmNode) -> List[ActionOperation]:
+    async def _terminate_custom_termination_handler(self, swarm_node: SwarmNode) -> List[FunctionCallOperation]:
         """
         Nodes can implement their own termination handlers.
         They can signal that that they want to use their own termination handler by updating their termination policy
@@ -54,7 +54,7 @@ class TerminationOperation(BaseOperation):
         context = swarm_node.context
         termination_handler = context.get("__termination_handler__", None)
         if termination_handler:
-            return [ActionOperation(
+            return [FunctionCallOperation(
                 swarm_node_id=swarm_node.id,
                 function_to_call=termination_handler,
                 context=self.context

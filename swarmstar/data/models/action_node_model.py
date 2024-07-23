@@ -7,12 +7,12 @@ from swarmstar.enums.swarm_node_status_enum import ActionStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
-class SwarmNodeModel(BaseSQLAlchemyModel):
-    __tablename__ = 'swarm_nodes'
+class ActionNodeModel(BaseSQLAlchemyModel):
+    __tablename__ = 'action_nodes'
 
     id = Column(String, primary_key=True)
     title = Column(String, nullable=False)
-    parent_id = Column(String, ForeignKey('swarm_nodes.id'), nullable=True)
+    parent_id = Column(String, ForeignKey('action_nodes.id'), nullable=True)
     children_ids = Column(SQLiteJSON, default=lambda: [])
     action_type = Column(SQLAlchemyEnum(ActionEnum), nullable=False)
     goal = Column(Text, nullable=False)
@@ -22,5 +22,5 @@ class SwarmNodeModel(BaseSQLAlchemyModel):
     report = Column(Text, nullable=True)
     context = Column(SQLiteJSON, default=lambda: {})
 
-    children = relationship("SwarmNodeModel", backref='parent', remote_side=[id])
-    operations = relationship("BaseOperationModel", backref='swarm_node', cascade="all, delete-orphan")
+    children = relationship("ActionNodeModel", backref='parent', remote_side=[id])
+    operations = relationship("BaseOperationModel", backref='action_node', cascade="all, delete-orphan")

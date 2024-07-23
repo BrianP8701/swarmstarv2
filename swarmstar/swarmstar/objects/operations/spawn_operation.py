@@ -1,12 +1,10 @@
-from typing import Any, ClassVar, Dict, List
+from typing import ClassVar, List
+from swarmstar.constants.action_constants import ACTION_ENUM_TO_ACTION_NODE_CLASS
 from swarmstar.enums.action_enum import ActionEnum
 from data.models.swarm_operation_models import SpawnOperationModel
-from swarmstar.objects.nodes.swarm_node import SwarmNode
-from swarmstar.objects.operations.action_operation import ActionOperation
+from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
 from swarmstar.objects.operations.base_operation import BaseOperation
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
-from swarmstar.utils.misc.strings import enum_to_string
-
 
 class SpawnOperation(BaseOperation):
     __table__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.SPAWN_OPERATIONS
@@ -15,17 +13,19 @@ class SpawnOperation(BaseOperation):
     goal: str
     action_enum: ActionEnum
 
-    async def _execute(self) -> List['ActionOperation']:
-        new_node = SwarmNode(
-            title=enum_to_string(self.action_enum),
-            parent_id=self.swarm_node_id,
-            action_enum=self.action_enum,
-            goal=self.goal,
+    async def _execute(self) -> List['FunctionCallOperation']:
+        ActionNodeClass = ACTION_ENUM_TO_ACTION_NODE_CLASS[self.action_enum]
+
+        new_node = ActionNodeClass(
+            goal= self.goal,
+            context=ActionNodeClass.__node_context_class__(),
+            operation=self
         )
 
         return [
-            ActionOperation(
-                function_to_call="start",
-                swarm_node_id=new_node.id,
+            FunctionCallOperation(
+                action_node_id=new_node.id,
+                function_to_call="main",
+                context=ActionNodeClass.__node_context_class__(**self.context.model_dump() if self.context else {})
             )
         ]

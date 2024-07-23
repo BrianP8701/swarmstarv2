@@ -7,63 +7,28 @@ from swarmstar.instructor.instructors.plan_instructor import ParallelPlanInstruc
 from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.message import Message
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
+from swarmstar.shapes.contexts.sequential_plan_context import SequentialPlanContext
 
 instructor = Instructor()
 
-class Plan(BaseActionNode):
+class SequentialPlan(BaseActionNode):
     __id__: ClassVar[str] = "sequential_plan"
     __parent_id__: ClassVar[str] = "plan"
     __title__: ClassVar[str] = "Sequential Plan"
     __action_enum__: ClassVar[ActionEnum] = ActionEnum.SEQUENTIAL_PLAN
+    __context_class__: ClassVar[SequentialPlanContext]
     __description__: ClassVar[str] = """
     Use this action to break down complex tasks into a series of ordered steps. 
     Ideal for tasks where each step depends on the completion of the previous one. 
     The goal is to create a clear, linear plan that can be executed step-by-step.
     """
+    
+    context: SequentialPlanContext
 
     async def main(self) -> List[SpawnOperation]:
         attempts = 0
-        conversation: List[Message] = ParallelPlanInstructor.generate_instructions(self.node.goal)
+        conversation: List[Message] = ParallelPlanInstructor.generate_instructions(self.context.goal)
 
-        while attempts < MAX_PLAN_ATTEMPTS:
-            plan_instructor_response = await instructor.instruct(
-                messages=conversation,
-                instructor_model=ParallelPlanInstructor,
-                operation=self.operation
-            )
-            review_plan_instructor_response = await instructor.instruct(
-                messages=ReviewParallelPlanInstructor.generate_instructions(plan_instructor_response.plan),
-                instructor_model=ReviewParallelPlanInstructor,
-                operation=self.operation
-            )
-            
-            plan = plan_instructor_response.plan
-            is_plan_complete = review_plan_instructor_response.confirmation
+        
 
-            if is_plan_complete:
-                return [SpawnOperation(
-                    swarm_node_id=self.node.id,
-                    goal=subgoal,
-                    action_type=ActionEnum.ROUTE_ACTION
-                ) for subgoal in plan]
-            else:
-                conversation.extend([
-                        Message(
-                            content=str(plan),
-                            role=MessageRoleEnum.ASSISTANT
-                        ),
-                        Message(
-                            content=review_plan_instructor_response.analysis,
-                            role=MessageRoleEnum.ASSISTANT
-                        ),
-                        Message(
-                            content="This is not a valid plan, it cannot be executed in parallel.",
-                            role=MessageRoleEnum.ASSISTANT
-                        )
-                    ]
-                )
-
-        raise Exception(f"Plan exceeded max attempts on swarm node {self.node.id}")
-
-    @BaseActionNode.question_wrapper()
-    async def generate_plan()
+        

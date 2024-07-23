@@ -11,5 +11,5 @@ class DatabaseTableEnum(Enum, str):
     TERMINATION_OPERATIONS = "termination_operations"
     BLOCKING_OPERATIONS = "blocking_operations"
     COMMUNICATION_OPERATIONS = "communication_operations"
-    ACTION_OPERATIONS = "action_operations"
+    FUNCTION_CALL_OPERATIONS = "function_call_operations"
     MESSAGES = "messages"

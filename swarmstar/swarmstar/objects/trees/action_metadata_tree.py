@@ -2,7 +2,7 @@ from typing import ClassVar, Union
 from data.models.action_metadata_node_model import ActionMetadataNodeModel
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
-from swarmstar.objects.operations.action_operation import ActionOperation
+from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
 from swarmstar.objects.trees.base_metadata_tree import MetadataTreeSearchInput, MetadataTreeSearchState
 from swarmstar.objects.trees.base_tree import BaseTree
 
@@ -30,7 +30,7 @@ class ActionMetadataTree(BaseTree):
         self, 
         input: ActionMetadataTreeSearchInput, 
         start_node: ActionMetadataNode, 
-        action_operation: ActionOperation
+        action_operation: FunctionCallOperation
     ) -> ActionMetadataTreeSearchState:
         return ActionMetadataTreeSearchState(
             action_operation=action_operation,
