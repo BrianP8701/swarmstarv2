@@ -1,58 +1,20 @@
-from typing import ClassVar, Generic, List, Protocol, TypeVar
-from pydantic import BaseModel
+from typing import List, Optional
+from swarmstar.instructor.instructors.router_instructor import RouterInstructor
 
-from swarmstar.instructor.instructor_client import Instructor
-from swarmstar.instructor.instructors.router_instructor import RouterInstructorModel
 from swarmstar.objects.operations.base_operation import BaseOperation
 
-T = TypeVar('T', bound='OptionLike')
-
-class OptionLike(Protocol):
-    id: str
-    title: str
-    description: str
-
-class RouterResponse(BaseModel, Generic[T]):
-    best_option: T | None
-    unviable_options: List[T]
-
-
-class Router(BaseModel, Generic[T]):
-    __system_prompt__: ClassVar[str] = """
-    You are responsible for naviagting a tree by descriptions. 
-    You will be given a list of options and a prompt. 
-    You will need to select the best option from the list that is most relevant to the prompt.
-    You will also need to mark options as unviable if they are not relevant to the prompt.
-    """
-
+class Router():
     @classmethod
-    async def route(cls, options: List[T], prompt: str, operation: BaseOperation) -> RouterResponse[T]:
-        formatted_options = cls._format_options(options, prompt)
-        router_response = await Instructor.completion(
-            messages=[
-                {
-                    "role": "system",
-                    "content": cls.__system_prompt__
-                },
-                {
-                    "role": "user",
-                    "content": formatted_options
-                }
-            ],
-            instructor_model=RouterInstructorModel,
+    async def route(
+        cls, 
+        options: List[str], 
+        content: str, 
+        system_message: str, 
+        operation: Optional[BaseOperation] = None
+    ) -> RouterInstructor:
+        return await RouterInstructor.route(
+            options=options,
+            content=content,
+            system_message=system_message,
             operation=operation
-        )
-        best_option_index = router_response.best_option - 1
-        best_option = options[best_option_index] if best_option_index >= 0 else None
-        unviable_options = [options[i - 1] for i in router_response.unviable_options]
-        return RouterResponse(
-            best_option=best_option,
-            unviable_options=unviable_options
-        )
-
-    @staticmethod
-    def _format_options(options: List[T], prompt: str) -> str:
-       return "Prompt: {}\nOptions:\n{}".format(
-            prompt,
-            '\n'.join(["{}. {}: {}".format(i + 1, option.title, option.description) for i, option in enumerate(options)])
         )

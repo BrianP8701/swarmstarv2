@@ -2,8 +2,8 @@ from typing import ClassVar, List, Union
 
 from swarmstar.constants.misc_constants import MAX_PLAN_ATTEMPTS
 from swarmstar.enums.action_enum import ActionEnum
-from swarmstar.instructor.instructors.plan.sequential_plan_instructor import SequentialPlanInstructor
-from swarmstar.instructor.instructors.plan.review_sequential_plan_instructor import ReviewSequentialPlanInstructor
+from swarmstar.instructor.instructors.plan_instructors.sequential_plan_instructor import SequentialPlanInstructor
+from swarmstar.instructor.instructors.plan_instructors.review_sequential_plan_instructor import ReviewSequentialPlanInstructor
 from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.operations.base_operation import BaseOperation
 from swarmstar.objects.operations.spawn_operation import SpawnOperation

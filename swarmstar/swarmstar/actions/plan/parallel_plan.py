@@ -2,8 +2,8 @@ from typing import ClassVar, List, Union
 from swarmstar.constants.misc_constants import MAX_PLAN_ATTEMPTS
 from swarmstar.shapes.contexts.parallel_plan_context import ParallelPlanContext
 from swarmstar.enums.action_enum import ActionEnum
-from swarmstar.instructor.instructors.plan.parallel_plan_instructor import ParallelPlanInstructor
-from swarmstar.instructor.instructors.plan.review_parallel_plan_instructor import ReviewParallelPlanInstructor
+from swarmstar.instructor.instructors.plan_instructors.parallel_plan_instructor import ParallelPlanInstructor
+from swarmstar.instructor.instructors.plan_instructors.review_parallel_plan_instructor import ReviewParallelPlanInstructor
 from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.operations.base_operation import BaseOperation
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
@@ -19,7 +19,7 @@ class ParallelPlan(BaseActionNode):
     Suitable for tasks that can be parallelized to optimize time and resource usage. 
     The goal is to create a set of concurrent tasks that contribute to the overall objective.
     """
-    
+
     context: ParallelPlanContext
 
     async def main(self) -> Union[List[BaseOperation], SpawnOperation]:
@@ -27,7 +27,6 @@ class ParallelPlan(BaseActionNode):
         if not is_context_sufficient:
             return [await self.ask_questions(self.context.goal)]
         return await self.generate_plan()
-
 
     async def generate_plan(self) -> Union[List[BaseOperation], SpawnOperation]:
         self.context.attempts += 1

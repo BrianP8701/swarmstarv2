@@ -5,7 +5,7 @@ from data.models.message import MessageModel
 from data.models.action_metadata_node_model import ActionMetadataNodeModel
 from data.models.memory_metadata_node_model import MemoryMetadataNodeModel
 from data.models.swarmstar_event_model import SwarmstarEventModel
-from data.models.swarm_operation_models import SpawnOperationModel, TerminationOperationModel, CommunicationOperationModel, FunctionCallOperationModel
+from data.models.swarm_operation_models import SpawnOperationModel, TerminationOperationModel, FunctionCallOperationModel
 from data.models.swarmstar_space_model import SwarmstarSpaceModel
 from data.models.tool_metadata_node_model import ToolMetadataNodeModel
 
@@ -14,12 +14,10 @@ from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
 from swarmstar.objects.nodes.memory_metadata_node import MemoryMetadataNode
 from swarmstar.objects.nodes.tool_metadata_node import ToolMetadataNode
 from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
-from swarmstar.objects.operations.communication_operation import CommunicationOperation
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
 from swarmstar.objects.operations.termination_operation import TerminationOperation
 
 TABLE_PROPERTIES = {
-    
     DatabaseTableEnum.ACTION_METADATA_NODES: {
         "abbreviation": "am",
         "count_column": "action_metadata_node_count",
@@ -55,18 +53,11 @@ TABLE_PROPERTIES = {
         "table_name": "termination_operations",
         "object_class": TerminationOperation
     },
-    DatabaseTableEnum.COMMUNICATION_OPERATIONS: {
-        "abbreviation": "co",
-        "count_column": "communication_operation_count",
-        "model_class": CommunicationOperationModel,
-        "table_name": "communication_operations",
-        "object_class": CommunicationOperation
-    },
-    DatabaseTableEnum.ACTION_OPERATIONS: {
-        "abbreviation": "ao",
-        "count_column": "action_operation_count",
+    DatabaseTableEnum.FUNCTION_CALL_OPERATIONS: {
+        "abbreviation": "fco",
+        "count_column": "function_call_operation_count",
         "model_class": FunctionCallOperationModel,
-        "table_name": "action_operations",
+        "table_name": "function_call_operations",
         "object_class": FunctionCallOperation
     },
     DatabaseTableEnum.TOOL_METADATA_NODES: {
@@ -99,6 +90,9 @@ ALL_DATABASE_MODEL_CLASSES = [
     SwarmstarSpaceModel, 
     SpawnOperationModel, 
     TerminationOperationModel, 
-    CommunicationOperationModel, 
-    FunctionCallOperationModel
+    FunctionCallOperationModel,
+    ActionMetadataNodeModel,
+    MemoryMetadataNodeModel,
+    ToolMetadataNodeModel,
+    MessageModel
 ]
