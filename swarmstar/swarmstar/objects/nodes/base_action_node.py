@@ -13,20 +13,18 @@ Here we define the base class for actions, which:
 from abc import ABC, abstractmethod
 from functools import wraps
 from typing import Any, ClassVar, List, Callable, Optional, Tuple, Type, Union, cast
-from swarmstar.contexts.base_context import BaseContext
-from swarmstar.contexts.question_context import QuestionContext
+from swarmstar.instructor.instructors.is_context_sufficient_instructor import IsContextSufficientInstructor
+from swarmstar.shapes.contexts.base_context import BaseContext
+from swarmstar.shapes.contexts.question_context import QuestionContext
 
 from swarmstar.enums.action_enum import ActionEnum
 from swarmstar.enums.swarm_node_status_enum import ActionStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
-from swarmstar.instructor.instructor import Instructor
 from swarmstar.instructor.instructors.question_instructor import QuestionInstructor
 from swarmstar.objects import BaseOperation
 from swarmstar.objects.message import Message
 from swarmstar.objects.nodes.base_node import BaseNode
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
-
-instructor = Instructor()
 
 class BaseActionNode(BaseNode['BaseActionNode'], ABC):
     __action_metadata_node_id__: ClassVar[str]
@@ -41,11 +39,11 @@ class BaseActionNode(BaseNode['BaseActionNode'], ABC):
     termination_policy: TerminationPolicyEnum = TerminationPolicyEnum.SIMPLE
     message_ids: List[Union[List[str], str]] = []                       # Structure of ids of messages that have been sent to and received from this node.
     report: Optional[str] = None                                        # We should look at the node and see like, "Okay, thats what this node did." 
-    context: Optional[BaseContext] = None                                # This is where nodes can store extra context about themselves.
+    context: BaseContext
     operation: BaseOperation
 
     @abstractmethod
-    async def main(self) -> List[BaseOperation]:
+    async def main(self) -> Union[List[BaseOperation], SpawnOperation]:
         pass
 
     async def submit_report(self, report: str):
@@ -78,49 +76,44 @@ class BaseActionNode(BaseNode['BaseActionNode'], ABC):
             return func(self, terminator_id, context)
         return wrapper
 
-    @staticmethod
-    def question_wrapper(func: Callable[..., Any]):
+    async def is_context_sufficient(self, content: str) -> bool:
         """
-        This wrapper abstracts search away from actions.
+        Ensures sufficient context for the given content, which can be a goal, plan, task, problem, or bug.
+        If additional context is needed, it generates questions and initiates a search for answers.
 
-        It can be applied to instance methods that accept a string "content" as an argument.
+        :param content: The content for which context is being ensured.
+        :return: A boolean indicating whether the context is sufficient.
         """
-        @wraps(func)
-        async def wrapper(self, *args, **kwargs):
-            content = kwargs.get('content', args[0] if args else None)
-            if content is None:
-                raise ValueError("Content argument is required to use question_wrapper.")
-
-            do_we_need_search, search_operation = await self._ask_questions(content)
-            if do_we_need_search:
-                return [search_operation]
-            else:
-                return await func(self, *args, **kwargs)
-
-        return wrapper
-
-    async def _ask_questions(self, content: str) -> Tuple[bool, SpawnOperation | None]:
-        questions = await Instructor.instruct(
-            QuestionInstructor.generate_instructions(content),
-            QuestionInstructor,
+        latest_context = self.context.context_history[-1] if self.context.context_history else None
+        instructions = IsContextSufficientInstructor.write_instructions(content, latest_context)
+        
+        is_context_sufficient = await IsContextSufficientInstructor.is_context_sufficient(
+            content,
+            latest_context,
             self.operation
         )
-        if questions.do_we_need_search:
-            if questions.questions is None:
-                raise ValueError(f"QuestionInstructor returned None for questions despite do_we_need_search being True in swarm node {self.id} at operation {self.operation.id}")
+        return is_context_sufficient.is_context_sufficient_boolean
 
-            questions_string = "\t-" + "\n\t-".join(questions.questions)
-            return True, SpawnOperation(
-                action_node_id=self.id,
-                action_enum=ActionEnum.SEARCH,
+    async def ask_questions(self, content: str) -> SpawnOperation:
+        """
+        Creates a SpawnOperation for searching answers to the given questions.
+
+        :param questions: The list of questions to be answered.
+        :return: The SpawnOperation for the search.
+        """
+        questions = await QuestionInstructor.ask_questions(content, self.context.get_most_recent_context())
+        
+        questions_string = "\t-" + "\n\t-".join(questions.questions)
+        return SpawnOperation(
+            action_node_id=self.id,
+            action_enum=ActionEnum.SEARCH,
+            goal=f'Find answers to the following questions:\n{questions_string}',
+            context=QuestionContext(
                 goal=f'Find answers to the following questions:\n{questions_string}',
-                context=QuestionContext(
-                    **self.operation.context.model_dump() if self.operation.context else {},
-                    questions=questions.questions
-                ).model_dump()
+                context_history=[questions.context] if questions.context else [],
+                questions=questions.questions
             )
-        else:
-            return False, None
+        )
 
     async def log(self, message: Message, keys: Optional[List[int]] = None) -> List[int]:
         """

@@ -19,7 +19,7 @@ from swarmstar.contexts.question_context import QuestionContext
 from swarmstar.enums.action_enum import ActionEnum
 from swarmstar.enums.swarm_node_status_enum import ActionStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
-from swarmstar.instructor.instructor import Instructor
+from swarmstar.instructor.instructor_client import Instructor
 from swarmstar.instructor.instructors.question_instructor import QuestionInstructor
 from swarmstar.objects import BaseOperation
 from swarmstar.objects.message import Message
@@ -96,7 +96,7 @@ class BaseAction(BaseNode['BaseAction'], ABC):
 
     async def _ask_questions(self, goal: str) -> Tuple[bool, SpawnOperation | None]:
         questions = await Instructor.instruct(
-            QuestionInstructor.generate_instructions(goal),
+            QuestionInstructor.write_instructions(goal),
             QuestionInstructor,
             self.operation
         )

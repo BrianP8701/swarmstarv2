@@ -7,7 +7,7 @@ from typing import List, Optional
 from abc import ABC
 from pydantic import BaseModel
 
-from swarmstar.instructor.instructor import Instructor
+from swarmstar.instructor.instructor_client import Instructor
 from swarmstar.instructor.instructors.router_instructor import RouterInstructor
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 from swarmstar.objects.operations.base_operation import BaseOperation
@@ -29,7 +29,7 @@ class BaseRouter(ABC):
     ) -> RouteDecision:
         children = await node.get_children()
         router_decision = await instructor.instruct(
-            messages=RouterInstructor.generate_instructions(
+            messages=RouterInstructor.write_instructions(
                 children,
                 content,
                 self.__system_instructions__

@@ -7,7 +7,7 @@ from swarmstar.utils.misc.ids import get_operation_class_from_id
 
 class BaseOperation(BaseObject, ABC):
     action_node_id: str
-    context: Optional[BaseContext] = None
+    context: BaseContext
     
     @staticmethod
     async def execute(operation_id: str) -> List[str]:

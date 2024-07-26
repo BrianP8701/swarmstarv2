@@ -7,7 +7,7 @@ from openai import AsyncOpenAI
 from swarmstar.enums.message_role_enum import MessageRoleEnum
 from swarmstar.instructor.instructors.base_instructor import BaseInstructor
 from swarmstar.objects.message import Message
-from swarmstar.objects.nodes.swarm_node import SwarmNode
+from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.operations.base_operation import BaseOperation
 
 load_dotenv()
@@ -15,7 +15,7 @@ OPENAI_KEY = os.getenv("OPENAI_KEY")
 
 T = TypeVar('T', bound=BaseInstructor)
 
-class Instructor:
+class InstructorClient:
     _instance = None
     aclient: AsyncOpenAI
 
@@ -55,8 +55,8 @@ class Instructor:
 
     @staticmethod
     async def _log_instructor_call(messages: List[Message], operation: BaseOperation) -> None:
-        swarm_node = await SwarmNode.read(operation.swarm_node_id)
-        log_index_key = operation.context.get("log_index_key", [])
+        swarm_node = await BaseActionNode.read(operation.action_node_id)
+        log_index_key = operation.context.log_index_key
         log_index_key = await swarm_node.log_multiple(messages, log_index_key)
-        operation.context["log_index_key"] = log_index_key
+        operation.context.log_index_key = log_index_key
         await operation.upsert()
