@@ -3,7 +3,6 @@ from swarmstar.shapes.contexts.base_context import BaseContext
 from swarmstar.objects.message import Message
 
 class ParallelPlanContext(BaseContext):
-    conversation: List[Message]
     attempts: int = 0
     parallel_plan_history: List[List[str]] = []
     parallel_plan_review_feedback_history: List[str] = []

@@ -6,7 +6,7 @@ from swarmstar.objects.trees.base_metadata_tree import BaseMetadataTree
 
 
 class ToolMetadataTree(BaseMetadataTree):
-    __table__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.TOOL_METADATA_NODES
+    __table_enum__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.TOOL_METADATA_NODES
     __node_object__: ClassVar[ToolMetadataNode]
     __node_model__: ClassVar[ToolMetadataNodeModel]
     __branch_size_soft_limit__: ClassVar[int]

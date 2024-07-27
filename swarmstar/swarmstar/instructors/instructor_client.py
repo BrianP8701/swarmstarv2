@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import instructor 
 from openai import AsyncOpenAI
 from swarmstar.enums.message_role_enum import MessageRoleEnum
-from swarmstar.instructor.instructors.base_instructor import BaseInstructor
+from swarmstar.instructors.instructors.base_instructor import BaseInstructor
 from swarmstar.objects.message import Message
 from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.operations.base_operation import BaseOperation
@@ -30,7 +30,7 @@ class InstructorClient:
         cls,
         messages: List[Message],
         instructor_model: Type[T],
-        operation: Optional[BaseOperation] = None,
+        action_node_id: Optional[str],
         max_retries: int = 3,
         logging: bool = True,
     ) -> T:
@@ -48,15 +48,13 @@ class InstructorClient:
             content=completion.model_dump_json()
         )
 
-        if logging and operation is not None:
-            await cls._log_instructor_call(messages + [response_message], operation)
+        if logging and action_node_id is not None:
+            await cls._log_instructor_call(messages + [response_message], action_node_id)
 
         return completion
 
     @staticmethod
-    async def _log_instructor_call(messages: List[Message], operation: BaseOperation) -> None:
-        swarm_node = await BaseActionNode.read(operation.action_node_id)
-        log_index_key = operation.context.log_index_key
-        log_index_key = await swarm_node.log_multiple(messages, log_index_key)
-        operation.context.log_index_key = log_index_key
-        await operation.upsert()
+    async def _log_instructor_call(messages: List[Message], action_node_id: str) -> None:
+        action_node = await BaseActionNode.read(action_node_id) # type: ignore
+        await action_node.log_multiple(messages)
+        await action_node.upsert()

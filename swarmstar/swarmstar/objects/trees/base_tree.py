@@ -7,8 +7,8 @@ from sqlalchemy.orm import aliased
 from sqlalchemy import select
 
 from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from swarmstar.constants.database_constants import TABLE_ENUM_TO_ABBREVIATION
 from swarmstar.objects.nodes.base_node import BaseNode
-from swarmstar.constants.constants import TABLE_ENUM_TO_ABBREVIATION
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.utils.misc.ids import get_all_swarm_object_ids
 
@@ -19,44 +19,28 @@ class BaseTree(ABC, BaseModel):
     organizing data in a way that's easy to traverse and understand. It's also naturally
     efficient and scalable.
     """
-    __table__: ClassVar[DatabaseTableEnum]
-    __node_model__: ClassVar[BaseSQLAlchemyModel]
-    __node_object__: ClassVar[BaseNode]
+    __table_enum__: ClassVar[DatabaseTableEnum]
+    __node_model_class__: ClassVar[BaseSQLAlchemyModel]
+    __node_class__: ClassVar[BaseNode]
 
     @classmethod
     def get_root_node_id(cls, swarm_id: str) -> str:
-        return f"{swarm_id}_{TABLE_ENUM_TO_ABBREVIATION[cls.__table__]}0"
+        return f"{swarm_id}_{TABLE_ENUM_TO_ABBREVIATION[cls.__table_enum__]}0"
 
     @classmethod
-    async def read_tree(cls, swarm_id: str) -> BaseNode:
+    async def get_all_node_ids(cls, swarm_id: str) -> List[str]:
+        return await get_all_swarm_object_ids(swarm_id, cls.__table_enum__) or []
+
+    @classmethod
+    async def read_tree(cls, swarm_id: str) -> List[BaseNode]:
         """ Reads the tree from the database and returns the root node with all children. """
-        root_node_id = cls.get_root_node_id(swarm_id)
-        
-        # Define the recursive CTE
-        node_alias = aliased(cls.__node_model__)
-        cte = (
-            select(node_alias)
-            .where(node_alias.id == root_node_id)
-            .cte(name="node_cte", recursive=True)
-        )
+        all_node_ids = await cls.get_all_node_ids(swarm_id)
+        return await cls.__node_class__.batch_read(all_node_ids)
 
-        cte = cte.union_all(
-            select(node_alias)
-            .join(cte, node_alias.parent_id == cte.c.id)
-        )
-
-        # Execute the query
-        query = select(cte)
-        result = await cls.__node_model__.execute(query)
-
-        # Convert the result to a tree structure
-        nodes = {row.id: BaseNode(**row._asdict()) for row in result}
-        for node in nodes.values():
-            if node.parent_id:
-                nodes[node.parent_id].children.append(node)
-                node.parent = nodes[node.parent_id]
-
-        return nodes[root_node_id]
+    @classmethod
+    async def delete(cls, swarm_id: str) -> None:
+        """ Deletes every node in the tree from the database. """        
+        await cls.__node_class__.batch_delete(await cls.get_all_node_ids(swarm_id))
 
     @classmethod
     async def clone(cls, old_swarm_id: str, swarm_id: str) -> None:
@@ -86,14 +70,6 @@ class BaseTree(ABC, BaseModel):
         update_node_ids(root_node)
 
         if batch_copy_payload:
-            await cls.__node_object__.batch_copy(batch_copy_payload[0], batch_copy_payload[1])
+            await cls.__node_class__.batch_copy(batch_copy_payload[0], batch_copy_payload[1])
         if batch_update_payload:
-            await cls.__node_object__.batch_update(batch_update_payload)
-
-    @classmethod
-    async def delete(cls, swarm_id: str) -> None:
-        """ Deletes every node in the tree from the database. """        
-        batch_delete_payload = await get_all_swarm_object_ids(swarm_id, cls.__table__)
-        
-        if batch_delete_payload:
-            await cls.__node_object__.batch_delete(batch_delete_payload)
+            await cls.__node_class__.batch_update(batch_update_payload)

@@ -1,12 +1,11 @@
 from typing import List, Optional
 from pydantic import Field
 from swarmstar.enums.message_role_enum import MessageRoleEnum
-from swarmstar.instructor.instructors.base_instructor import BaseInstructor
+from swarmstar.instructors.instructors.base_instructor import BaseInstructor
 from swarmstar.objects.message import Message
-from swarmstar.objects.operations.base_operation import BaseOperation
 
 class RouterInstructor(BaseInstructor):
-    best_option: int = Field(description="The index of the best option. 0 if there is no viable option.")
+    best_option: Optional[int] = Field(description="The index of the best option. None if there is no viable option.")
     unviable_options: List[int] = Field(description="The indices of the options that are unviable")
 
     @classmethod
@@ -24,12 +23,22 @@ class RouterInstructor(BaseInstructor):
         ]
 
     @classmethod
-    async def route(cls, options: List[str], content: str, system_message: str, operation: Optional[BaseOperation] = None) -> 'RouterInstructor':
-        return await cls.client.instruct(
+    async def route(
+        cls, 
+        options: List[str], 
+        content: str, 
+        system_message: str, 
+        action_node_id: Optional[str]
+    ) -> 'RouterInstructor':
+        instructor = await cls.client.instruct(
             messages=cls.write_instructions(options, content, system_message),
             instructor_model=cls,
-            operation=operation
+            action_node_id=action_node_id
         )
+        if instructor.best_option is not None:
+            instructor.best_option -= 1
+        instructor.unviable_options = [opt - 1 for opt in instructor.unviable_options]
+        return instructor
 
     @classmethod
     def _format_options(cls, options: List[str], prompt: str) -> str:

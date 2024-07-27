@@ -8,7 +8,7 @@ Following that, just keep feeding operations into the execute function and it wi
 Keep in mind that you shouldn't pass UserCommunication operations into the execute function. 
 I've provided a template for how you may handle those in the user_communication_examples folder.
 """
-from typing import List, Union
+from typing import List
 import inspect
 
 from swarmstar.objects import (
@@ -39,7 +39,7 @@ class Swarmstar:
         BaseOperation.create(root_spawn_operation)
         return root_spawn_operation
 
-    async def execute(self, swarm_operation: BaseOperation) -> Union[List[BaseOperation], None]:
+    async def execute(self, swarm_operation: BaseOperation) -> List[BaseOperation] | None:
         """
         This function is the main entry point for the swarmstar library. It takes in a swarm configuration and a swarm operation
         and returns a list of swarm operations that should be executed next.

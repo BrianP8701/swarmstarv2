@@ -3,7 +3,7 @@ from swarmstar.enums.action_enum import ActionEnum
 from swarmstar.enums.swarm_node_status_enum import ActionStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from data.models.swarm_operation_models import TerminationOperationModel
-from swarmstar.objects.nodes.swarm_node import SwarmNode
+from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
 from swarmstar.objects.operations.base_operation import BaseOperation
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
@@ -16,70 +16,76 @@ TERMINATION_POLICY_MAP: Dict[TerminationPolicyEnum, str] = {
 }
 
 class TerminationOperation(BaseOperation):
-    __table__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.TERMINATION_OPERATIONS
-    __object_model__: ClassVar[TerminationOperationModel] = TerminationOperationModel
+    __table_enum__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.TERMINATION_OPERATIONS
+    __model_class__: ClassVar[TerminationOperationModel] = TerminationOperationModel
 
     terminator_id: str
 
-    async def _execute(self) -> List[str]:
-        swarm_node = await SwarmNode.read(self.swarm_node_id)
-        termination_policy = swarm_node.termination_policy
-        termination_handler_function_name = TERMINATION_POLICY_MAP[termination_policy]
-        termination_handler_function = getattr(self, termination_handler_function_name)
-        return await termination_handler_function(swarm_node)
+    async def _execute(self) -> List[BaseOperation]:
+        action_node = await BaseActionNode.read(self.action_node_id)
+        termination_policy = action_node.termination_policy
+        
+        match termination_policy:
+            case TerminationPolicyEnum.SIMPLE:
+                return await self._terminate_simple(action_node)
+            case TerminationPolicyEnum.CONFIRM_DIRECTIVE_COMPLETION:
+                return await self._terminate_confirm_directive_completion(action_node)
+            case TerminationPolicyEnum.CUSTOM_TERMINATION_HANDLER:
+                return await self._terminate_custom_termination_handler(action_node)
+            case _:
+                raise ValueError(f"Unknown termination policy: {termination_policy}")
 
-    async def _terminate_simple(self, swarm_node: SwarmNode) -> List['TerminationOperation']:
+    async def _terminate_simple(self, action_node: BaseActionNode) -> List[BaseOperation]:
         """
         Terminate the node and return a new termination operation for the parent node.
         """
-        swarm_node.status = ActionStatusEnum.TERMINATED
-        await swarm_node.upsert()
-        parent_node_id = swarm_node.parent_id
+        action_node.status = ActionStatusEnum.TERMINATED
+        await action_node.upsert()
+        parent_node_id = action_node.parent_id
         if parent_node_id:
             return [
                 TerminationOperation(
-                    swarm_node_id=parent_node_id, 
-                    terminator_id=swarm_node.id
+                    action_node_id=parent_node_id, 
+                    terminator_id=action_node.id
                 )
             ]
         else:
             return []
 
-    async def _terminate_custom_termination_handler(self, swarm_node: SwarmNode) -> List[FunctionCallOperation]:
+    async def _terminate_custom_termination_handler(self, action_node: BaseActionNode) -> List[BaseOperation]:
         """
         Nodes can implement their own termination handlers.
         They can signal that that they want to use their own termination handler by updating their termination policy
         to CUSTOM_TERMINATION_HANDLER and adding a __termination_handler__ key to their context.
         """
-        context = swarm_node.context
-        termination_handler = context.get("__termination_handler__", None)
+        context = action_node.context
+        termination_handler = context.termination_handler_function_name
         if termination_handler:
             return [FunctionCallOperation(
-                swarm_node_id=swarm_node.id,
+                action_node_id=action_node.id,
                 function_to_call=termination_handler,
-                context=self.context
             )]
         else:
-            raise ValueError(f"No termination handler found for action type {swarm_node.action_enum} in swarm node {swarm_node.id}")
+            raise ValueError(f"No termination handler found for action node {action_node.id}")
 
-    async def _terminate_confirm_directive_completion(self, swarm_node: SwarmNode):
+    async def _terminate_confirm_directive_completion(self, action_node: BaseActionNode) -> List[BaseOperation]:
         """            
             1. If any children are alive, do nothing.
             2. If all children are terminated spawn the 'confirm_directive_completion' node.
             3. If all children are terminated including a 'confirm_directive_completion' node, 
                 terminate the node.
         """
-        children_swarm_nodes = await swarm_node.get_children()
-        if all(child.status == ActionStatusEnum.TERMINATED for child in children_swarm_nodes):
-            node_has_been_reviewed = next((child for child in children_swarm_nodes if child.action_enum == ActionEnum.REVIEW_GOAL_PROGRESS), False)
+        children_action_nodes = await action_node.get_children()
+        if all(child.status == ActionStatusEnum.TERMINATED for child in children_action_nodes):
+            node_has_been_reviewed = next((child for child in children_action_nodes if child.__action_enum__ == ActionEnum.REVIEW_GOAL_PROGRESS), False)
             if node_has_been_reviewed:
-                return await self._terminate_simple(swarm_node)
+                return await self._terminate_simple(action_node)
             else:
                 return [
                     SpawnOperation(
-                        swarm_node_id=swarm_node.id, 
+                        action_node_id=action_node.id, 
                         action_enum=ActionEnum.REVIEW_GOAL_PROGRESS,
-                        goal=swarm_node.goal,
+                        goal=action_node.goal,
                     )
                 ]
         else:

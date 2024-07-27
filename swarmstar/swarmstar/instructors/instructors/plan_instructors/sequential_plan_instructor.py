@@ -2,7 +2,7 @@ from pydantic import Field
 from typing import List, Optional
 from swarmstar.enums.message_role_enum import MessageRoleEnum
 
-from swarmstar.instructor.instructors.base_instructor import BaseInstructor
+from swarmstar.instructors.instructors.base_instructor import BaseInstructor
 from swarmstar.objects.message import Message
 from swarmstar.objects.operations.base_operation import BaseOperation
 
@@ -30,13 +30,13 @@ class SequentialPlanInstructor(BaseInstructor):
     async def generate_plan(
         cls, 
         goal: str, 
-        context: Optional[str] = None, 
-        review: Optional[str] = None, 
-        last_plan_attempt: Optional[List[str]] = None,
-        operation: Optional[BaseOperation] = None
+        context: Optional[str], 
+        review: Optional[str], 
+        last_plan_attempt: Optional[List[str]],
+        action_node_id: Optional[str]
     ) -> 'SequentialPlanInstructor':
         return await cls.client.instruct(
             messages=cls.write_instructions(goal, context, review, last_plan_attempt),
             instructor_model=cls,
-            operation=operation,
+            action_node_id=action_node_id
         )

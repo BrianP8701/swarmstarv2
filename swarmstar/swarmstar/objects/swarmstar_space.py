@@ -24,8 +24,8 @@ class SwarmstarSpace(BaseObject):
     This includes nodes, metadata, operations, and other related entities, 
     encapsulating the entire state and behavior of the swarm.
     """
-    __table__ = DatabaseTableEnum.SWARMSTAR_SPACE
-    __object_model__ = SwarmstarSpaceModel
+    __table_enum__ = DatabaseTableEnum.SWARMSTAR_SPACE
+    __model_class__ = SwarmstarSpaceModel
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     total_event_count: int = 0

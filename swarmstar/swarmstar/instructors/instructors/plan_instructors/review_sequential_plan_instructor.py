@@ -2,7 +2,7 @@ from pydantic import Field
 from typing import List, Optional
 from swarmstar.enums.message_role_enum import MessageRoleEnum
 
-from swarmstar.instructor.instructors.base_instructor import BaseInstructor
+from swarmstar.instructors.instructors.base_instructor import BaseInstructor
 from swarmstar.objects.message import Message
 from swarmstar.objects.operations.base_operation import BaseOperation
 
@@ -25,9 +25,15 @@ class ReviewSequentialPlanInstructor(BaseInstructor):
         return f"The steps are: {steps}. Please analyze if this plan is valid and can be executed in sequence."
 
     @classmethod
-    async def review_plan(cls, goal: str, steps: List[str], context: Optional[str] = None, operation: Optional[BaseOperation] = None) -> 'ReviewSequentialPlanInstructor':
+    async def review_plan(
+        cls, 
+        goal: str, 
+        steps: List[str], 
+        context: Optional[str], 
+        action_node_id: Optional[str]
+    ) -> "ReviewSequentialPlanInstructor":
         return await cls.client.instruct(
             messages=cls.write_instructions(goal, steps, context),
             instructor_model=cls,
-            operation=operation
+            action_node_id=action_node_id
         )

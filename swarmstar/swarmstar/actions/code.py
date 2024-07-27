@@ -2,8 +2,8 @@ from typing import ClassVar, List
 from swarmstar.constants.misc_constants import MAX_PLAN_ATTEMPTS
 from swarmstar.enums.action_enum import ActionEnum
 from swarmstar.enums.message_role_enum import MessageRoleEnum
-from swarmstar.instructor.instructor_client import Instructor
-from swarmstar.instructor.instructors.plan.parallel_plan_instructor import ParallelPlanInstructor, ReviewParallelPlanInstructor
+from swarmstar.instructors.instructor_client import Instructor
+from swarmstar.instructors.instructors.plan.parallel_plan_instructor import ParallelPlanInstructor, ReviewParallelPlanInstructor
 from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.message import Message
 from swarmstar.objects.operations.spawn_operation import SpawnOperation

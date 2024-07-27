@@ -7,4 +7,4 @@ from swarmstar.objects.trees.base_tree import BaseTree
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 
 class SwarmTree(BaseTree):
-    __table__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.SWARM_NODES
+    __table_enum__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.SWARM_NODES

@@ -1,15 +1,14 @@
 from abc import ABC
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel, Field
 
 class BaseContext(BaseModel, ABC):
-    goal: str = Field(
-        description="The goal of the node. This is the context that the node is trying to achieve."
-    )
-    context_history: List[str] = Field(
-        description="A list of context strings for the node's task. The most recent context is at the last index, and the list is maintained for observability."
-    )
-    log_index_key: List[int] = []
-
-    def get_most_recent_context(self) -> Optional[str]:
-        return self.context_history[-1] if self.context_history else None
+    """
+    Context is how nodes pass information between each other and maintain context across operations internally.
+    Represent arguments with required fields.
+    
+    Context objects can only contain primitive types, lists, and dictionaries.
+    Complex objects, such as database models or full node instances, should be represented by their IDs or simpler representations.
+    """
+    termination_handler_function_name: Optional[str] = Field(default=None)
+    ...

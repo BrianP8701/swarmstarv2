@@ -1,10 +1,7 @@
 from typing import List, Optional
 from swarmstar.shapes.contexts.base_context import BaseContext
-from swarmstar.objects.message import Message
 
 class SequentialPlanContext(BaseContext):
-    goal: str
-    conversation: List[Message]
     attempts: int = 0
     sequential_plan_history: List[List[str]] = []
     sequential_plan_review_feedback_history: List[str] = []

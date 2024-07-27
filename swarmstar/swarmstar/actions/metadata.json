@@ -1,0 +1,10 @@
+{
+  "id": "root",
+  "title": "Action Metadata Tree Root",
+  "parent_id": null,
+  "children_ids": [
+    "plan",
+    "routers"
+  ],
+  "description": "Root of the action metadata tree."
+}

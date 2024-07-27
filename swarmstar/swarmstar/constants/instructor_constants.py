@@ -3,8 +3,8 @@ from pydantic import BaseModel
 
 from swarmstar.enums.instructor_enum import InstructorEnum
 
-from swarmstar.instructor.instructors.router_instructor import RouterInstructor
-from swarmstar.instructor.instructors.question_instructor import QuestionInstructor
+from swarmstar.instructors.instructors.router_instructor import RouterInstructor
+from swarmstar.instructors.instructors.question_instructor import QuestionInstructor
 
 INSTRUCTOR_PROPERTIES: Dict[InstructorEnum, Dict[str, Any]] = {
     InstructorEnum.ROUTER_INSTRUCTOR: {

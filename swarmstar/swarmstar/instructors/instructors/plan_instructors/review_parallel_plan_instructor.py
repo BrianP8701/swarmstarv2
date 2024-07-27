@@ -2,7 +2,7 @@ from pydantic import Field
 from typing import List, Optional
 from swarmstar.enums.message_role_enum import MessageRoleEnum
 
-from swarmstar.instructor.instructors.base_instructor import BaseInstructor
+from swarmstar.instructors.instructors.base_instructor import BaseInstructor
 from swarmstar.objects.message import Message
 from swarmstar.objects.operations.base_operation import BaseOperation
 
@@ -25,9 +25,15 @@ class ReviewParallelPlanInstructor(BaseInstructor):
         return f"The subgoals are: {subgoals}. Please analyze if this plan is valid and can be executed in parallel."
 
     @classmethod
-    async def review_plan(cls, goal: str, subgoals: List[str], context: Optional[str] = None, operation: Optional[BaseOperation] = None) -> 'ReviewParallelPlanInstructor':
+    async def review_plan(
+        cls, 
+        goal: str, 
+        subgoals: List[str], 
+        context: Optional[str], 
+        action_node_id: Optional[str]
+    ) -> "ReviewParallelPlanInstructor":
         return await cls.client.instruct(
             messages=cls.write_instructions(goal, subgoals, context),
             instructor_model=cls,
-            operation=operation
+            action_node_id=action_node_id
         )

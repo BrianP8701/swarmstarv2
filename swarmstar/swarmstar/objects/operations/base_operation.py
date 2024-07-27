@@ -1,13 +1,11 @@
-from typing import List, Optional
+from typing import List
 from abc import ABC, abstractmethod
 
 from swarmstar.objects.base_object import BaseObject
-from swarmstar.shapes.contexts.base_context import BaseContext
 from swarmstar.utils.misc.ids import get_operation_class_from_id
 
 class BaseOperation(BaseObject, ABC):
     action_node_id: str
-    context: BaseContext
     
     @staticmethod
     async def execute(operation_id: str) -> List[str]:

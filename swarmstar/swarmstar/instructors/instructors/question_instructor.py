@@ -1,7 +1,7 @@
 from typing import List, Optional
 from pydantic import Field
 from swarmstar.enums.message_role_enum import MessageRoleEnum
-from swarmstar.instructor.instructors.base_instructor import BaseInstructor
+from swarmstar.instructors.instructors.base_instructor import BaseInstructor
 from swarmstar.objects.message import Message
 from swarmstar.objects.operations.base_operation import BaseOperation
 
@@ -18,11 +18,16 @@ class QuestionInstructor(BaseInstructor):
         ]
 
     @classmethod
-    async def ask_questions(cls, content: str, context: Optional[str] = None, operation: Optional[BaseOperation] = None) -> "QuestionInstructor":
+    async def ask_questions(
+        cls, 
+        content: str, 
+        context: Optional[str], 
+        action_node_id: Optional[str]
+    ) -> "QuestionInstructor":
         instructions = cls.write_instructions(content, context)
         response = await cls.client.instruct(
             messages=instructions,
             instructor_model=cls,
-            operation=operation
+            action_node_id=action_node_id
         )
         return response

@@ -15,8 +15,8 @@ from data.models.action_metadata_node_model import ActionMetadataNodeModel
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 
 class ActionMetadataNode(BaseMetadataNode['ActionMetadataNode']):
-    __table__: ClassVar[str] = "action_metadata_nodes"
-    __object_model__: ClassVar[Type['ActionMetadataNodeModel']] = ActionMetadataNodeModel
+    __table_enum__: ClassVar[str] = "action_metadata_nodes"
+    __model_class__: ClassVar[Type['ActionMetadataNodeModel']] = ActionMetadataNodeModel
 
     goal: str
     action_enum: ActionEnum

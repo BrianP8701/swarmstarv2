@@ -1,7 +1,7 @@
 from typing import List, Optional
 from pydantic import Field
 from swarmstar.enums.message_role_enum import MessageRoleEnum
-from swarmstar.instructor.instructors.base_instructor import BaseInstructor
+from swarmstar.instructors.instructors.base_instructor import BaseInstructor
 from swarmstar.objects.message import Message
 from swarmstar.objects.operations.base_operation import BaseOperation
 
@@ -28,9 +28,14 @@ class IsContextSufficientInstructor(BaseInstructor):
         ]
 
     @classmethod
-    async def is_context_sufficient(cls, content: str, context: Optional[str] = None, operation: Optional[BaseOperation] = None) -> 'IsContextSufficientInstructor':
+    async def is_context_sufficient(
+        cls, 
+        content: str, 
+        context: Optional[str], 
+        action_node_id: Optional[str]
+    ) -> "IsContextSufficientInstructor":
         return await cls.client.instruct(
             cls.write_instructions(content, context),
             cls,
-            operation=operation
+            action_node_id=action_node_id
         )
