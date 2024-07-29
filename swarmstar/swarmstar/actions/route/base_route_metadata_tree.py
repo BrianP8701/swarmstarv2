@@ -13,7 +13,7 @@ from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 from swarmstar.objects.operations.base_operation import BaseOperation
 from swarmstar.objects.trees.base_tree import BaseTree
-from swarmstar.shapes.contexts.base_metadata_tree_router_context import BaseRouteMetadataTreeContext
+from swarmstar.shapes.contexts.base_route_metadata_tree_context import BaseRouteMetadataTreeContext
 from swarmstar.utils.misc.ids import extract_swarm_id
 
 T = TypeVar('T', bound='BaseRouteMetadataTree')

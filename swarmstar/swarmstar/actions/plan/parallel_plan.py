@@ -9,7 +9,7 @@ from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.operations.base_operation import BaseOperation
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
 
-class ParallelPlan(BaseActionNode['ParallelPlan']):
+class ParallelPlan(BaseActionNode):
     __id__ = "parallel_plan"
     __parent_id__ = "plan"
     __title__ = "Parallel Plan"
@@ -50,6 +50,7 @@ class ParallelPlan(BaseActionNode['ParallelPlan']):
                 action_node_id="parallel_plan",
                 goal=subgoal,
                 action_enum=ActionEnum.ROUTE_ACTION,
+                node_context=ParallelPlanContext()
             ) for subgoal in parallel_plan.plan]
         else:
             self.context.parallel_plan_history.append(parallel_plan.plan)

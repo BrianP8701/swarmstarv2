@@ -6,17 +6,16 @@ from swarmstar.enums.action_enum import ActionEnum
 from swarmstar.instructors.instructors.plan_instructors.sequential_plan_instructor import SequentialPlanInstructor
 from swarmstar.instructors.instructors.plan_instructors.review_sequential_plan_instructor import ReviewSequentialPlanInstructor
 from swarmstar.objects.nodes.base_action_node import BaseActionNode
-from swarmstar.objects.operations.base_operation import BaseOperation
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
 from swarmstar.shapes.contexts.sequential_plan_context import SequentialPlanContext
 
 
-class SequentialPlan(BaseActionNode['SequentialPlan']):
+class SequentialPlan(BaseActionNode):
     __id__ = "sequential_plan"
     __parent_id__ = "plan"
     __title__ = "Sequential Plan"
     __action_enum__ = ActionEnum.SEQUENTIAL_PLAN
-    __context_class__: Type[BasePlanContext] = SequentialPlanContext  # Change BaseContext to BasePlanContext
+    __context_class__: Type[SequentialPlanContext] = SequentialPlanContext  # Change BaseContext to BasePlanContext
     __description__ = """
     Use this action to break down complex tasks into a series of ordered steps. 
     Ideal for tasks where each step depends on the completion of the previous one. 
@@ -51,7 +50,8 @@ class SequentialPlan(BaseActionNode['SequentialPlan']):
             return SpawnOperation(
                 action_node_id="sequential_plan",
                 goal=sequential_plan.steps[0],
-                action_enum=ActionEnum.ROUTE_ACTION
+                action_enum=ActionEnum.ROUTE_ACTION,
+                node_context=SequentialPlanContext()
             )
         else:
             if self.context.attempts < MAX_PLAN_ATTEMPTS:

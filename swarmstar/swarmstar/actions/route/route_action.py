@@ -30,6 +30,7 @@ class RouteAction(BaseRouteMetadataTree):
             action_node_id=node.id,
             goal=self.context.content,
             action_enum=node.action_enum,
+            node_context=
         )
 
     async def _tree_level_fallback(self) -> List[BaseOperation] | BaseOperation:

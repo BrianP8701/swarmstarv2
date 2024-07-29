@@ -1,6 +1,6 @@
 from typing import ClassVar, Dict, List
 from swarmstar.enums.action_enum import ActionEnum
-from swarmstar.enums.swarm_node_status_enum import ActionStatusEnum
+from swarmstar.enums.action_status_enum import ActionStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from data.models.swarm_operation_models import TerminationOperationModel
 from swarmstar.objects.nodes.base_action_node import BaseActionNode
@@ -86,6 +86,7 @@ class TerminationOperation(BaseOperation):
                         action_node_id=action_node.id, 
                         action_enum=ActionEnum.REVIEW_GOAL_PROGRESS,
                         goal=action_node.goal,
+                        node_context=action_node.context
                     )
                 ]
         else:

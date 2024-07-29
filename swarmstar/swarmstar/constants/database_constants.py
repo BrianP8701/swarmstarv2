@@ -1,4 +1,5 @@
 from typing import List
+from data.models.action_node_model import ActionNodeModel
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 
 from data.models.message import MessageModel
@@ -11,6 +12,7 @@ from data.models.tool_metadata_node_model import ToolMetadataNodeModel
 
 from swarmstar.objects.message import Message
 from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
+from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.nodes.memory_metadata_node import MemoryMetadataNode
 from swarmstar.objects.nodes.tool_metadata_node import ToolMetadataNode
 from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
@@ -73,6 +75,13 @@ TABLE_PROPERTIES = {
         "model_class": MessageModel,
         "table_name": "messages",
         "object_class": Message
+    },
+    DatabaseTableEnum.ACTION_NODES: {
+        "abbreviation": "an",
+        "count_column": "action_node_count",
+        "model_class": ActionNodeModel,
+        "table_name": "action_nodes",
+        "object_class": BaseActionNode
     }
 }
 

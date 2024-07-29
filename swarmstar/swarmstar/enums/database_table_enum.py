@@ -1,7 +1,7 @@
 from enum import Enum
 
 class DatabaseTableEnum(Enum, str):
-    SWARM_NODES = "swarm_nodes"
+    ACTION_NODES = "action_nodes"
     SWARMSTAR_SPACE = "swarmstar_space"
     SWARMSTAR_EVENTS = "swarmstar_events"
     ACTION_METADATA_NODES = "action_metadata_nodes"

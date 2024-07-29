@@ -1,6 +1,6 @@
 from abc import ABC
 import asyncio
-from typing import Any, Dict, List, Optional, Type, TypeVar, ClassVar, Generic
+from typing import Any, Dict, List, Optional, Type, TypeVar, ClassVar, Generic, cast
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -49,7 +49,7 @@ class BaseObject(BaseModel, Generic[T], ABC):
     @classmethod
     async def read(cls: Type[T], id: str, session: Optional[AsyncSession] = None) -> T:
         model = await db.read(cls.__model_class__, id, session)
-        return cls(**model.__dict__)
+        return cast(T, cls(**model.__dict__))
 
     @classmethod
     async def delete(cls: Type[T], id: str, session: Optional[AsyncSession] = None) -> None:

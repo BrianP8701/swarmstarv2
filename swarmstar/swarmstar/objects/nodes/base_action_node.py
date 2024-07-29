@@ -11,14 +11,15 @@ Here we define the base class for actions, which:
         termination handlers, etc.
 """
 from abc import ABC, abstractmethod
-from typing import ClassVar, List, Callable, Optional, TypeVar
+from typing import ClassVar, List, Callable, Optional, Type
+from data.models.action_node_model import ActionNodeModel
 from pydantic import Field
 
 from swarmstar.instructors.instructors.is_context_sufficient_instructor import IsContextSufficientInstructor
 from swarmstar.shapes.contexts.base_context import BaseContext
 from swarmstar.shapes.contexts.question_context import QuestionContext
 from swarmstar.enums.action_enum import ActionEnum
-from swarmstar.enums.swarm_node_status_enum import ActionStatusEnum
+from swarmstar.enums.action_status_enum import ActionStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from swarmstar.instructors.instructors.question_instructor import QuestionInstructor
 from swarmstar.objects import BaseOperation
@@ -26,9 +27,7 @@ from swarmstar.objects.message import Message
 from swarmstar.objects.nodes.base_node import BaseNode
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
 
-T = TypeVar('T', bound='BaseActionNode')
-
-class BaseActionNode(BaseNode[T], ABC):
+class BaseActionNode(BaseNode['BaseActionNode'], ABC):
     __action_metadata_node_id__: ClassVar[str]
     __parent_metadata_node_id__: ClassVar[str]
     __children_metadata_node_ids__: ClassVar[List[str]] = []
@@ -36,6 +35,7 @@ class BaseActionNode(BaseNode[T], ABC):
     __description__: ClassVar[str]
     __operation__: ClassVar[BaseOperation]
     __context_class__: ClassVar[BaseContext]
+    __model_class__: ClassVar[Type['ActionNodeModel']] = ActionNodeModel
 
     goal: str
     status: ActionStatusEnum = ActionStatusEnum.ACTIVE

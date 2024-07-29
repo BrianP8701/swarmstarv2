@@ -3,7 +3,7 @@ from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
 from sqlalchemy.orm import relationship
 
 from swarmstar.enums.action_enum import ActionEnum
-from swarmstar.enums.swarm_node_status_enum import ActionStatusEnum
+from swarmstar.enums.action_status_enum import ActionStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 

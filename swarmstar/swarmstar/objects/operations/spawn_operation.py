@@ -14,14 +14,14 @@ class SpawnOperation(BaseOperation):
     goal: str
     action_enum: ActionEnum
     context: Optional[str] = None
-    node_context: Optional[BaseContext] = None
+    node_context: BaseContext
 
     async def _execute(self) -> List['FunctionCallOperation']:
         ActionNodeClass = ACTION_ENUM_TO_ACTION_NODE_CLASS[self.action_enum]
 
         new_action_node = ActionNodeClass(
             goal=self.goal,
-            context=self.node_context or ActionNodeClass.context
+            context=self.node_context
         )
 
         return [

@@ -1,10 +1,8 @@
 from typing import ClassVar, List
-from swarmstar.constants.action_constants import ACTION_ENUM_TO_ACTION_NODE_CLASS
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from data.models.swarm_operation_models import FunctionCallOperationModel
 from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.operations.base_operation import BaseOperation
-
 
 class FunctionCallOperation(BaseOperation):
     __table_enum__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.FUNCTION_CALL_OPERATIONS

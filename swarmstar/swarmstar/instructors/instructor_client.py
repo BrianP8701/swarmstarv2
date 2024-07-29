@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 import instructor 
 from openai import AsyncOpenAI
+from swarmstar.constants.action_constants import ACTION_ENUM_TO_ACTION_NODE_CLASS
 from swarmstar.enums.message_role_enum import MessageRoleEnum
 from swarmstar.instructors.instructors.base_instructor import BaseInstructor
 from swarmstar.objects.message import Message
@@ -55,6 +56,6 @@ class InstructorClient:
 
     @staticmethod
     async def _log_instructor_call(messages: List[Message], action_node_id: str) -> None:
-        action_node = await BaseActionNode.read(action_node_id) # type: ignore
+        action_node = await BaseActionNode.read(action_node_id)
         await action_node.log_multiple(messages)
         await action_node.upsert()
