@@ -1,4 +1,3 @@
-
 [x] - Action Metadata Tree Search
-[ ] - Strongly type context when being passed between operations
-[ ] - Fix type inheritance issues
+[x] - Strongly type context when being passed between operations
+[x] - Fix type inheritance issues

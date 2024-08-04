@@ -29,6 +29,13 @@ class AbstractDatabase(ABC):
         pass
 
     @abstractmethod
+    def get_session(self):
+        """
+        Returns a new session for the database.
+        """
+        pass
+
+    @abstractmethod
     def read(self, table_name: str, id: str) -> Dict[str, Any]:
         """
         Queries the database for a data entry by its identifier.

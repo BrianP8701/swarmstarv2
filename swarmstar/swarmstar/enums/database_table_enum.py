@@ -1,6 +1,6 @@
 from enum import Enum
 
-class DatabaseTableEnum(Enum, str):
+class DatabaseTableEnum(str, Enum):
     ACTION_NODES = "action_nodes"
     SWARMSTAR_SPACE = "swarmstar_space"
     SWARMSTAR_EVENTS = "swarmstar_events"

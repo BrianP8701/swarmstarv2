@@ -31,15 +31,15 @@ class BaseActionNode(BaseNode['BaseActionNode'], ABC):
     __action_metadata_node_id__: ClassVar[str]
     __parent_metadata_node_id__: ClassVar[str]
     __children_metadata_node_ids__: ClassVar[List[str]] = []
-    __action_enum__: ClassVar[ActionEnum]
     __description__: ClassVar[str]
     __operation__: ClassVar[BaseOperation]
     __context_class__: ClassVar[BaseContext]
     __model_class__: ClassVar[Type['ActionNodeModel']] = ActionNodeModel
+    action_enum: ClassVar[ActionEnum]
 
     goal: str
     status: ActionStatusEnum = ActionStatusEnum.ACTIVE
-    termination_policy: TerminationPolicyEnum = TerminationPolicyEnum.SIMPLE
+    termination_policy_enum: TerminationPolicyEnum = TerminationPolicyEnum.SIMPLE
     message_ids: List[str] = []                       # Structure of ids of messages that have been sent to and received from this node.
     report: Optional[str] = None                     # We should look at the node and see like, "Okay, thats what this node did." 
     context: BaseContext
@@ -47,6 +47,7 @@ class BaseActionNode(BaseNode['BaseActionNode'], ABC):
         description="A list of context strings for the node's task. The most recent context is at the last index, and the list is maintained for observability.",
         default=lambda: []
     )
+    operations_ids: List[str] = []
 
     @abstractmethod
     async def main(self) -> List[BaseOperation] | BaseOperation:
@@ -115,8 +116,7 @@ class BaseActionNode(BaseNode['BaseActionNode'], ABC):
             action_node_id=self.id,
             action_enum=ActionEnum.SEARCH,
             goal=f'Find answers to the following questions:\n{questions_string}',
-            context=self.get_most_recent_context(),
-            node_context=QuestionContext(
+            context=QuestionContext(
                 questions=questions.questions
             )
         )

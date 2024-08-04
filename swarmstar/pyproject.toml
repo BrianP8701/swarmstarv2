@@ -20,6 +20,8 @@ uvicorn = "^0.30.1"
 sqlalchemy = "^2.0.31"
 pyodbc = "^5.1.0"
 pygithub = "^2.3.0"
+aiosqlite = "^0.20.0"
+greenlet = "^3.0.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

@@ -1,8 +1,7 @@
-from abc import ABC
 from typing import Optional
 from pydantic import BaseModel, Field
 
-class BaseContext(BaseModel, ABC):
+class BaseContext(BaseModel):
     """
     Context is how nodes pass information between each other and maintain context across operations internally.
     Represent arguments with required fields.

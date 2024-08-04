@@ -1,12 +1,11 @@
 from abc import ABC
 import asyncio
-from typing import Any, Dict, List, Optional, Type, TypeVar, ClassVar, Generic, cast
+from typing import Any, Dict, List, Optional, Type, TypeVar, ClassVar, Generic
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
-from swarmstar.utils.misc.ids import generate_id
 from data.database import Database
 
 db = Database()
@@ -35,8 +34,9 @@ class BaseObject(BaseModel, Generic[T], ABC):
     def __init__(self, swarm_id: Optional[str] = None, **data: Any):
         super().__init__(**data)
         if not self.id:
+            from swarmstar.utils.misc.ids import generate_id
             loop = asyncio.get_event_loop()
-            self.id = loop.run_until_complete(generate_id(self.__table_enum__, swarm_id))
+            self.id = loop.run_until_complete(generate_id(db, self.__table_enum__, swarm_id))
             loop.run_until_complete(self._create())
 
     async def _create(self, session: Optional[AsyncSession] = None) -> None:
@@ -49,7 +49,7 @@ class BaseObject(BaseModel, Generic[T], ABC):
     @classmethod
     async def read(cls: Type[T], id: str, session: Optional[AsyncSession] = None) -> T:
         model = await db.read(cls.__model_class__, id, session)
-        return cast(T, cls(**model.__dict__))
+        return cls(**model.__dict__)
 
     @classmethod
     async def delete(cls: Type[T], id: str, session: Optional[AsyncSession] = None) -> None:

@@ -8,6 +8,7 @@ from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 from swarmstar.objects.operations.base_operation import BaseOperation
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
 from swarmstar.objects.trees.action_metadata_tree import ActionMetadataTree
+from swarmstar.shapes.contexts.base_context import BaseContext
 from swarmstar.shapes.contexts.route_action_context import RouteActionContext
 
 class RouteAction(BaseRouteMetadataTree):
@@ -30,7 +31,7 @@ class RouteAction(BaseRouteMetadataTree):
             action_node_id=node.id,
             goal=self.context.content,
             action_enum=node.action_enum,
-            node_context=
+            node_context=BaseContext()
         )
 
     async def _tree_level_fallback(self) -> List[BaseOperation] | BaseOperation:

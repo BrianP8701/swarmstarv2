@@ -7,7 +7,7 @@ from sqlalchemy.orm import aliased
 from sqlalchemy import select
 
 from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
-from swarmstar.constants.database_constants import TABLE_ENUM_TO_ABBREVIATION
+from swarmstar.constants.object_constants import TABLE_ENUM_TO_ABBREVIATION
 from swarmstar.objects.nodes.base_node import BaseNode
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.utils.misc.ids import get_all_swarm_object_ids

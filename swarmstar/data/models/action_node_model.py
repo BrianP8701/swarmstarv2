@@ -11,16 +11,20 @@ class ActionNodeModel(BaseSQLAlchemyModel):
     __tablename__ = 'action_nodes'
 
     id = Column(String, primary_key=True)
-    title = Column(String, nullable=False)
-    parent_id = Column(String, ForeignKey('action_nodes.id'), nullable=True)
-    children_ids = Column(SQLiteJSON, default=lambda: [])
-    action_type = Column(SQLAlchemyEnum(ActionEnum), nullable=False)
+
     goal = Column(Text, nullable=False)
     status = Column(SQLAlchemyEnum(ActionStatusEnum), default=ActionStatusEnum.ACTIVE)
-    termination_policy = Column(SQLAlchemyEnum(TerminationPolicyEnum), default=TerminationPolicyEnum.SIMPLE)
-    message_ids = Column(SQLiteJSON, default=lambda: [])
+    termination_policy_enum = Column(SQLAlchemyEnum(TerminationPolicyEnum), default=TerminationPolicyEnum.SIMPLE)
     report = Column(Text, nullable=True)
-    context = Column(SQLiteJSON, default=lambda: {})
+    context_history = Column(SQLiteJSON, default=lambda: [])
+    action_enum = Column(SQLAlchemyEnum(ActionEnum), nullable=False)
+    parent_id = Column(String, ForeignKey('action_nodes.id'), nullable=True)
 
+    children_ids = Column(SQLiteJSON, default=lambda: [])
     children = relationship("ActionNodeModel", backref='parent', remote_side=[id])
+
+    operations_ids = Column(SQLiteJSON, default=lambda: [])
     operations = relationship("BaseOperationModel", backref='action_node', cascade="all, delete-orphan")
+    
+    message_ids = Column(SQLiteJSON, default=lambda: [])
+    messages = relationship("MessageModel", backref='action_node', cascade="all, delete-orphan")

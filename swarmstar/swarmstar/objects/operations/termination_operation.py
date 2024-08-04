@@ -86,7 +86,7 @@ class TerminationOperation(BaseOperation):
                         action_node_id=action_node.id, 
                         action_enum=ActionEnum.REVIEW_GOAL_PROGRESS,
                         goal=action_node.goal,
-                        node_context=action_node.context
+                        context=action_node.context
                     )
                 ]
         else:

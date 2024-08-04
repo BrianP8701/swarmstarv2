@@ -11,7 +11,6 @@ from swarmstar.objects.base_object import BaseObject
 from swarmstar.objects.trees.memory_metadata_tree import MemoryMetadataTree
 from swarmstar.objects.trees.action_metadata_tree import ActionMetadataTree
 from swarmstar.objects.trees.swarm_tree import SwarmTree
-from swarmstar.objects.operations.base_operation import BaseOperation
 
 from data.database import Database
 from swarmstar.objects.trees.tool_metadata_tree import ToolMetadataTree
@@ -37,13 +36,13 @@ class SwarmstarSpace(BaseObject):
     termination_operation_count: int = 0
     blocking_operation_count: int = 0
     communication_operation_count: int = 0
-    action_operation_count: int = 0
+    function_call_operation_count: int = 0
     queued_operation_ids: List[str] = []
     goal: str
     swarm_title: str
     memory_title: str
     environment_vars: Dict[str, str] = {}
-    status: SwarmStatusEnum = SwarmStatusEnum.WAITING_FOR_USER_INPUT
+    status: SwarmStatusEnum
 
     async def instantiate(self, swarm_id: str):
         await MemoryMetadataTree.clone(DEFAULT_SWARMSTAR_ID, swarm_id)

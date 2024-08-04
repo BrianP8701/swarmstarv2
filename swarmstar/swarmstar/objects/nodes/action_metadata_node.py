@@ -18,5 +18,5 @@ class ActionMetadataNode(BaseMetadataNode['ActionMetadataNode']):
     __table_enum__: ClassVar[str] = "action_metadata_nodes"
     __model_class__: ClassVar[Type['ActionMetadataNodeModel']] = ActionMetadataNodeModel
 
-    goal: str
     action_enum: ActionEnum
+    description: str

@@ -6,7 +6,7 @@
         "client"
     ],
     "scripts": {
-        "client": "cd client && yarn run",
+        "client": "cd client && yarn run dev",
         "server": "cd server && uvicorn main:app --reload",
         "dev": "concurrently \"yarn client\" \"yarn server\""
     },

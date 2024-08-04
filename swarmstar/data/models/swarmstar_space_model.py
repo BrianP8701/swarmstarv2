@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Enum as SqlAlchemyEnum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.sqlite import JSON as SQLiteJSON
+
 from swarmstar.enums.swarm_status_enum import SwarmStatusEnum
 
 Base = declarative_base()
@@ -23,5 +24,5 @@ class SwarmstarSpaceModel(Base):
     termination_operation_count = Column(Integer)
     blocking_operation_count = Column(Integer)
     communication_operation_count = Column(Integer)
-    action_operation_count = Column(Integer)
+    function_call_operation_count = Column(Integer)
     queued_operation_ids = Column(SQLiteJSON, default=lambda: [])

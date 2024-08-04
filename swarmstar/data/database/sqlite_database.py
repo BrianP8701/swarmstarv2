@@ -1,4 +1,5 @@
-from typing import Dict, Any, Callable, List, Optional, Type
+import asyncio
+from typing import Dict, Any, Callable, List, Optional, TYPE_CHECKING
 from sqlalchemy import MetaData, Table, delete, text, update
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -10,7 +11,10 @@ from dotenv import load_dotenv
 import os
 
 from data.database.abstract_database import AbstractDatabase
-from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from swarmstar.constants.database_constants import ALL_DATABASE_MODEL_CLASSES
+
+if TYPE_CHECKING:
+    from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
 load_dotenv()
 SQLITE_DB_FILE_PATH = os.getenv("SQLITE_DB_FILE_PATH")
@@ -38,12 +42,12 @@ class SqliteDatabase(AbstractDatabase):
         self.engine = create_async_engine(connection_string)
         self.metadata = MetaData()
         self.Session = async_sessionmaker(bind=self.engine, class_=AsyncSession)
-        self.create_all_tables()
+        asyncio.run(self.create_all_tables())
 
-    def create_all_tables(self):
-        from swarmstar.constants.constants import ALL_DATABASE_MODEL_CLASSES
-        for model in ALL_DATABASE_MODEL_CLASSES:
-            model.metadata.create_all(bind=self.engine)
+    async def create_all_tables(self):
+        async with self.engine.begin() as conn:
+            for model in ALL_DATABASE_MODEL_CLASSES:
+                await conn.run_sync(model.metadata.create_all)
 
     async def dispose_instance(self) -> None:
         await self.engine.dispose()
@@ -57,7 +61,7 @@ class SqliteDatabase(AbstractDatabase):
             session.add(model)
             await session.commit()
 
-    async def read(self, model_class: BaseSQLAlchemyModel, id: str, session: Optional[AsyncSession] = None) -> BaseSQLAlchemyModel: 
+    async def read(self, model_class: 'BaseSQLAlchemyModel', id: str, session: Optional[AsyncSession] = None) -> 'BaseSQLAlchemyModel': 
         if not session:
             session = self.Session()
         async with session:
@@ -67,7 +71,7 @@ class SqliteDatabase(AbstractDatabase):
             else:
                 raise ValueError(f"No {model_class.__name__} with id {id} found")
 
-    async def update(self, model_class: BaseSQLAlchemyModel, id: str, data: Dict[str, Any], session: Optional[AsyncSession] = None) -> None:
+    async def update(self, model_class: 'BaseSQLAlchemyModel', id: str, data: Dict[str, Any], session: Optional[AsyncSession] = None) -> None:
         if not session:
             session = self.Session()
         async with session:
@@ -77,7 +81,7 @@ class SqliteDatabase(AbstractDatabase):
                     setattr(instance, key, value)
                 await session.commit()
 
-    async def delete(self, model_class: BaseSQLAlchemyModel, id: str, session: Optional[AsyncSession] = None) -> None:
+    async def delete(self, model_class: 'BaseSQLAlchemyModel', id: str, session: Optional[AsyncSession] = None) -> None:
         if not session:
             session = self.Session()
         async with session:
@@ -98,7 +102,7 @@ class SqliteDatabase(AbstractDatabase):
             await session.execute(stmt)
             await session.commit()
 
-    async def select(self, model_class: BaseSQLAlchemyModel, id: str, columns: List[str], session: Optional[AsyncSession] = None) -> Dict[str, Any]:
+    async def select(self, model_class: 'BaseSQLAlchemyModel', id: str, columns: List[str], session: Optional[AsyncSession] = None) -> Dict[str, Any]:
         if not session:
             session = self.Session()
         async with session:
@@ -110,7 +114,7 @@ class SqliteDatabase(AbstractDatabase):
             else:
                 raise ValueError(f"No {model_class.__name__} with id {id} found")
 
-    async def exists(self, model_class: BaseSQLAlchemyModel, id: str, session: Optional[AsyncSession] = None) -> bool:
+    async def exists(self, model_class: 'BaseSQLAlchemyModel', id: str, session: Optional[AsyncSession] = None) -> bool:
         if not session:
             session = self.Session()
         async with session:
@@ -134,7 +138,7 @@ class SqliteDatabase(AbstractDatabase):
     def get_session(self) -> AsyncSession:
         return self.Session()
 
-    async def clear_table(self, model_class: BaseSQLAlchemyModel, safety: str) -> None:
+    async def clear_table(self, model_class: 'BaseSQLAlchemyModel', safety: str) -> None:
         if safety != "CONFIRM":
             raise ValueError("Safety string does not match. Operation aborted.")
         async with self.Session() as session:
@@ -150,7 +154,7 @@ class SqliteDatabase(AbstractDatabase):
             session.add_all(models)
             await session.commit()
 
-    async def batch_read(self, model_class: BaseSQLAlchemyModel, ids: List[str], session: Optional[AsyncSession] = None) -> List[BaseSQLAlchemyModel]:
+    async def batch_read(self, model_class: 'BaseSQLAlchemyModel', ids: List[str], session: Optional[AsyncSession] = None) -> List['BaseSQLAlchemyModel']:
         if not session:
             session = self.Session()
         async with session:
@@ -158,7 +162,7 @@ class SqliteDatabase(AbstractDatabase):
             result = await session.execute(query)
             return list(result.scalars().all())
 
-    async def batch_update(self, model_class: BaseSQLAlchemyModel, data_list: List[Dict[str, Any]], session: Optional[AsyncSession] = None) -> None:
+    async def batch_update(self, model_class: 'BaseSQLAlchemyModel', data_list: List[Dict[str, Any]], session: Optional[AsyncSession] = None) -> None:
         if not session:
             session = self.Session()
         async with session:
@@ -167,14 +171,14 @@ class SqliteDatabase(AbstractDatabase):
                 await session.execute(stmt)
             await session.commit()
 
-    async def batch_delete(self, model_class: BaseSQLAlchemyModel, ids: List[str], session: Optional[AsyncSession] = None) -> None:
+    async def batch_delete(self, model_class: 'BaseSQLAlchemyModel', ids: List[str], session: Optional[AsyncSession] = None) -> None:
         if not session:
             session = self.Session()
         async with session:
             await session.execute(delete(model_class).where(getattr(model_class, 'id').in_(ids)))
             await session.commit()
 
-    async def batch_copy(self, model_class: BaseSQLAlchemyModel, old_ids: List[str], new_ids: List[str], session: Optional[AsyncSession] = None) -> None:
+    async def batch_copy(self, model_class: 'BaseSQLAlchemyModel', old_ids: List[str], new_ids: List[str], session: Optional[AsyncSession] = None) -> None:
         if len(old_ids) != len(new_ids):
             raise ValueError("The length of old_ids and new_ids must be the same.")
         

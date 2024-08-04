@@ -1,6 +1,6 @@
 from enum import Enum
 
-class ActionStatusEnum(Enum):
+class ActionStatusEnum(str, Enum):
     ACTIVE = 'active'
     WAITING = 'waiting'
     WAITING_FOR_USER_INPUT = 'waiting_for_user_input'
