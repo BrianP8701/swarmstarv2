@@ -16,11 +16,11 @@ from swarmstar.objects.trees.base_tree import BaseTree
 #     original_question_index_to_answer: Dict[int, str]
 
 class MemoryMetadataTree(BaseTree):
-    __table_enum__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.MEMORY_METADATA_NODES
-    __node_object__: ClassVar[MemoryMetadataNode]
-    __node_model__: ClassVar[MemoryMetadataNodeModel]
-    __branch_size_soft_limit__: ClassVar[int]
-    __branch_size_hard_limit__: ClassVar[int]
+    table_enum: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.MEMORY_METADATA_NODES
+    node_object: ClassVar[MemoryMetadataNode]
+    node_model: ClassVar[MemoryMetadataNodeModel]
+    branch_size_soft_limit: ClassVar[int]
+    branch_size_hard_limit__: ClassVar[int]
 
     # def add(self):
     #     pass

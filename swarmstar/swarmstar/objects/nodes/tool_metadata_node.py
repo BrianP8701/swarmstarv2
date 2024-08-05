@@ -5,7 +5,7 @@ from data.models.tool_metadata_node_model import ToolMetadataNodeModel
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 
 class ToolMetadataNode(BaseMetadataNode['ToolMetadataNode']):
-    __table_enum__: ClassVar[str] = "tool_metadata_nodes"
-    __model_class__: ClassVar[Type['ToolMetadataNodeModel']] = ToolMetadataNodeModel
+    table_enum: ClassVar[str] = "tool_metadata_nodes"
+    database_model_class: ClassVar[Type['ToolMetadataNodeModel']] = ToolMetadataNodeModel
 
     tool_type: ToolTypeEnum

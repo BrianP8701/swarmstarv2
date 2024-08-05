@@ -6,16 +6,14 @@ from swarmstar.enums.action_enum import ActionEnum
 from swarmstar.instructors.instructors.plan_instructors.parallel_plan_instructor import ParallelPlanInstructor
 from swarmstar.instructors.instructors.plan_instructors.review_parallel_plan_instructor import ReviewParallelPlanInstructor
 from swarmstar.objects.nodes.base_action_node import BaseActionNode
-from swarmstar.objects.operations.base_operation import BaseOperation
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
 
 class ParallelPlan(BaseActionNode):
-    __id__ = "parallel_plan"
-    __parent_id__ = "plan"
-    __title__ = "Parallel Plan"
-    __action_enum__ = ActionEnum.PARALLEL_PLAN
-    __context_class__: Type[BaseContext] = ParallelPlanContext
-    __description__ = """
+    id = "parallel_plan"
+    parent_id = "plan"
+    title = "Parallel Plan"
+    action_enum = ActionEnum.PARALLEL_PLAN
+    description = """
     Select this action to divide the task into independent subgoals that can be pursued simultaneously. 
     Suitable for tasks that can be parallelized to optimize time and resource usage. 
     The goal is to create a set of concurrent tasks that contribute to the overall objective.
@@ -50,7 +48,7 @@ class ParallelPlan(BaseActionNode):
                 action_node_id="parallel_plan",
                 goal=subgoal,
                 action_enum=ActionEnum.ROUTE_ACTION,
-                node_context=ParallelPlanContext()
+                context=ParallelPlanContext()
             ) for subgoal in parallel_plan.plan]
         else:
             self.context.parallel_plan_history.append(parallel_plan.plan)

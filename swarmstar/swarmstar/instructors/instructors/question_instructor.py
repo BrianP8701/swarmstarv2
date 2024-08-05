@@ -25,7 +25,7 @@ class QuestionInstructor(BaseInstructor):
         action_node_id: Optional[str]
     ) -> "QuestionInstructor":
         instructions = cls.write_instructions(content, context)
-        response = await cls.client.instruct(
+        response = await cls.get_client().instruct(
             messages=instructions,
             instructor_model=cls,
             action_node_id=action_node_id

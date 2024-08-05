@@ -30,7 +30,7 @@ class RouterInstructor(BaseInstructor):
         system_message: str, 
         action_node_id: Optional[str]
     ) -> 'RouterInstructor':
-        instructor = await cls.client.instruct(
+        instructor = await cls.get_client().instruct(
             messages=cls.write_instructions(options, content, system_message),
             instructor_model=cls,
             action_node_id=action_node_id

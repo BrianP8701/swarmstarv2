@@ -34,7 +34,7 @@ class IsContextSufficientInstructor(BaseInstructor):
         context: Optional[str], 
         action_node_id: Optional[str]
     ) -> "IsContextSufficientInstructor":
-        return await cls.client.instruct(
+        return await cls.get_client().instruct(
             cls.write_instructions(content, context),
             cls,
             action_node_id=action_node_id

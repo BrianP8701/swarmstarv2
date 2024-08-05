@@ -6,6 +6,7 @@ from swarmstar.enums.action_enum import ActionEnum
 from swarmstar.enums.action_status_enum import ActionStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
 from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from data.models.message_model import MessageModel
 
 class ActionNodeModel(BaseSQLAlchemyModel):
     __tablename__ = 'action_nodes'
@@ -20,11 +21,11 @@ class ActionNodeModel(BaseSQLAlchemyModel):
     action_enum = Column(SQLAlchemyEnum(ActionEnum), nullable=False)
     parent_id = Column(String, ForeignKey('action_nodes.id'), nullable=True)
 
-    children_ids = Column(SQLiteJSON, default=lambda: [])
-    children = relationship("ActionNodeModel", backref='parent', remote_side=[id])
+    children = relationship('ActionNodeModel', backref='parent', remote_side=[id])
 
-    operations_ids = Column(SQLiteJSON, default=lambda: [])
-    operations = relationship("BaseOperationModel", backref='action_node', cascade="all, delete-orphan")
+    spawn_operations = relationship("SpawnOperationModel", back_populates="action_node", cascade="all, delete-orphan")
+    function_call_operations = relationship("FunctionCallOperationModel", back_populates="action_node", cascade="all, delete-orphan")
+    termination_operations = relationship("TerminationOperationModel", back_populates="action_node", cascade="all, delete-orphan")
+    blocking_operations = relationship("BlockingOperationModel", back_populates="action_node", cascade="all, delete-orphan")
     
-    message_ids = Column(SQLiteJSON, default=lambda: [])
-    messages = relationship("MessageModel", backref='action_node', cascade="all, delete-orphan")
+    messages = relationship(MessageModel, backref='action_node', cascade="all, delete-orphan", primaryjoin="MessageModel.action_node_id == ActionNodeModel.id")

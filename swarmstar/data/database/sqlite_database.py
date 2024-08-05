@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 import os
 
 from data.database.abstract_database import AbstractDatabase
-from swarmstar.constants.database_constants import ALL_DATABASE_MODEL_CLASSES
+from data.constants import ALL_DATABASE_MODEL_CLASSES
 
 if TYPE_CHECKING:
     from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
@@ -48,6 +48,11 @@ class SqliteDatabase(AbstractDatabase):
         async with self.engine.begin() as conn:
             for model in ALL_DATABASE_MODEL_CLASSES:
                 await conn.run_sync(model.metadata.create_all)
+
+    async def delete_all_tables(self):
+        async with self.engine.begin() as conn:
+            for model in ALL_DATABASE_MODEL_CLASSES:
+                await conn.run_sync(model.metadata.drop_all)
 
     async def dispose_instance(self) -> None:
         await self.engine.dispose()

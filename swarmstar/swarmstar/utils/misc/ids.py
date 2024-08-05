@@ -5,9 +5,7 @@ from swarmstar.constants.misc_constants import SWARM_ID_LENGTH
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from data.models.swarmstar_space_model import SwarmstarSpaceModel
 from swarmstar.objects.operations.base_operation import BaseOperation
-
-if TYPE_CHECKING:
-    from data import Database
+from data import Database
 
 async def generate_id(db: Database, table: DatabaseTableEnum, swarm_id: Optional[str] = None) -> str:
     """
@@ -20,7 +18,7 @@ async def generate_id(db: Database, table: DatabaseTableEnum, swarm_id: Optional
     
     Where x is a number that is incremented every time a new object of that type is created in this swarm.
     """
-    from swarmstar.constants.object_constants import TABLE_ENUM_TO_ABBREVIATION, TABLE_ENUM_TO_SWARMSTAR_SPACE_COUNT_COLUMN
+    from swarmstar.constants.database_constants import TABLE_ENUM_TO_ABBREVIATION, TABLE_ENUM_TO_SWARMSTAR_SPACE_COUNT_COLUMN
     if table == DatabaseTableEnum.SWARMSTAR_SPACE:
         return uuid.uuid4().hex
     if swarm_id is None:
@@ -36,7 +34,7 @@ async def get_swarm_object_count(db: Database, swarm_id: str, table: DatabaseTab
     """
     This function gets the current count of an object in a given swarm.
     """
-    from swarmstar.constants.object_constants import TABLE_ENUM_TO_SWARMSTAR_SPACE_COUNT_COLUMN
+    from swarmstar.constants.database_constants import TABLE_ENUM_TO_SWARMSTAR_SPACE_COUNT_COLUMN
     count_column_name = TABLE_ENUM_TO_SWARMSTAR_SPACE_COUNT_COLUMN[table]
     if count_column_name is None:
         raise ValueError(f"No count column for table {table}")
@@ -47,7 +45,7 @@ async def get_swarm_object_count(db: Database, swarm_id: str, table: DatabaseTab
         return result[count_column_name]
 
 async def get_all_swarm_object_ids(db: Database, swarm_id: str, table: DatabaseTableEnum, session: Optional[AsyncSession] = None) -> Optional[List[str]]:
-    from swarmstar.constants.object_constants import TABLE_ENUM_TO_ABBREVIATION, TABLE_ENUM_TO_SWARMSTAR_SPACE_COUNT_COLUMN
+    from swarmstar.constants.database_constants import TABLE_ENUM_TO_ABBREVIATION, TABLE_ENUM_TO_SWARMSTAR_SPACE_COUNT_COLUMN
     count_column_name = TABLE_ENUM_TO_SWARMSTAR_SPACE_COUNT_COLUMN[table]
     if count_column_name is None:
         return None
@@ -61,16 +59,16 @@ def extract_swarm_id(id: str) -> str:
     return id[:SWARM_ID_LENGTH]
 
 def get_table_enum_from_id(id: str) -> DatabaseTableEnum:
-    from swarmstar.constants.object_constants import TABLE_ABBREVIATION_TO_ENUM
+    from swarmstar.constants.database_constants import TABLE_ABBREVIATION_TO_ENUM
     table_identifier = id[SWARM_ID_LENGTH+2:SWARM_ID_LENGTH+4]
     return TABLE_ABBREVIATION_TO_ENUM[table_identifier]
 
 def get_table_name_from_id(id: str) -> str:
-    from swarmstar.constants.object_constants import TABLE_ENUM_TO_TABLE_NAME
+    from swarmstar.constants.database_constants import TABLE_ENUM_TO_TABLE_NAME
     table_enum = get_table_enum_from_id(id)
     return TABLE_ENUM_TO_TABLE_NAME[table_enum]
 
 def get_operation_class_from_id(id: str) -> BaseOperation:
-    from swarmstar.constants.object_constants import TABLE_ENUM_TO_OBJECT_CLASS
+    from swarmstar.constants.database_constants import TABLE_ENUM_TO_OBJECT_CLASS
     table_enum = get_table_enum_from_id(id)
     return TABLE_ENUM_TO_OBJECT_CLASS[table_enum]

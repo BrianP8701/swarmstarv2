@@ -2,7 +2,7 @@ from typing import ClassVar, Dict, List
 from swarmstar.enums.action_enum import ActionEnum
 from swarmstar.enums.action_status_enum import ActionStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
-from data.models.swarm_operation_models import TerminationOperationModel
+from data.models.operation_models import TerminationOperationModel
 from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
 from swarmstar.objects.operations.base_operation import BaseOperation
@@ -16,14 +16,14 @@ TERMINATION_POLICY_MAP: Dict[TerminationPolicyEnum, str] = {
 }
 
 class TerminationOperation(BaseOperation):
-    __table_enum__: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.TERMINATION_OPERATIONS
-    __model_class__: ClassVar[TerminationOperationModel] = TerminationOperationModel
+    table_enum: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.TERMINATION_OPERATIONS
+    database_model_class: ClassVar[TerminationOperationModel] = TerminationOperationModel
 
     terminator_id: str
 
     async def _execute(self) -> List[BaseOperation]:
         action_node = await BaseActionNode.read(self.action_node_id)
-        termination_policy = action_node.termination_policy
+        termination_policy = action_node.termination_policy_enum
         
         match termination_policy:
             case TerminationPolicyEnum.SIMPLE:
@@ -77,7 +77,7 @@ class TerminationOperation(BaseOperation):
         """
         children_action_nodes = await action_node.get_children()
         if all(child.status == ActionStatusEnum.TERMINATED for child in children_action_nodes):
-            node_has_been_reviewed = next((child for child in children_action_nodes if child.__action_enum__ == ActionEnum.REVIEW_GOAL_PROGRESS), False)
+            node_has_been_reviewed = next((child for child in children_action_nodes if child.action_enum == ActionEnum.REVIEW_GOAL_PROGRESS), False)
             if node_has_been_reviewed:
                 return await self._terminate_simple(action_node)
             else:

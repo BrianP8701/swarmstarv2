@@ -14,5 +14,4 @@ class ActionMetadataNodeModel(BaseSQLAlchemyModel):
 
     parent_id = Column(String, ForeignKey('action_metadata_nodes.id'), nullable=True)
 
-    children_ids = Column(SQLiteJSON, default=lambda: [])
     children = relationship("ActionMetadataNodeModel", backref='parent', remote_side=[id])

@@ -7,9 +7,9 @@ T = TypeVar('T', bound='BaseNode')
 
 class BaseNode(BaseObject[T], Generic[T], ABC):
     """ Base class for nodes. """
-    __title__: ClassVar[str]
+    title: ClassVar[str]
     parent_id: Optional[str] = None
-    children_ids: List[str] = []
+    children_ids: ClassVar[List[str]] = []
 
     async def get_parent(self: T) -> Optional[T]:
         if self.parent_id:

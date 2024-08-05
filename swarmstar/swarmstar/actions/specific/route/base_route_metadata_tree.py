@@ -19,12 +19,11 @@ from swarmstar.utils.misc.ids import extract_swarm_id
 T = TypeVar('T', bound='BaseRouteMetadataTree')
 
 class BaseRouteMetadataTree(BaseActionNode, ABC):
-    __parent_metadata_node_id__: ClassVar[str] = 'route'
-    __children_metadata_node_ids__: ClassVar[List[str]] = []
+    parent_metadata_node_id = 'route'
 
-    __metadata_node_class__ = ClassVar[BaseMetadataNode]
-    __tree_class__ = ClassVar[BaseTree]
-    __system_prompt__: ClassVar[str]
+    metadata_node_class: ClassVar[BaseMetadataNode]
+    tree_class: ClassVar[BaseTree]
+    system_prompt: ClassVar[str]
 
     context: BaseRouteMetadataTreeContext
 
@@ -50,8 +49,8 @@ class BaseRouteMetadataTree(BaseActionNode, ABC):
     async def _get_start_node(self) -> BaseMetadataNode:
         """Retrieve the start node based on the context."""
         if self.context.start_node_id:
-            return await self.__metadata_node_class__.read(self.context.start_node_id)
-        return await self.__metadata_node_class__.read(self.__tree_class__.get_root_node_id(extract_swarm_id(self.__operation__.id)))
+            return await self.metadata_node_class.read(self.context.start_node_id)
+        return await self.metadata_node_class.read(self.tree_class.get_root_node_id(extract_swarm_id(self.operation.id)))
 
     async def _search(self, node: BaseMetadataNode) -> Tuple[RouterStatusEnum, BaseMetadataNode]:
         """Search for viable child nodes."""
@@ -76,7 +75,7 @@ class BaseRouteMetadataTree(BaseActionNode, ABC):
         router_response = await RouterInstructor.route(
             [child.description for child in children], 
             self.context.content,
-            self.__system_prompt__,
+            self.system_prompt,
             self.id
         )
 

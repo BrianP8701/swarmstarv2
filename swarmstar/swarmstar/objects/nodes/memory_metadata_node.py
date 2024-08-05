@@ -11,8 +11,8 @@ from data.models.memory_metadata_node_model import MemoryMetadataNodeModel
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 
 class MemoryMetadataNode(BaseMetadataNode['MemoryMetadataNode']):
-    __table_enum__: ClassVar[str] = "memory_metadata"
-    __model_class__: ClassVar[Type['MemoryMetadataNodeModel']] = MemoryMetadataNodeModel
+    table_enum: ClassVar[str] = "memory_metadata"
+    database_model_class: ClassVar[Type['MemoryMetadataNodeModel']] = MemoryMetadataNodeModel
     
     memory_type: MemoryTypeEnum # These define the type of the underlying data. Each type has tools to better navigate the data
 

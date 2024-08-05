@@ -35,7 +35,7 @@ class ParallelPlanInstructor(BaseInstructor):
         last_plan_attempt: Optional[List[str]],
         action_node_id: Optional[str]
     ) -> 'ParallelPlanInstructor':
-        return await cls.client.instruct(
+        return await cls.get_client().instruct(
             messages=cls.write_instructions(goal, context, review, last_plan_attempt),
             instructor_model=cls,
             action_node_id=action_node_id

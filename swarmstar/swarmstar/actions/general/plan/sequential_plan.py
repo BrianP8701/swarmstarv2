@@ -1,6 +1,3 @@
-from multiprocessing.context import BaseContext
-from typing import List, Type
-
 from swarmstar.constants.misc_constants import MAX_PLAN_ATTEMPTS
 from swarmstar.enums.action_enum import ActionEnum
 from swarmstar.instructors.instructors.plan_instructors.sequential_plan_instructor import SequentialPlanInstructor
@@ -9,14 +6,12 @@ from swarmstar.objects.nodes.base_action_node import BaseActionNode
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
 from swarmstar.shapes.contexts.sequential_plan_context import SequentialPlanContext
 
-
 class SequentialPlan(BaseActionNode):
-    __id__ = "sequential_plan"
-    __parent_id__ = "plan"
-    __title__ = "Sequential Plan"
-    __action_enum__ = ActionEnum.SEQUENTIAL_PLAN
-    __context_class__: Type[SequentialPlanContext] = SequentialPlanContext  # Change BaseContext to BasePlanContext
-    __description__ = """
+    id = "sequential_plan"
+    parent_id = "plan"
+    title = "Sequential Plan"
+    action_enum = ActionEnum.SEQUENTIAL_PLAN
+    description = """
     Use this action to break down complex tasks into a series of ordered steps. 
     Ideal for tasks where each step depends on the completion of the previous one. 
     The goal is to create a clear, linear plan that can be executed step-by-step.
@@ -51,7 +46,7 @@ class SequentialPlan(BaseActionNode):
                 action_node_id="sequential_plan",
                 goal=sequential_plan.steps[0],
                 action_enum=ActionEnum.ROUTE_ACTION,
-                node_context=SequentialPlanContext()
+                context=SequentialPlanContext()
             )
         else:
             if self.context.attempts < MAX_PLAN_ATTEMPTS:

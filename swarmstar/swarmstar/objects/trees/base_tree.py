@@ -7,11 +7,11 @@ from sqlalchemy.orm import aliased
 from sqlalchemy import select
 
 from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
-from swarmstar.constants.object_constants import TABLE_ENUM_TO_ABBREVIATION
+from swarmstar.constants.database_constants import TABLE_ENUM_TO_ABBREVIATION
 from swarmstar.objects.nodes.base_node import BaseNode
 from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.utils.misc.ids import get_all_swarm_object_ids
-
+from data import Database
 class BaseTree(ABC, BaseModel):
     """
     We use trees quite a lot in swarmstar. The actual swarm's nodes are stored in a tree.
@@ -19,33 +19,33 @@ class BaseTree(ABC, BaseModel):
     organizing data in a way that's easy to traverse and understand. It's also naturally
     efficient and scalable.
     """
-    __table_enum__: ClassVar[DatabaseTableEnum]
-    __node_model_class__: ClassVar[BaseSQLAlchemyModel]
-    __node_class__: ClassVar[BaseNode]
+    table_enum: ClassVar[DatabaseTableEnum]
+    node_database_model_class: ClassVar[BaseSQLAlchemyModel]
+    node_class: ClassVar[BaseNode]
 
     @classmethod
     def get_root_node_id(cls, swarm_id: str) -> str:
-        return f"{swarm_id}_{TABLE_ENUM_TO_ABBREVIATION[cls.__table_enum__]}0"
+        return f"{swarm_id}_{TABLE_ENUM_TO_ABBREVIATION[cls.table_enum]}0"
 
     @classmethod
-    async def get_all_node_ids(cls, swarm_id: str) -> List[str]:
-        return await get_all_swarm_object_ids(swarm_id, cls.__table_enum__) or []
+    async def get_all_node_ids(cls, db: Database, swarm_id: str) -> List[str]:
+        return await get_all_swarm_object_ids(db, swarm_id, cls.table_enum) or []
 
     @classmethod
-    async def read_tree(cls, swarm_id: str) -> List[BaseNode]:
+    async def read_tree(cls, db: Database, swarm_id: str) -> List[BaseNode]:
         """ Reads the tree from the database and returns the root node with all children. """
-        all_node_ids = await cls.get_all_node_ids(swarm_id)
-        return await cls.__node_class__.batch_read(all_node_ids)
+        all_node_ids = await cls.get_all_node_ids(db, swarm_id)
+        return await cls.node_class.batch_read(all_node_ids)
 
     @classmethod
-    async def delete(cls, swarm_id: str) -> None:
+    async def delete(cls, db: Database, swarm_id: str) -> None:
         """ Deletes every node in the tree from the database. """        
-        await cls.__node_class__.batch_delete(await cls.get_all_node_ids(swarm_id))
+        await cls.node_class.batch_delete(await cls.get_all_node_ids(db, swarm_id))
 
     @classmethod
-    async def clone(cls, old_swarm_id: str, swarm_id: str) -> None:
+    async def clone(cls, db: Database, old_swarm_id: str, swarm_id: str) -> None:
         """ Clones every node in the tree under a new swarm id in the database. """
-        root_node = await cls.read_tree(old_swarm_id)
+        root_node = await cls.read_tree(db, old_swarm_id)
 
         batch_copy_payload = [[], []]  # [old_ids, new_ids]
         batch_update_payload = []  # {new_id: {parent_id: "", children_ids: []}}
@@ -70,6 +70,6 @@ class BaseTree(ABC, BaseModel):
         update_node_ids(root_node)
 
         if batch_copy_payload:
-            await cls.__node_class__.batch_copy(batch_copy_payload[0], batch_copy_payload[1])
+            await cls.node_class.batch_copy(batch_copy_payload[0], batch_copy_payload[1])
         if batch_update_payload:
-            await cls.__node_class__.batch_update(batch_update_payload)
+            await cls.node_class.batch_update(batch_update_payload)

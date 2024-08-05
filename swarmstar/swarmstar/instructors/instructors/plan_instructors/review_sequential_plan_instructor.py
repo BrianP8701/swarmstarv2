@@ -32,7 +32,7 @@ class ReviewSequentialPlanInstructor(BaseInstructor):
         context: Optional[str], 
         action_node_id: Optional[str]
     ) -> "ReviewSequentialPlanInstructor":
-        return await cls.client.instruct(
+        return await cls.get_client().instruct(
             messages=cls.write_instructions(goal, steps, context),
             instructor_model=cls,
             action_node_id=action_node_id

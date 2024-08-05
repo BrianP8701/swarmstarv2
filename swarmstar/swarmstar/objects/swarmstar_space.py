@@ -10,7 +10,6 @@ from swarmstar.objects.base_object import BaseObject
 
 from swarmstar.objects.trees.memory_metadata_tree import MemoryMetadataTree
 from swarmstar.objects.trees.action_metadata_tree import ActionMetadataTree
-from swarmstar.objects.trees.swarm_tree import SwarmTree
 
 from data.database import Database
 from swarmstar.objects.trees.tool_metadata_tree import ToolMetadataTree
@@ -23,8 +22,8 @@ class SwarmstarSpace(BaseObject):
     This includes nodes, metadata, operations, and other related entities, 
     encapsulating the entire state and behavior of the swarm.
     """
-    __table_enum__ = DatabaseTableEnum.SWARMSTAR_SPACE
-    __model_class__ = SwarmstarSpaceModel
+    table_enum = DatabaseTableEnum.SWARMSTAR_SPACE
+    database_model_class = SwarmstarSpaceModel
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     total_event_count: int = 0
@@ -44,24 +43,31 @@ class SwarmstarSpace(BaseObject):
     environment_vars: Dict[str, str] = {}
     status: SwarmStatusEnum
 
-    async def instantiate(self, swarm_id: str):
-        await MemoryMetadataTree.clone(DEFAULT_SWARMSTAR_ID, swarm_id)
-        await ActionMetadataTree.clone(DEFAULT_SWARMSTAR_ID, swarm_id)
-        await ToolMetadataTree.clone(DEFAULT_SWARMSTAR_ID, swarm_id)
-
+    @staticmethod
+    async def instantiate(goal: str, swarm_title: str, memory_title: str) -> 'SwarmstarSpace':
         default_swarmstar_space = await SwarmstarSpace.read(DEFAULT_SWARMSTAR_ID)
-        self.memory_metadata_node_count = default_swarmstar_space.memory_metadata_node_count
-        self.action_metadata_node_count = default_swarmstar_space.action_metadata_node_count
-        self.tool_metadata_node_count = default_swarmstar_space.tool_metadata_node_count
 
-        await self.upsert()
+        swarm = SwarmstarSpace(
+            goal=goal,
+            swarm_title=swarm_title,
+            memory_title=memory_title,
+            status=SwarmStatusEnum.ACTIVE,
+            action_metadata_node_count=default_swarmstar_space.action_metadata_node_count,
+            memory_metadata_node_count=default_swarmstar_space.memory_metadata_node_count,
+            tool_metadata_node_count=default_swarmstar_space.tool_metadata_node_count,
+        )
+
+        await MemoryMetadataTree.clone(db, DEFAULT_SWARMSTAR_ID, swarm.id)
+        await ActionMetadataTree.clone(db, DEFAULT_SWARMSTAR_ID, swarm.id)
+        await ToolMetadataTree.clone(db, DEFAULT_SWARMSTAR_ID, swarm.id)
+
+        return swarm
 
     @staticmethod
     async def delete_swarmstar_space(swarm_id: str):
-        await MemoryMetadataTree.delete(swarm_id)
-        await ActionMetadataTree.delete(swarm_id)
-        await ToolMetadataTree.delete(swarm_id)
-        await SwarmTree.delete(swarm_id)
+        await MemoryMetadataTree.delete(db, swarm_id)
+        await ActionMetadataTree.delete(db, swarm_id)
+        await ToolMetadataTree.delete(db, swarm_id)
 
     @staticmethod
     def rollback_to_event(session, swarm_id: str, event_index: int):
