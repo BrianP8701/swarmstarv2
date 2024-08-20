@@ -22,11 +22,16 @@ pyodbc = "^5.1.0"
 pygithub = "^2.3.0"
 aiosqlite = "^0.20.0"
 greenlet = "^3.0.3"
+strawberry-graphql = "^0.237.3"
+python-dotenv = "^1.0.1"
+stripe = "^10.8.0"
+svix = "^1.30.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
 python-dotenv = "^1.0.1"
 coverage = "^7.4.2"
+isort = "^5.13.2"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs-material = {extras = ["imaging"], version = "^9.5.9"}

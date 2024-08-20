@@ -1,0 +1,51 @@
+{
+  "name": "swarmstar-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "cli": "ts-node src/cli/index.ts",
+    "start": "ts-node src/index.ts",
+    "build": "tsc",
+    "prisma": "prisma",
+    "codegen": "graphql-codegen --config codegen.yml",
+    "generate": "yarn codegen && yarn prisma generate",
+    "lint": "eslint --config eslint.config.mjs",
+    "knip": "knip"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@graphql-codegen/cli": "5.0.2",
+    "@graphql-codegen/introspection": "4.0.3",
+    "@graphql-codegen/typescript": "4.0.9",
+    "@graphql-codegen/typescript-document-nodes": "4.0.9",
+    "@graphql-codegen/typescript-resolvers": "4.2.1",
+    "@types/inversify": "^2.0.33",
+    "@types/node": "^22.4.1",
+    "@types/winston": "^2.4.4",
+    "@typescript-eslint/eslint-plugin": "^8.1.0",
+    "@typescript-eslint/parser": "^8.1.0",
+    "eslint-plugin-react": "^7.35.0",
+    "globals": "^15.9.0",
+    "knip": "^5.27.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.1.0"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.11.0",
+    "@google-cloud/functions-framework": "^3.4.2",
+    "@google-cloud/logging-winston": "^6.0.0",
+    "@google-cloud/pubsub": "^4.5.0",
+    "@prisma/client": "^5.18.0",
+    "apollo-server": "^3.13.0",
+    "dotenv": "^16.4.5",
+    "eslint": "^9.9.0",
+    "graphql": "^16.9.0",
+    "inversify": "^6.0.2",
+    "openai": "^4.56.0",
+    "prisma": "^5.18.0",
+    "stripe": "^16.8.0",
+    "winston": "^3.14.2"
+  }
+}

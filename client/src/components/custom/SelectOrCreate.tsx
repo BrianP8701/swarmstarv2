@@ -5,8 +5,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+} from "@/src/components/ui/select";
+import { Input } from "@/src/components/ui/input";
 
 interface SelectOrCreateProps {
   placeholder: string;

@@ -1,14 +1,16 @@
-import os
-import json
 import asyncio
 import importlib.util
-from typing import List, Dict, Any
+import json
+import os
+from typing import Any, Dict, List
 
-from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
+from swarmstar.constants.misc_constants import DEFAULT_SWARMSTAR_ID
 from swarmstar.enums.action_enum import ActionEnum
+from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
 from swarmstar.objects.nodes.base_action_node import BaseActionNode
 
-ACTIONS_ROOT = "/Users/brianprzezdziecki/swarmstar_world/swarmstarv2/swarmstar/swarmstar/actions"
+ACTIONS_ROOT = "/Users/brianprzezdziecki/swarmstar_world/swarmstarv2/swarmstar/swarmstar/actions/general"
+
 
 async def create_action_metadata_node(node_data: Dict[str, Any]) -> ActionMetadataNode:
     print(node_data)
@@ -16,14 +18,18 @@ async def create_action_metadata_node(node_data: Dict[str, Any]) -> ActionMetada
     if existing_node:
         await ActionMetadataNode.delete(node_data["id"])
     node = ActionMetadataNode(
+        swarm_id=DEFAULT_SWARMSTAR_ID,
         id=node_data["id"],
         parent_id=node_data["parent_id"],
         description=node_data["description"],
-        action_enum=ActionEnum[node_data["action_enum"]] if isinstance(node_data["action_enum"], str) else node_data["action_enum"]
+        action_enum=ActionEnum[node_data["action_enum"]]
+        if isinstance(node_data["action_enum"], str)
+        else node_data["action_enum"],
     )
     await node._create()
     print(f"Created action metadata node: {node.id}")
     return node
+
 
 def load_class_from_file(filepath: str, classname: str):
     spec = importlib.util.spec_from_file_location(classname, filepath)
@@ -33,7 +39,10 @@ def load_class_from_file(filepath: str, classname: str):
     spec.loader.exec_module(module)
     return getattr(module, classname)
 
-async def process_folder(folder_path: str, parent_id: str | None = None) -> List[ActionMetadataNode]:
+
+async def process_folder(
+    folder_path: str, parent_id: str | None = None
+) -> List[ActionMetadataNode]:
     print(f"Processing folder: {folder_path}")
     metadata_path = os.path.join(folder_path, "metadata.json")
     if not os.path.exists(metadata_path):
@@ -44,7 +53,7 @@ async def process_folder(folder_path: str, parent_id: str | None = None) -> List
         metadata = json.load(f)
 
     metadata["parent_id"] = parent_id
-    metadata["action_enum"] = 'FOLDER'
+    metadata["action_enum"] = "FOLDER"
     node = await create_action_metadata_node(metadata)
     nodes = [node]
     children_relationships = []
@@ -69,15 +78,19 @@ async def process_folder(folder_path: str, parent_id: str | None = None) -> List
                         print(f"Loaded class: {cls}")
                         if issubclass(cls, BaseActionNode):
                             print(f"{class_name} is a subclass of BaseActionNode")
-                            action_node = await create_action_metadata_node({
-                                "id": cls.id,
-                                "parent_id": node.id,
-                                "description": cls.description,
-                                "action_enum": cls.action_enum.name  # Convert enum to string
-                            })
+                            action_node = await create_action_metadata_node(
+                                {
+                                    "id": cls.id,
+                                    "parent_id": node.id,
+                                    "description": cls.description,
+                                    "action_enum": cls.action_enum.name,  # Convert enum to string
+                                }
+                            )
                             nodes.append(action_node)
                             children_relationships.append((node, [action_node]))
-                            print(f"Created action node from Python file: {action_node.id}")
+                            print(
+                                f"Created action node from Python file: {action_node.id}"
+                            )
                         else:
                             print(f"{class_name} is not a subclass of BaseActionNode")
                     except Exception as e:
@@ -88,9 +101,11 @@ async def process_folder(folder_path: str, parent_id: str | None = None) -> List
 
     return nodes
 
+
 async def generate_action_metadata_tree():
     nodes = await process_folder(ACTIONS_ROOT)
     print(f"Generated {len(nodes)} action metadata nodes")
+
 
 if __name__ == "__main__":
     asyncio.run(generate_action_metadata_tree())

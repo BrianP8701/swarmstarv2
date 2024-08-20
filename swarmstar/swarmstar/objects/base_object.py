@@ -1,16 +1,18 @@
-from abc import ABC
 import asyncio
-from typing import Any, Dict, List, Optional, Type, TypeVar, ClassVar, Generic
+from abc import ABC
+from typing import Any, ClassVar, Dict, Generic, List, Optional, Type, TypeVar
+
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from swarmstar.enums.database_table_enum import DatabaseTableEnum
-from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
+from data.constants import DATABASE_MAP
 from data.database import Database
+from data.enums import DatabaseTableEnum
 
 db = Database()
 
-T = TypeVar('T', bound='BaseObject')
+T = TypeVar("T", bound="BaseObject")
+
 
 class BaseObject(BaseModel, Generic[T], ABC):
     """
@@ -25,71 +27,94 @@ class BaseObject(BaseModel, Generic[T], ABC):
     This project has an id schema, the ids aren't entirely random.
     The id schema makes a lot of operations very simple.
     """
+
     table_enum: ClassVar[DatabaseTableEnum] = Field(exclude=True)
-    database_model_class: ClassVar[BaseSQLAlchemyModel] = Field(exclude=True)
-    id: str = ''
+    swarm_id: Optional[str] = None
+    id: str = ""
 
     model_config = ConfigDict(use_enum_values=True)
 
-    def __init__(self, swarm_id: Optional[str] = None, **data: Any):
+    @property
+    def model_class(self):
+        return DATABASE_MAP[self.table_enum]["model_class"]
+
+    def __init__(self, **data: Any):
+        print("BaseObject __init__ called")
         super().__init__(**data)
-        if not self.id:
+        print(f"BaseObject __init__ called with data: {data}")
+        print("id", self.id)
+        if self.id == "":
+            print("No ID provided, generating ID")
             from swarmstar.utils.misc.ids import generate_id
-            loop = asyncio.get_event_loop()
-            self.id = loop.run_until_complete(generate_id(db, self.table_enum, swarm_id))
+
+            try:
+                loop = asyncio.get_event_loop()
+            except RuntimeError:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+            self.id = loop.run_until_complete(
+                generate_id(db, self.table_enum, self.swarm_id)
+            )
+            print(f"Generated ID: {self.id}")
             loop.run_until_complete(self._create())
 
     def _filter_model_fields(self) -> Dict[str, Any]:
         """
         Filters out fields that are not part of the database model.
         """
-        model_fields = {col.name for col in self.database_model_class.__table__.columns}
-        return {key: value for key, value in self.model_dump().items() if key in model_fields}
+        model_fields = {col.name for col in self.model_class.__table__.columns}
+        return {
+            key: value
+            for key, value in self.model_dump().items()
+            if key in model_fields
+        }
 
     async def _create(self, session: Optional[AsyncSession] = None) -> None:
         """
         This method should never be called directly, except in cases where the object is created with a predefined id.
         It is called by the __init__ function when the object is created without an id.
         """
-        await db.create(self.database_model_class(**self._filter_model_fields()), session)
+        print(f"Creating entry in database for: {self}")
+        await db.create(self.model_class(**self._filter_model_fields()), session)
+        print("Entry created successfully")
 
     @classmethod
     async def read(cls: Type[T], id: str, session: Optional[AsyncSession] = None) -> T:
-        model = await db.read(cls.database_model_class, id, session)
+        model = await db.read(cls().model_class, id, session)
         return cls(**model.__dict__)
 
     @classmethod
     async def delete(cls: Type[T], id: str, session: Optional[AsyncSession] = None) -> None:
-        await db.delete(cls.database_model_class, id, session)
+        await db.delete(cls().model_class, id, session)
 
     async def upsert(self, session: Optional[AsyncSession] = None) -> None:
-        await db.upsert(self.database_model_class(**self._filter_model_fields()), session)
+        await db.upsert(self.model_class(**self._filter_model_fields()), session)
 
     @classmethod
     async def select(cls: Type[T], id: str, columns: List[str], session: Optional[AsyncSession] = None) -> Dict[str, Any]:
-        return await db.select(cls.database_model_class, id, columns, session)
+        return await db.select(cls().model_class, id, columns, session)
 
     @classmethod
     async def exists(cls: Type[T], id: str, session: Optional[AsyncSession] = None) -> bool:
-        return await db.exists(cls.database_model_class, id, session)
+        return await db.exists(cls().model_class, id, session)
 
     @classmethod
     async def batch_create(cls: Type[T], models: List[T], session: Optional[AsyncSession] = None) -> None:
-        await db.batch_create([cls.database_model_class(**model.model_dump()) for model in models], session)
+        await db.batch_create([cls().model_class(**model.model_dump()) for model in models], session)
 
     @classmethod
     async def batch_read(cls: Type[T], ids: List[str], session: Optional[AsyncSession] = None) -> List[T]:
-        models = await db.batch_read(cls.database_model_class, ids, session)
+        models = await db.batch_read(cls().model_class, ids, session)
         return [cls(**model.__dict__) for model in models]
 
     @classmethod
     async def batch_update(cls: Type[T], models: List[Dict[str, Any]], session: Optional[AsyncSession] = None) -> None:
-        await db.batch_update(cls.database_model_class, models, session)
+        await db.batch_update(cls().model_class, models, session)
 
     @classmethod
     async def batch_delete(cls: Type[T], ids: List[str], session: Optional[AsyncSession] = None) -> None:
-        await db.batch_delete(cls.database_model_class, ids, session)
+        await db.batch_delete(cls().model_class, ids, session)
 
     @classmethod
     async def batch_copy(cls: Type[T], old_ids: List[str], new_ids: List[str], session: Optional[AsyncSession] = None) -> None:
-        await db.batch_copy(cls.database_model_class, old_ids, new_ids, session)
+        await db.batch_copy(cls().model_class, old_ids, new_ids, session)

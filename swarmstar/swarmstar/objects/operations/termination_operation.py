@@ -1,12 +1,12 @@
-from typing import ClassVar, Dict, List
+from typing import Dict, List
+
+from data.enums import DatabaseTableEnum
 from swarmstar.enums.action_enum import ActionEnum
 from swarmstar.enums.action_status_enum import ActionStatusEnum
 from swarmstar.enums.termination_policy_enum import TerminationPolicyEnum
-from data.models.operation_models import TerminationOperationModel
 from swarmstar.objects.nodes.base_action_node import BaseActionNode
-from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
 from swarmstar.objects.operations.base_operation import BaseOperation
-from swarmstar.enums.database_table_enum import DatabaseTableEnum
+from swarmstar.objects.operations.function_call_operation import FunctionCallOperation
 from swarmstar.objects.operations.spawn_operation import SpawnOperation
 
 TERMINATION_POLICY_MAP: Dict[TerminationPolicyEnum, str] = {
@@ -16,8 +16,8 @@ TERMINATION_POLICY_MAP: Dict[TerminationPolicyEnum, str] = {
 }
 
 class TerminationOperation(BaseOperation):
-    table_enum: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.TERMINATION_OPERATIONS
-    database_model_class: ClassVar[TerminationOperationModel] = TerminationOperationModel
+    table_enum = DatabaseTableEnum.TERMINATION_OPERATIONS
+    action_node_id: str
 
     terminator_id: str
 

@@ -1,6 +1,8 @@
 import logging
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+
 
 def setup_logging():
     load_dotenv()
@@ -12,14 +14,14 @@ def setup_logging():
     logging.basicConfig(
         filename=LOGGING_FILE_PATH,  # Log file name
         level=logging.INFO,  # Log level
-        format='%(asctime)s - %(levelname)s - %(message)s',  # Log format
-        datefmt='%Y-%m-%d %H:%M:%S'  # Date format
+        format="%(asctime)s - %(levelname)s - %(message)s",  # Log format
+        datefmt="%Y-%m-%d %H:%M:%S",  # Date format
     )
 
     class CustomFileHandler(logging.FileHandler):
         def emit(self, record):
             super().emit(record)
-            self.stream.write('\n\n')  # Add two new lines
+            self.stream.write("\n\n")  # Add two new lines
             self.flush()
 
     # Replace the default handler with the custom handler

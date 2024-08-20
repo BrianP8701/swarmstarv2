@@ -22,14 +22,20 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
+
 class AskQuestions(BaseModel):
-    shared_context_for_questions: Optional[str] = Field(None, description="Context shared with all questions if you have questions, otherwise None")
-    questions: Optional[List[str]] = Field(None, description="List of questions to ask if you have questions, otherwise None")
+    shared_context_for_questions: Optional[str] = Field(
+        None,
+        description="Context shared with all questions if you have questions, otherwise None",
+    )
+    questions: Optional[List[str]] = Field(
+        None,
+        description="List of questions to ask if you have questions, otherwise None",
+    )
+
 
 class NextPath(BaseModel):
-    index: Optional[int] = Field(
-        None, description="Index of the best path to take"
-    )
+    index: Optional[int] = Field(None, description="Index of the best path to take")
     failure_message: Optional[str] = Field(
         None,
         description="There's no good path to take. Describe what you're looking for in detail.",

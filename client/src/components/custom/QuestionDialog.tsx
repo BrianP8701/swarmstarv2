@@ -1,5 +1,5 @@
 import { CircleHelp } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/src/components/ui/dialog";
 
 interface QuestionDialogProps {
   dialogContent: React.ReactNode;

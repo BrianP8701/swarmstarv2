@@ -1,16 +1,16 @@
 "use client";
 import React from 'react';
-import { Menu, HoveredLink } from '@/components/aceternity/navbar-menu';
-import NeonButton from '@/components/aceternity/neon-button';
+import { Menu, HoveredLink } from '@/src/components/aceternity/navbar-menu';
+import NeonButton from '@/src/components/aceternity/neon-button';
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { setCurrentPage } from "@/app/store/appSlice";
-import { SelectTheme } from "@/components/custom/SelectTheme"
+import { setCurrentPage } from "@/store/appSlice";
+import { SelectTheme } from "@/src/components/custom/SelectTheme"
 import Image from 'next/image';
 import moonxuDark from 'public/moonxu_dark.svg';
 import moonxuLight from 'public/moonxu_light.svg';
 import { useTheme } from 'next-themes';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/src/components/ui/button';
 
 const LandingLayout = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();

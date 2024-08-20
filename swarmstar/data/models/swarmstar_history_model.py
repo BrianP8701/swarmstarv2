@@ -1,16 +1,22 @@
-from sqlalchemy import Column, String, Integer, JSON, Enum as SQLAlchemyEnum
 from contextlib import contextmanager
 
-from swarmstar.enums.database_table_enum import DatabaseTableEnum
+from sqlalchemy import JSON, Column
+from sqlalchemy import Enum as SQLAlchemyEnum
+from sqlalchemy import Integer, String
+
+from data.enums import DatabaseTableEnum
 from data.models.base_sqlalchemy_model import BaseSQLAlchemyModel
 
+
 class SwarmstarHistoryModel(BaseSQLAlchemyModel):
-    __tablename__ = 'swarmstar_history'
+    __tablename__ = "swarmstar_history"
     id = Column(Integer, primary_key=True, autoincrement=True)
     swarmstar_space_id = Column(String)
     operation = Column(String)  # e.g., 'update', 'delete', etc.
     data = Column(JSON)  # Store the state of the model after the operation
-    model_name = Column(SQLAlchemyEnum(DatabaseTableEnum), nullable=False)  # Name of the model being changed
+    model_name = Column(
+        SQLAlchemyEnum(DatabaseTableEnum), nullable=False
+    )  # Name of the model being changed
 
     @staticmethod
     @contextmanager
@@ -27,10 +33,15 @@ class SwarmstarHistoryModel(BaseSQLAlchemyModel):
 
         try:
             # Rollback to the specified event
-            history_entries = session.query(SwarmstarHistoryModel).filter_by(
-                model_name=model.__name__,
-                swarmstar_space_id=model.swarmstar_space_id
-            ).order_by(SwarmstarHistoryModel.event_count).all()
+            history_entries = (
+                session.query(SwarmstarHistoryModel)
+                .filter_by(
+                    model_name=model.__name__,
+                    swarmstar_space_id=model.swarmstar_space_id,
+                )
+                .order_by(SwarmstarHistoryModel.event_count)
+                .all()
+            )
 
             for entry in history_entries:
                 if entry.event_count > event_index:
@@ -54,10 +65,14 @@ class SwarmstarHistoryModel(BaseSQLAlchemyModel):
         :param model: The model instance to restore
         """
         # Get the most recent state from the history
-        history_entry = session.query(SwarmstarHistoryModel).filter_by(
-            model_name=model.__name__,
-            swarmstar_space_id=model.swarmstar_space_id
-        ).order_by(SwarmstarHistoryModel.event_count.desc()).first()
+        history_entry = (
+            session.query(SwarmstarHistoryModel)
+            .filter_by(
+                model_name=model.__name__, swarmstar_space_id=model.swarmstar_space_id
+            )
+            .order_by(SwarmstarHistoryModel.event_count.desc())
+            .first()
+        )
 
         if history_entry:
             for key, value in history_entry.data.items():

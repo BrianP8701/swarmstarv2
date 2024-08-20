@@ -1,4 +1,5 @@
 import asyncio
+
 from data import Database
 
 db = Database()

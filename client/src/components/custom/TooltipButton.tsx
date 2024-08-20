@@ -1,15 +1,15 @@
 import React from 'react';
-import { Button, ButtonProps } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button, ButtonProps } from "@/src/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/components/ui/tooltip";
 
 interface TooltipButtonProps extends ButtonProps {
-    onClick: () => void;
-    tooltipText: string;
-    ariaLabel: string;
-  }
+  onClick: () => void;
+  tooltipText: string;
+  ariaLabel: string;
+}
 
 export default function TooltipButton({ children, className, variant = "ghost", size = "icon", ariaLabel, onClick, tooltipText }: TooltipButtonProps) {
-    return (
+  return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button

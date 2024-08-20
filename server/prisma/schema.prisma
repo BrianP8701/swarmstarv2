@@ -1,0 +1,297 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//  ___________________________________________________________
+// /                                                           \
+// |                                                           |
+// |                    MODEL SECTION STARTS                   |
+// |                                                           |
+// \___________________________________________________________/
+
+model User {
+  id        String           @id @default(uuid()) @db.Uuid
+  stripeId  String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  swarms    SwarmstarSpace[]
+}
+
+model SwarmstarSpace {
+  id                          String          @id @default(uuid()) @db.Uuid
+  goal                        String?
+  swarmTitle                  String?
+  memoryTitle                 String?
+  status                      SwarmStatusEnum @default(WAITING_FOR_USER_INPUT)
+  // totalEventCount             Int
+  actionNodeCount             Int?
+  actionMetadataNodeCount     Int?
+  memoryMetadataNodeCount     Int?
+  toolMetadataNodeCount       Int?
+  spawnOperationCount         Int?
+  terminationOperationCount   Int?
+  blockingOperationCount      Int?
+  communicationOperationCount Int?
+  functionCallOperationCount  Int?
+  userId                      String          @db.Uuid
+  user                        User            @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id           String          @id @default(uuid()) @db.Uuid
+  content      String
+  role         MessageRoleEnum
+  actionNodeId String
+  actionNode   ActionNode      @relation(fields: [actionNodeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SpawnOperation {
+  id           String              @id @default(uuid()) @db.Uuid
+  goal         String?
+  actionEnum   ActionEnum
+  context      Json?
+  actionNodeId String
+  actionNode   ActionNode          @relation(fields: [actionNodeId], references: [id])
+  status       OperationStatusEnum @default(CREATED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FunctionCallOperation {
+  id             String              @id @default(uuid()) @db.Uuid
+  functionToCall String
+  actionNodeId   String
+  actionNode     ActionNode          @relation(fields: [actionNodeId], references: [id])
+  status         OperationStatusEnum @default(CREATED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TerminationOperation {
+  id           String              @id @default(uuid()) @db.Uuid
+  terminatorId String
+  actionNodeId String
+  actionNode   ActionNode          @relation(fields: [actionNodeId], references: [id])
+  status       OperationStatusEnum @default(CREATED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlockingOperation {
+  id                    String                @id @default(uuid()) @db.Uuid
+  nextFunctionToCall    String
+  args                  Json?
+  blockingOperationEnum BlockingOperationEnum
+  actionNodeId          String
+  actionNode            ActionNode            @relation(fields: [actionNodeId], references: [id])
+  status                OperationStatusEnum   @default(CREATED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ActionNode {
+  id                     String                  @id @default(uuid()) @db.Uuid
+  goal                   String
+  status                 ActionStatusEnum        @default(ACTIVE)
+  terminationPolicyEnum  TerminationPolicyEnum   @default(SIMPLE)
+  report                 String?
+  contextHistory         Json?                   @default("[]")
+  actionEnum             ActionEnum
+  parentId               String?
+  parent                 ActionNode?             @relation("ActionNodeToActionNode", fields: [parentId], references: [id])
+  children               ActionNode[]            @relation("ActionNodeToActionNode")
+  spawnOperations        SpawnOperation[]
+  functionCallOperations FunctionCallOperation[]
+  terminationOperations  TerminationOperation[]
+  blockingOperations     BlockingOperation[]
+  messages               Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// model SwarmstarEvent {
+//   id        String            @id @default(uuid()) @db.Uuid
+//   operation String
+//   data      Json
+//   modelName DatabaseTableEnum
+
+//   createdAt    DateTime    @default(now())
+//   updatedAt    DateTime    @updatedAt
+// }
+
+// model SwarmstarHistory {
+//   id               Int               @id @default(autoincrement())
+//   swarmstarSpaceId String
+//   operation        String
+//   data             Json
+//   modelName        DatabaseTableEnum
+
+//   createdAt    DateTime    @default(now())
+//   updatedAt    DateTime    @updatedAt
+// }
+
+model ToolMetadataNode {
+  id          String             @id @default(uuid()) @db.Uuid
+  title       String
+  description String
+  parentId    String?
+  parent      ToolMetadataNode?  @relation("ToolMetadataNodeToToolMetadataNode", fields: [parentId], references: [id])
+  children    ToolMetadataNode[] @relation("ToolMetadataNodeToToolMetadataNode")
+  toolType    ToolTypeEnum
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ActionMetadataNode {
+  id          String               @id @default(uuid()) @db.Uuid
+  description String
+  actionEnum  ActionEnum
+  parentId    String?
+  parent      ActionMetadataNode?  @relation("ActionMetadataNodeToActionMetadataNode", fields: [parentId], references: [id])
+  children    ActionMetadataNode[] @relation("ActionMetadataNodeToActionMetadataNode")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MemoryMetadataNode {
+  id          String               @id @default(uuid()) @db.Uuid
+  title       String
+  description String
+  memoryType  MemoryTypeEnum
+  parentId    String?
+  parent      MemoryMetadataNode?  @relation("MemoryMetadataNodeToMemoryMetadataNode", fields: [parentId], references: [id])
+  children    MemoryMetadataNode[] @relation("MemoryMetadataNodeToMemoryMetadataNode")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//  ___________________________________________________________
+// /                                                           \
+// |                                                           |
+// |                    MODEL SECTION ENDS                     |
+// |                                                           |
+// \___________________________________________________________/
+
+// ___________________________________________________________
+
+//  ___________________________________________________________
+// /                                                           \
+// |                                                           |
+// |                    ENUM SECTION STARTS                    |
+// |                                                           |
+// \___________________________________________________________/
+
+enum OperationStatusEnum {
+  CREATED
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum MessageRoleEnum {
+  USER
+  SYSTEM
+  ASSISTANT
+  SWARMSTAR
+}
+
+enum ActionEnum {
+  FOLDER
+  PARALLEL_PLAN
+  SEQUENTIAL_PLAN
+  ROUTE_ACTION
+  CODE
+  SEARCH
+  REVIEW_GOAL_PROGRESS
+}
+
+enum ActionStatusEnum {
+  ACTIVE
+  WAITING_FOR_USER_INPUT
+  TERMINATED
+  PAUSED
+  ERROR
+}
+
+enum TerminationPolicyEnum {
+  SIMPLE
+  CONFIRM_DIRECTIVE_COMPLETION
+  CUSTOM_TERMINATION_HANDLER
+}
+
+enum BlockingOperationEnum {
+  SEND_USER_MESSAGE
+  INSTRUCTOR_CALL
+  CHATGPT_CALL
+}
+
+enum DatabaseTableEnum {
+  ACTION_NODES
+  SWARMSTAR_SPACE
+  SWARMSTAR_EVENTS
+  ACTION_METADATA_NODES
+  MEMORY_METADATA_NODES
+  TOOL_METADATA_NODES
+  SPAWN_OPERATIONS
+  TERMINATION_OPERATIONS
+  BLOCKING_OPERATIONS
+  COMMUNICATION_OPERATIONS
+  FUNCTION_CALL_OPERATIONS
+  MESSAGES
+  USERS
+}
+
+enum SwarmStatusEnum {
+  SPAWNING
+  ACTIVE
+  WAITING_FOR_USER_INPUT
+  COMPLETED
+  PAUSED
+  ERROR
+}
+
+enum ToolTypeEnum {
+  GITHUB_CLONE
+}
+
+enum MemoryTypeEnum {
+  FOLDER
+  GITHUB_REPOSITORY_LINK
+  PYTHON_FILE
+  TYPESCRIPT_FILE
+  STRING
+}
+
+//  ___________________________________________________________
+// /                                                           \
+// |                                                           |
+// |                    ENUM SECTION ENDS                      |
+// |                                                           |
+// \___________________________________________________________/

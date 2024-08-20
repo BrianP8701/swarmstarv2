@@ -1,12 +1,15 @@
 from abc import ABC
-from typing import ClassVar, List, Optional, Type, TypeVar, Generic
+from typing import ClassVar, Generic, List, Optional, Type, TypeVar
 
 from swarmstar.objects.base_object import BaseObject
 
-T = TypeVar('T', bound='BaseNode')
+T = TypeVar("T", bound="BaseNode")
+
 
 class BaseNode(BaseObject[T], Generic[T], ABC):
-    """ Base class for nodes. """
+    """Base class for nodes."""
+
+    swarm_id: str
     title: ClassVar[str]
     parent_id: Optional[str] = None
     children_ids: ClassVar[List[str]] = []

@@ -8,15 +8,16 @@ Every action can be found in swarmstar/actions
 
 I'm excited to create the action, "create_action".
 """
-from typing import Type, ClassVar
+from typing import ClassVar, Type
 
-from swarmstar.enums.action_enum import ActionEnum
+from data.enums import DatabaseTableEnum
 from data.models.action_metadata_node_model import ActionMetadataNodeModel
+from swarmstar.enums.action_enum import ActionEnum
 from swarmstar.objects.nodes.base_metadata_node import BaseMetadataNode
 
-class ActionMetadataNode(BaseMetadataNode['ActionMetadataNode']):
-    table_enum: ClassVar[str] = "action_metadata_nodes"
-    database_model_class: ClassVar[Type['ActionMetadataNodeModel']] = ActionMetadataNodeModel
+
+class ActionMetadataNode(BaseMetadataNode["ActionMetadataNode"]):
+    table_enum = DatabaseTableEnum.ACTION_METADATA_NODES
 
     action_enum: ActionEnum
     description: str

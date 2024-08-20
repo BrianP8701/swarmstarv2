@@ -1,0 +1,12 @@
+{
+    "$schema": "https://unpkg.com/knip@5/schema.json",
+    "entry": [
+        "src/functions/index.ts",
+        "src/graphql/resolvers/index.ts",
+        "src/di/container.ts"
+    ],
+    "ignore": [
+        "src/generated/graphql.ts",
+        "dist/**"
+    ]
+}

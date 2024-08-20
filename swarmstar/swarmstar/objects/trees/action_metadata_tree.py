@@ -1,6 +1,7 @@
 from typing import ClassVar
+
+from data.enums import DatabaseTableEnum
 from data.models.action_metadata_node_model import ActionMetadataNodeModel
-from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.objects.nodes.action_metadata_node import ActionMetadataNode
 from swarmstar.objects.trees.base_tree import BaseTree
 

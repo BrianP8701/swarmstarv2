@@ -8,7 +8,8 @@
     "scripts": {
         "client": "cd client && yarn run dev",
         "server": "cd server && uvicorn main:app --reload",
-        "dev": "concurrently \"yarn client\" \"yarn server\""
+        "dev": "concurrently \"yarn client\" \"yarn server\"",
+        "lint:python": "cd swarmstar && yarn lint:python"
     },
     "devDependencies": {
         "concurrently": "^6.0.0",

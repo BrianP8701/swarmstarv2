@@ -851,6 +851,17 @@ python-dateutil = ">=2.8.1"
 dev = ["flake8", "markdown", "twine", "wheel"]
 
 [[package]]
+name = "graphql-core"
+version = "3.2.3"
+description = "GraphQL implementation for Python, a port of GraphQL.js, the JavaScript reference implementation for GraphQL."
+optional = false
+python-versions = ">=3.6,<4"
+files = [
+    {file = "graphql-core-3.2.3.tar.gz", hash = "sha256:06d2aad0ac723e35b1cb47885d3e5c45e956a53bc1b209a9fc5369007fe46676"},
+    {file = "graphql_core-3.2.3-py3-none-any.whl", hash = "sha256:5766780452bd5ec8ba133f8bf287dc92713e3868ddd83aee4faab9fc3e303dc3"},
+]
+
+[[package]]
 name = "greenlet"
 version = "3.0.3"
 description = "Lightweight in-process concurrent programming"
@@ -1088,6 +1099,20 @@ litellm = ["litellm (>=1.35.31,<2.0.0)"]
 mistralai = ["mistralai (>=0.1.8,<0.2.0)"]
 test-docs = ["anthropic (>=0.27.0,<0.28.0)", "cohere (>=5.1.8,<6.0.0)", "diskcache (>=5.6.3,<6.0.0)", "fastapi (>=0.109.2,<0.110.0)", "groq (>=0.4.2,<0.5.0)", "litellm (>=1.35.31,<2.0.0)", "mistralai (>=0.1.8,<0.2.0)", "pandas (>=2.2.0,<3.0.0)", "pydantic_extra_types (>=2.6.0,<3.0.0)", "redis (>=5.0.1,<6.0.0)", "tabulate (>=0.9.0,<0.10.0)"]
 vertexai = ["google-cloud-aiplatform (>=1.53.0,<2.0.0)", "jsonref (>=1.1.0,<2.0.0)"]
+
+[[package]]
+name = "isort"
+version = "5.13.2"
+description = "A Python utility / library to sort Python imports."
+optional = false
+python-versions = ">=3.8.0"
+files = [
+    {file = "isort-5.13.2-py3-none-any.whl", hash = "sha256:8ca5e72a8d85860d5a3fa69b8745237f2939afe12dbf656afbcb47fe72d947a6"},
+    {file = "isort-5.13.2.tar.gz", hash = "sha256:48fdfcb9face5d58a4f6dde2e72a1fb8dcaf8ab26f95ab49fab84c2ddefb0109"},
+]
+
+[package.extras]
+colors = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "jinja2"
@@ -2505,6 +2530,74 @@ anyio = ">=3.4.0,<5"
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7)", "pyyaml"]
 
 [[package]]
+name = "strawberry-graphql"
+version = "0.237.3"
+description = "A library for creating GraphQL APIs"
+optional = false
+python-versions = "<4.0,>=3.8"
+files = [
+    {file = "strawberry_graphql-0.237.3-py3-none-any.whl", hash = "sha256:2dc43a5036995edf614d21c9faca8b6848a09353d167ae05f42a9d0e976e1611"},
+    {file = "strawberry_graphql-0.237.3.tar.gz", hash = "sha256:8e04bb8821b303cb2cbd2c981f211b2d61bd21e3d171a638d93ceb99081194ac"},
+]
+
+[package.dependencies]
+graphql-core = ">=3.2.0,<3.4.0"
+python-dateutil = ">=2.7.0,<3.0.0"
+typing-extensions = ">=4.5.0"
+
+[package.extras]
+aiohttp = ["aiohttp (>=3.7.4.post0,<4.0.0)"]
+asgi = ["python-multipart (>=0.0.7)", "starlette (>=0.18.0)"]
+chalice = ["chalice (>=1.22,<2.0)"]
+channels = ["asgiref (>=3.2,<4.0)", "channels (>=3.0.5)"]
+cli = ["graphlib_backport", "libcst (>=0.4.7)", "pygments (>=2.3,<3.0)", "rich (>=12.0.0)", "typer (>=0.7.0)"]
+debug = ["libcst (>=0.4.7)", "rich (>=12.0.0)"]
+debug-server = ["libcst (>=0.4.7)", "pygments (>=2.3,<3.0)", "python-multipart (>=0.0.7)", "rich (>=12.0.0)", "starlette (>=0.18.0)", "typer (>=0.7.0)", "uvicorn (>=0.11.6)"]
+django = ["Django (>=3.2)", "asgiref (>=3.2,<4.0)"]
+fastapi = ["fastapi (>=0.65.2)", "python-multipart (>=0.0.7)"]
+flask = ["flask (>=1.1)"]
+litestar = ["litestar (>=2)"]
+opentelemetry = ["opentelemetry-api (<2)", "opentelemetry-sdk (<2)"]
+pydantic = ["pydantic (>1.6.1)"]
+pyinstrument = ["pyinstrument (>=4.0.0)"]
+quart = ["quart (>=0.19.3)"]
+sanic = ["sanic (>=20.12.2)"]
+starlite = ["starlite (>=1.48.0)"]
+
+[[package]]
+name = "stripe"
+version = "10.8.0"
+description = "Python bindings for the Stripe API"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "stripe-10.8.0-py2.py3-none-any.whl", hash = "sha256:cf2f4ae56bf9230e17f4e98741de919382e66f9eba8a5bcf1244ce5f4966c7c9"},
+    {file = "stripe-10.8.0.tar.gz", hash = "sha256:2b49a6a4b403209c1df98d19e8b8392ba17d841399ac82a25b5b0894c1efae5f"},
+]
+
+[package.dependencies]
+requests = {version = ">=2.20", markers = "python_version >= \"3.0\""}
+typing-extensions = {version = ">=4.5.0", markers = "python_version >= \"3.7\""}
+
+[[package]]
+name = "svix"
+version = "1.30.0"
+description = "Svix webhooks API client and webhook verification library"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "svix-1.30.0.tar.gz", hash = "sha256:e730ab66280c95ecc4f67a9708aedcc635edad8f21d48198ddffa438c213fd8c"},
+]
+
+[package.dependencies]
+attrs = ">=21.3.0"
+Deprecated = "*"
+httpx = ">=0.23.0"
+python-dateutil = "*"
+types-Deprecated = "*"
+types-python-dateutil = "*"
+
+[[package]]
 name = "tenacity"
 version = "8.5.0"
 description = "Retry code until it succeeds"
@@ -2584,6 +2677,28 @@ click = ">=8.0.0"
 rich = ">=10.11.0"
 shellingham = ">=1.3.0"
 typing-extensions = ">=3.7.4.3"
+
+[[package]]
+name = "types-deprecated"
+version = "1.2.9.20240311"
+description = "Typing stubs for Deprecated"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-Deprecated-1.2.9.20240311.tar.gz", hash = "sha256:0680e89989a8142707de8103f15d182445a533c1047fd9b7e8c5459101e9b90a"},
+    {file = "types_Deprecated-1.2.9.20240311-py3-none-any.whl", hash = "sha256:d7793aaf32ff8f7e49a8ac781de4872248e0694c4b75a7a8a186c51167463f9d"},
+]
+
+[[package]]
+name = "types-python-dateutil"
+version = "2.9.0.20240316"
+description = "Typing stubs for python-dateutil"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-python-dateutil-2.9.0.20240316.tar.gz", hash = "sha256:5d2f2e240b86905e40944dd787db6da9263f0deabef1076ddaed797351ec0202"},
+    {file = "types_python_dateutil-2.9.0.20240316-py3-none-any.whl", hash = "sha256:6b8cb66d960771ce5ff974e9dd45e38facb81718cc1e208b10b1baccbfdbee3b"},
+]
 
 [[package]]
 name = "typing-extensions"
@@ -3178,4 +3293,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "84502fd60cab6cc0e9bae719a59e94f1f117aebca1b613db33e0f954e5910066"
+content-hash = "551a3362b630ceed25f9859b83c79473dc29d4126e55f338e05a82c62332d894"

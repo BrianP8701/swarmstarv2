@@ -1,4 +1,5 @@
 from enum import Enum
 
+
 class ToolTypeEnum(str, Enum):
-    GITHUB_CLONE = 'github_clone'
+    GITHUB_CLONE = "github_clone"

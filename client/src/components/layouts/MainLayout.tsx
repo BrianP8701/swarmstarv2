@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '@/app/store/store';
+import { RootState } from '@/store/store';
 import {
   LifeBuoy,
   SquareUser,
@@ -10,24 +10,24 @@ import {
   Brain,
   Network
 } from "lucide-react"
-import SelectTheme from "@/components/custom/SelectTheme"
+import SelectTheme from "@/src/components/custom/SelectTheme"
 import { useRouter } from 'next/navigation';
 import {
   DialogDescription,
   DialogTitle,
   DialogHeader,
-} from "@/components/ui/dialog"
-import { setCurrentPage, setCurrentSwarm } from "@/app/store/appSlice"
+} from "@/src/components/ui/dialog"
+import { setCurrentPage, setCurrentSwarm } from "@/store/appSlice"
 import { useDispatch } from "react-redux"
-import TooltipDialogButton from "@/components/custom/TooltipDialog"
-import TooltipButton from "@/components/custom/TooltipButton"
+import TooltipDialogButton from "@/src/components/custom/TooltipDialog"
+import TooltipButton from "@/src/components/custom/TooltipButton"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/src/components/ui/select"
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();

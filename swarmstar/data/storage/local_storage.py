@@ -1,8 +1,9 @@
 import os
 import shutil
-from typing import Any, Dict, List
-from dotenv import load_dotenv
 from threading import Lock
+from typing import Any, Dict, List
+
+from dotenv import load_dotenv
 
 from data.database.abstract_storage import AbstractStorage
 
@@ -11,6 +12,7 @@ STORAGE_FOLDER_PATH = os.getenv("STORAGE_FOLDER_PATH")
 
 if STORAGE_FOLDER_PATH is None:
     raise ValueError("STORAGE_FOLDER_PATH is not set in the .env file")
+
 
 class LocalStorage(AbstractStorage):
     _instance = None
@@ -53,7 +55,11 @@ class LocalStorage(AbstractStorage):
     def list_files(self, directory: str) -> List[str]:
         full_directory = self._get_full_path(directory)
         if os.path.exists(full_directory):
-            return [os.path.join(directory, f) for f in os.listdir(full_directory) if os.path.isfile(os.path.join(full_directory, f))]
+            return [
+                os.path.join(directory, f)
+                for f in os.listdir(full_directory)
+                if os.path.isfile(os.path.join(full_directory, f))
+            ]
         else:
             raise FileNotFoundError(f"Directory {directory} not found in storage")
 
@@ -63,7 +69,7 @@ class LocalStorage(AbstractStorage):
             return {
                 "size": os.path.getsize(full_path),
                 "modified_time": os.path.getmtime(full_path),
-                "created_time": os.path.getctime(full_path)
+                "created_time": os.path.getctime(full_path),
             }
         else:
             raise FileNotFoundError(f"File {file_path} not found in storage")

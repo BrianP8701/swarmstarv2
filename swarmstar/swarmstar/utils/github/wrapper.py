@@ -1,9 +1,11 @@
 # swarmstar/utils/github/wrapper.py
 import os
-from github import Github, GithubException, Auth
+
 from dotenv import load_dotenv
+from github import Auth, Github, GithubException
 
 load_dotenv()
+
 
 class GitHubWrapper:
     _instance = None
@@ -11,7 +13,7 @@ class GitHubWrapper:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(GitHubWrapper, cls).__new__(cls)
-            cls._instance.github_token = os.getenv('GITHUB_ACCESS_TOKEN')
+            cls._instance.github_token = os.getenv("GITHUB_ACCESS_TOKEN")
             cls._instance.client = Github(auth=Auth.Token(cls._instance.github_token))
         return cls._instance
 
@@ -26,7 +28,11 @@ class GitHubWrapper:
         """
         try:
             # Extract the repository name from the GitHub link
-            repo_name = '/'.join(github_link.split('/')[-2:]) if '/' in github_link else github_link
+            repo_name = (
+                "/".join(github_link.split("/")[-2:])
+                if "/" in github_link
+                else github_link
+            )
 
             # Get the repository
             repo = self.client.get_repo(repo_name)
@@ -52,7 +58,11 @@ class GitHubWrapper:
         """
         try:
             # Extract the repository name from the GitHub link
-            repo_name = '/'.join(github_link.split('/')[-2:]) if '/' in github_link else github_link
+            repo_name = (
+                "/".join(github_link.split("/")[-2:])
+                if "/" in github_link
+                else github_link
+            )
             repo = self.client.get_repo(repo_name)
 
             # Get the list of branches

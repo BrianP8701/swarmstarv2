@@ -1,6 +1,7 @@
 from typing import ClassVar
+
+from data.enums import DatabaseTableEnum
 from data.models.memory_metadata_node_model import MemoryMetadataNodeModel
-from swarmstar.enums.database_table_enum import DatabaseTableEnum
 from swarmstar.objects.nodes.memory_metadata_node import MemoryMetadataNode
 from swarmstar.objects.trees.base_tree import BaseTree
 
@@ -14,6 +15,7 @@ from swarmstar.objects.trees.base_tree import BaseTree
 #     remaining_questions: List[str]
 #     risk_of_incorrect_node_mark: bool
 #     original_question_index_to_answer: Dict[int, str]
+
 
 class MemoryMetadataTree(BaseTree):
     table_enum: ClassVar[DatabaseTableEnum] = DatabaseTableEnum.MEMORY_METADATA_NODES
@@ -31,9 +33,9 @@ class MemoryMetadataTree(BaseTree):
     # """ Search Helpers """
 
     # def _search_initialize_state(
-    #     self, 
-    #     input: MemoryMetadataTreeSearchInput, 
-    #     start_node: MemoryMetadataNode, 
+    #     self,
+    #     input: MemoryMetadataTreeSearchInput,
+    #     start_node: MemoryMetadataNode,
     #     action_operation: FunctionCallOperation
     # ) -> MemoryMetadataTreeSearchState:
     #     return MemoryMetadataTreeSearchState(
