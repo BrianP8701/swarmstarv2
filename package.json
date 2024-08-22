@@ -9,7 +9,10 @@
         "client": "cd client && yarn run dev",
         "server": "cd server && uvicorn main:app --reload",
         "dev": "concurrently \"yarn client\" \"yarn server\"",
-        "lint:python": "cd swarmstar && yarn lint:python"
+        "lint:python": "cd swarmstar && yarn lint:python",
+        "generate": "yarn server:generate && yarn client:generate",
+        "client:generate": "cd client && yarn generate",
+        "server:generate": "cd server && yarn generate"
     },
     "devDependencies": {
         "concurrently": "^6.0.0",

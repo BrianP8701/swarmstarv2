@@ -1,12 +1,11 @@
-"use client";
 import { useState } from "react"
 
-import MainLayout from "@/src/components/layouts/MainLayout"
+import MainLayout from "@/components/layouts/MainLayout"
 import HomeControlBoard from "./ControlBoard"
 import HomeChat from "./Chat"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
-import { ScrollArea } from "@/src/components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import HomeControlBoardCreateTab from "./ControlBoardCreateTab"
 
 export default function HomePage() {

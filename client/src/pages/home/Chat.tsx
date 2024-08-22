@@ -3,23 +3,32 @@ import {
   Mic,
   Paperclip,
 } from "lucide-react"
-import { Button } from "@/src/components/ui/button"
-import { Label } from "@/src/components/ui/label"
-import { Textarea } from "@/src/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/src/components/ui/tooltip"
+} from "@/components/ui/tooltip"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/src/components/ui/select"
+} from "@/components/ui/select"
 
 export default function Chat() {
+  const currentChat = "1"; // Temporary constant for currentChat
+  const chats = [
+    ["1", "Chat 1"],
+    ["2", "Chat 2"],
+  ]; // Temporary constant for chats
+
+  const handleChatChange = (value: string) => {
+    console.log("Selected chat:", value);
+  };
 
   return (
     <div className="relative h-full">
@@ -30,11 +39,14 @@ export default function Chat() {
         </SelectTrigger>
         <SelectContent>
           {chats && chats.length > 0 ? (
-            chats.map(([id, name]: [string, string]) => (
-              <SelectItem key={id} value={id}>
-                {name}
-              </SelectItem>
-            ))
+            chats.map((chat) => {
+              const [id, name] = chat;
+              return (
+                <SelectItem key={id} value={id}>
+                  {name}
+                </SelectItem>
+              );
+            })
           ) : (
             <SelectItem value="no-chats" disabled>
               No chats exist for this swarm.

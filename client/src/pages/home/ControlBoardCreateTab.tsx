@@ -1,16 +1,9 @@
-import { Label } from "@/src/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/src/components/ui/select"
-import QuestionTooltip from "@/src/components/custom/QuestionTooltip"
-import { Textarea } from "@/src/components/ui/textarea"
-import { Input } from "@/src/components/ui/input"
-import SelectOrCreate from "@/src/components/custom/SelectOrCreate";
-import { Button } from "@/src/components/ui/button";
+import { Label } from "@/components/ui/label"
+import QuestionTooltip from "@/components/custom/QuestionTooltip"
+import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
+import SelectOrCreate from "@/components/custom/SelectOrCreate";
+import { Button } from "@/components/ui/button";
 
 interface SpawnControlBoardCreateTabProps {
   memoryOptions: string[];

@@ -4,8 +4,7 @@ documents:
   - "src/graphql/queries.gql"
   - "src/graphql/fragments.gql"
 generates:
-  src/graphql/generated/:
-    preset: client
+  src/graphql/generated/graphql.ts:
     plugins:
       - typescript
       - typescript-operations
