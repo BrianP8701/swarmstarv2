@@ -27,7 +27,8 @@
       "@/components/*": ["src/components/*"],
       "@/layouts/*": ["src/layouts/*"],
       "@/pages/*": ["src/pages/*"],
-      "@/graphql/*": ["src/graphql/*"]
+      "@/graphql/*": ["src/graphql/*"],
+      "@/utils/*": ["src/utils/*"]
     }
   },
   "include": ["src", "vite.config.ts"]

@@ -4,16 +4,16 @@ import * as React from "react"
 import { Palette } from "lucide-react"
 import { useTheme } from "next-themes"
 
-import { Button } from "@/src/components/ui/button"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/src/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu"
 
 export default function SelectTheme() {
-  const { setTheme, theme, resolvedTheme } = useTheme()
+  const { setTheme, resolvedTheme } = useTheme()
 
   React.useEffect(() => {
     if (resolvedTheme) {

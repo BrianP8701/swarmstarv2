@@ -1,52 +1,58 @@
-import { useEffect } from "react";
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
-import { useRouter } from "next/router";
-import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs';
+import { PropsWithChildren } from "react";
+import { BrowserRouter, Route, Routes, Navigate, Outlet } from 'react-router-dom';
+import { ClerkProvider, ClerkLoaded, RedirectToSignIn, SignedIn, SignedOut } from '@clerk/clerk-react';
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { Inter } from "next/font/google";
 import './App.css';
-import HomePage from './pages/home/page'; // Adjust the import path as necessary
+import NewHomePage from './pages/newHome/HomePage';
+import { ApolloClientProvider } from "./providers/ApolloClientProvider";
+import MainLayout from "@/components/layouts/MainLayout";
 
-const inter = Inter({ subsets: ["latin"] });
-
-function App() {
+const App = () => {
   return (
-    <ClerkProvider>
-      <div className={inter.className}>
-        <TooltipProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<SignedOut><RedirectToSignIn /></SignedOut>} />
-              <Route path="/home" element={<SignedIn><AuthWrapper><HomePage /></AuthWrapper></SignedIn>} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </div>
-    </ClerkProvider>
-  );
+    <BrowserRouter>
+      <Providers>
+        <Routes>
+          <Route element={<AuthWrapper />}>
+            <Route element={<NewHomePage />} path='/' index />
+          </Route>
+          <Route element={<Navigate to='/' />} path='/*' />
+        </Routes>
+      </Providers>
+    </BrowserRouter>
+  )
 }
 
-function AuthWrapper({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
+const Providers = (props: PropsWithChildren<NonNullable<unknown>>) => {
+  const clerkPubKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY
 
-  useEffect(() => {
-    const checkAuthStatus = async () => {
-      // const response = await fetch("/api/checkAuthStatus");
-      // const data = await response.json();
-      const isAuthenticated = true;
+  return (
+    <ClerkProvider publishableKey={clerkPubKey}>
+      <ClerkLoaded>
+        <ApolloClientProvider url={import.meta.env.VITE_REACT_APP_GRAPHQL_URL!}>
+          <TooltipProvider>
+            <MainLayout>
+              {props.children}
+            </MainLayout>
+          </TooltipProvider>
+        </ApolloClientProvider>
+      </ClerkLoaded>
+    </ClerkProvider >
+  )
+}
 
-      if (isAuthenticated) {
-        router.push("/home");
-      } else {
-        router.push("/home");
-      }
-    };
-
-    checkAuthStatus();
-  }, [router]);
-
-  return <>{children}</>;
+const AuthWrapper = () => {
+  return (
+    <>
+      <SignedIn>
+        <TooltipProvider>
+          <Outlet />
+        </TooltipProvider>
+      </SignedIn>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+    </>
+  )
 }
 
 export default App;

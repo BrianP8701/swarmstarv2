@@ -1,7 +1,13 @@
 type Query {
-  user(id: ID!): User
+  user: User
+}
+
+enum UserTypeEnum {
+  FREE_USER
+  ADMIN
 }
 
 type User {
   id: ID!
+  type: UserTypeEnum!
 }

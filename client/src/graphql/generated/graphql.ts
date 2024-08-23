@@ -22,33 +22,33 @@ export type Query = {
   user?: Maybe<User>;
 };
 
-
-export type QueryUserArgs = {
-  id: Scalars['ID']['input'];
-};
-
 export type User = {
   __typename?: 'User';
   id: Scalars['ID']['output'];
+  type: UserTypeEnum;
 };
 
-export type UserFragmentFragment = { __typename?: 'User', id: string };
+export enum UserTypeEnum {
+  Admin = 'ADMIN',
+  FreeUser = 'FREE_USER'
+}
 
-export type FetchUserQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
+export type UserFragmentFragment = { __typename?: 'User', id: string, type: UserTypeEnum };
+
+export type FetchUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FetchUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string } | null };
+export type FetchUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, type: UserTypeEnum } | null };
 
 export const UserFragmentFragmentDoc = gql`
     fragment UserFragment on User {
   id
+  type
 }
     `;
 export const FetchUserDocument = gql`
-    query FetchUser($id: ID!) {
-  user(id: $id) {
+    query FetchUser {
+  user {
     ...UserFragment
   }
 }
@@ -66,11 +66,10 @@ export const FetchUserDocument = gql`
  * @example
  * const { data, loading, error } = useFetchUserQuery({
  *   variables: {
- *      id: // value for 'id'
  *   },
  * });
  */
-export function useFetchUserQuery(baseOptions: Apollo.QueryHookOptions<FetchUserQuery, FetchUserQueryVariables> & ({ variables: FetchUserQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useFetchUserQuery(baseOptions?: Apollo.QueryHookOptions<FetchUserQuery, FetchUserQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<FetchUserQuery, FetchUserQueryVariables>(FetchUserDocument, options);
       }

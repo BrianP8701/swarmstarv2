@@ -1,6 +1,5 @@
-import React from 'react';
-import { Button, ButtonProps } from "@/src/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/components/ui/tooltip";
+import { Button, ButtonProps } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface TooltipButtonProps extends ButtonProps {
   onClick: () => void;

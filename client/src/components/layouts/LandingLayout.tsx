@@ -3,9 +3,8 @@ import React from 'react';
 import { Menu, HoveredLink } from '@/src/components/aceternity/navbar-menu';
 import NeonButton from '@/src/components/aceternity/neon-button';
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
 import { setCurrentPage } from "@/store/appSlice";
-import { SelectTheme } from "@/src/components/custom/SelectTheme"
+import SelectTheme from "@/components/custom/SelectTheme"
 import Image from 'next/image';
 import moonxuDark from 'public/moonxu_dark.svg';
 import moonxuLight from 'public/moonxu_light.svg';
@@ -14,7 +13,6 @@ import { Button } from '@/src/components/ui/button';
 
 const LandingLayout = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
-    const dispatch = useDispatch();
     const { theme } = useTheme();
     const logoSrc = theme === 'dark' ? moonxuDark : moonxuLight;
 
