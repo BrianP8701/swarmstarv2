@@ -1,6 +1,3 @@
-type Query {
-  user: User
-}
 
 enum UserTypeEnum {
   FREE_USER
@@ -10,4 +7,65 @@ enum UserTypeEnum {
 type User {
   id: ID!
   type: UserTypeEnum!
+  swarms: [Swarm]
+  memories: [SwarmMemory]
+}
+
+type Swarm {
+  id: ID!
+  title: String!
+  goal: String
+  memory: SwarmMemory
+  chats: [SwarmChat]
+  actions: [ActionNode]
+  memories: [MemoryNode]
+}
+
+type SwarmMemory {
+  id: ID!
+  title: String!
+}
+
+type SwarmChat {
+  id: ID!
+  title: String!
+}
+
+type ActionNode {
+  id: ID!
+  title: String!
+}
+
+type MemoryNode {
+  id: ID!
+  title: String!
+}
+
+input CreateSwarmMemoryInput {
+  title: String!
+}
+
+input CreateSwarmInput {
+  title: String!
+  goal: String!
+  createMemory: CreateSwarmMemoryInput
+  existingMemoryId: ID
+}
+
+type SwarmMutation {
+  createSwarm(input: CreateSwarmInput!): Swarm!
+}
+
+type RootMutation {
+  swarm: SwarmMutation
+}
+
+type RootQuery {
+  user: User
+  swarm(id: ID!): Swarm
+}
+
+schema {
+  query: RootQuery
+  mutation: RootMutation
 }

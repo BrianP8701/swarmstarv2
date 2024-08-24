@@ -3,3 +3,15 @@ query FetchUser {
     ...UserFragment
   }
 }
+
+query FetchSwarm($id: ID!) {
+  swarm(id: $id) {
+    ...SwarmFragment
+  }
+}
+
+mutation CreateSwarm($input: CreateSwarmInput!) {
+  createSwarm(input: $input) {
+    ...SwarmFragment
+  }
+}

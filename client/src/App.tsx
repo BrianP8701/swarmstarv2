@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes, Navigate, Outlet } from 'react-router-dom
 import { ClerkProvider, ClerkLoaded, RedirectToSignIn, SignedIn, SignedOut } from '@clerk/clerk-react';
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import './App.css';
-import NewHomePage from './pages/newHome/HomePage';
+import NewHomePage from './views/HomePage';
 import { ApolloClientProvider } from "./providers/ApolloClientProvider";
 import MainLayout from "@/components/layouts/MainLayout";
 
