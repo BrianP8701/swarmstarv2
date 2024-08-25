@@ -2,7 +2,7 @@ import * as React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from '@/components/ui/command';
 import { PopoverButton } from './PopoverButton';
-import { CheckIcon, PlusCircleIcon } from 'lucide-react';
+import { CheckIcon } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 interface SelectWithCreateProps {
@@ -17,7 +17,6 @@ interface SelectWithCreateProps {
 
 const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
   create,
-  createMessage,
   options,
   onSelect,
   className,
@@ -37,18 +36,11 @@ const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
     setIsOpen(false);
   };
 
-  const allOptions = [
-    { value: 'create', label: createMessage },
-    ...options
-  ];
-
-  const selectedOption = allOptions.find(option => option.value === selectedValue);
-
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <PopoverButton
-          selectedOptions={selectedOption ? [selectedOption] : []}
+          selectedOptions={options}
           title={placeholder}
           togglePopover={togglePopover}
           className={className}
@@ -56,28 +48,25 @@ const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
       </PopoverTrigger>
       <PopoverContent align='start' className={`p-0 relative ${className}`}>
         <Command>
-          <CommandInput placeholder="Search" />
+          <CommandInput placeholder="Search" create={create} />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
-              {allOptions.map(option => (
+              {options.map(option => (
                 <CommandItem
                   key={option.value}
+                  value={option.value}
                   onSelect={() => handleSelect(option.value)}
                   className={cn(
                     option.value === selectedValue && 'bg-accent'
                   )}
                 >
-                  {option.value === 'create' ? (
-                    <PlusCircleIcon className="mr-2 h-4 w-4" />
-                  ) : (
-                    <CheckIcon
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        option.value === selectedValue ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                  )}
+                  <CheckIcon
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      option.value === selectedValue ? "opacity-100" : "opacity-0"
+                    )}
+                  />
                   {option.label}
                 </CommandItem>
               ))}

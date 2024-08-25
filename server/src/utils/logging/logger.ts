@@ -1,6 +1,6 @@
 import winston, { format } from 'winston'
 import { LoggingWinston } from '@google-cloud/logging-winston'
-import { TraceContext } from '../TraceContext'
+import { TraceContext } from './TraceContext'
 import * as util from 'util'
 import dotenv from 'dotenv'
 

@@ -1,7 +1,5 @@
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button";
 import SelectWithCreate from "@/components/custom/SelectWithCreate";
 import { useState } from "react";
 
@@ -18,32 +16,27 @@ export default function SwarmConfig() {
   }
 
   return (
-    <div className="grid w-full items-start h-full overflow-auto gap-6 p-2">
+    <div className="grid w-full items-start h-full overflow-auto gap-6 p-2 mt-4">
       <div className="grid grid-cols-2 gap-6">
         <Input
           id="source"
           placeholder="Swarm Name"
+          autoComplete="off"
         />
         <SelectWithCreate
-          className="hover:bg-muted/50"
+          className="hover:bg-muted/50 h-9 text-sm"
           create={createMemory}
           createMessage="Create"
           options={memoryOptions}
           onSelect={setSelectedMemory}
-          placeholder="Select Memory"
+          placeholder="Memory"
         />
       </div>
-      <div className="grid gap-3">
-        <Label htmlFor="source" className="flex justify-between items-center">
-          Goal
-        </Label>
         <Textarea
-          className="min-h-[9.5rem]"
+          className="min-h-[9.5rem] max-h-[60vh]"
           id="source"
           placeholder="Create a new feature in the sourcing app."
         />
-      </div>
     </div>
-
   )
 }

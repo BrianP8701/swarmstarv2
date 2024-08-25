@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Chat from "./Chat";
-import DialogSection from "@/components/custom/DialogSection";
+import DialogPreview from "@/components/custom/DialogPreview";
 import SelectWithCreate from "@/components/custom/SelectWithCreate";
 import { CreateSwarmDialog } from "./CreateSwarmDialog";
 import {
@@ -10,6 +10,11 @@ import {
 } from "@/components/ui/resizable"
 
 export default function HomePage() {
+  const swarmOptions = [
+    { value: "swarm1", label: "Swarm 1" },
+    { value: "swarm2", label: "Swarm 2" },
+    { value: "swarm3", label: "Swarm 3" },
+  ];
   const [selectedSwarm, setSelectedSwarm] = useState<string | null>(null);
   const [isCreateSwarmDialogOpen, setIsCreateSwarmDialogOpen] = useState(false);
 
@@ -20,37 +25,51 @@ export default function HomePage() {
   return (
 
     <div className="flex flex-col h-full">
-      <header className="sticky top-0 h-15 flex items-center z-20">
+      <header className="sticky top-0 h-15 flex items-center">
         <SelectWithCreate
           className="border-none text-lg hover:bg-muted/50"
           create={openCreateSwarmDialog}
           createMessage="Create"
-          options={[]}
+          options={swarmOptions}
           onSelect={setSelectedSwarm}
-          placeholder="No Swarm Selected"
+          placeholder="swarmstarv2"
         />
       </header>
       <main className="flex-1">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={50} minSize={20}>
             <div className="h-full p-4">
-              <div className="relative flex h-full flex-col rounded-xl bg-muted/50">
+              <div className="relative flex h-full flex-col rounded-xl bg-secondary">
                 <Chat />
               </div>
             </div>
           </ResizablePanel>
-          <ResizableHandle />
+          <ResizableHandle withHandle fadeStart fadeEnd />
           <ResizablePanel defaultSize={50} minSize={20}>
             <ResizablePanelGroup direction="vertical">
               <ResizablePanel defaultSize={50} minSize={20}>
-                <div className="flex-1 p-4">
-                  <DialogSection selectedSwarm={selectedSwarm} />
+                <div className="h-full p-4">
+                  <DialogPreview 
+                    previewComponent={
+                      <div className="w-full h-full bg-secondary rounded-xl p-4"></div>
+                    }
+                    dialogContent={
+                      <div className="w-full h-full rounded-xl p-4"></div>
+                    }
+                  />
                 </div>
               </ResizablePanel>
-              <ResizableHandle />
+              <ResizableHandle withHandle fadeEnd />
               <ResizablePanel defaultSize={50} minSize={20}>
-                <div className="flex-1 p-4">
-                  <DialogSection selectedSwarm={selectedSwarm} />
+                <div className="h-full p-4">
+                  <DialogPreview 
+                    previewComponent={
+                      <div className="w-full h-full bg-secondary rounded-xl p-4"></div>
+                    }
+                    dialogContent={
+                      <div className="w-full h-full rounded-xl p-4"></div>
+                    }
+                  />
                 </div>
               </ResizablePanel>
             </ResizablePanelGroup>

@@ -8,12 +8,12 @@ interface ChatSidebarProps {
 
 const ChatSidebar: React.FC<ChatSidebarProps> = ({ options, onSelect }) => {
     return (
-        <div className="bg-background/50 h-full p-4">
-            <div className='mt-6'>
+        <div className="bg-background h-full p-4 rounded-lg">
+            <div className='mt-8'>
                 {options.map((option) => (
                     <Button
                         key={option.value}
-                        className="w-full text-left py-2 px-4 hover:bg-muted-foreground rounded"
+                        className="w-full justify-start py-2 px-4 hover:bg-accent hover:text-accent-foreground rounded"
                         onClick={() => onSelect(option.value)}
                         variant="ghost"
                     >

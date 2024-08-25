@@ -1,9 +1,7 @@
 import { useState, useRef, useEffect } from "react"
-import { CornerDownLeft, ArrowUp } from "lucide-react"
+import { ArrowUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function ChatInput() {
   const [message, setMessage] = useState("")

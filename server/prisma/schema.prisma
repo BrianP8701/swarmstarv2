@@ -22,53 +22,66 @@ datasource db {
 // \___________________________________________________________/
 
 model User {
-  id        String           @id @default(uuid()) @db.Uuid
+  id        String   @id @db.VarChar(255) // id from clerk
   stripeId  String?
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  swarms    SwarmstarSpace[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  swarms    Swarm[]
 }
 
-model SwarmstarSpace {
-  id                          String          @id @default(uuid()) @db.Uuid
-  goal                        String?
-  swarmTitle                  String?
-  memoryTitle                 String?
-  status                      SwarmStatusEnum @default(WAITING_FOR_USER_INPUT)
+model Swarm {
+  id     String          @id @default(uuid()) @db.Uuid
+  goal   String?
+  title  String?
+  status SwarmStatusEnum @default(WAITING_FOR_USER_INPUT)
+
+  actionNodes ActionNode[]
+  memoryNodes MemoryNode[]
+
   // totalEventCount             Int
   actionNodeCount             Int?
-  actionMetadataNodeCount     Int?
-  memoryMetadataNodeCount     Int?
-  toolMetadataNodeCount       Int?
+  memoryNodeCount             Int?
   spawnOperationCount         Int?
   terminationOperationCount   Int?
   blockingOperationCount      Int?
   communicationOperationCount Int?
   functionCallOperationCount  Int?
-  userId                      String          @db.Uuid
-  user                        User            @relation(fields: [userId], references: [id])
+  userId                      String @db.VarChar(255)
+  user                        User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Chat {
+  id           String     @id @default(uuid()) @db.Uuid
+  title        String
+  userId       String     @db.VarChar(255)
+  messages     Message[]
+  actionNodeId String     @db.VarChar(255)
+  actionNode   ActionNode @relation(fields: [actionNodeId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Message {
-  id           String          @id @default(uuid()) @db.Uuid
-  content      String
-  role         MessageRoleEnum
-  actionNodeId String
-  actionNode   ActionNode      @relation(fields: [actionNodeId], references: [id])
+  id      String          @id @default(uuid()) @db.Uuid
+  content String
+  role    MessageRoleEnum
+  chatId  String         @db.Uuid
+  chat    Chat           @relation(fields: [chatId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model SpawnOperation {
-  id           String              @id @default(uuid()) @db.Uuid
+  id           String              @id @db.VarChar(255)
   goal         String?
   actionEnum   ActionEnum
   context      Json?
-  actionNodeId String
+  actionNodeId String              @db.VarChar(255)
   actionNode   ActionNode          @relation(fields: [actionNodeId], references: [id])
   status       OperationStatusEnum @default(CREATED)
 
@@ -77,9 +90,9 @@ model SpawnOperation {
 }
 
 model FunctionCallOperation {
-  id             String              @id @default(uuid()) @db.Uuid
+  id             String              @id @db.VarChar(255)
   functionToCall String
-  actionNodeId   String
+  actionNodeId   String              @db.VarChar(255)
   actionNode     ActionNode          @relation(fields: [actionNodeId], references: [id])
   status         OperationStatusEnum @default(CREATED)
 
@@ -88,9 +101,9 @@ model FunctionCallOperation {
 }
 
 model TerminationOperation {
-  id           String              @id @default(uuid()) @db.Uuid
+  id           String              @id @db.VarChar(255)
   terminatorId String
-  actionNodeId String
+  actionNodeId String              @db.VarChar(255)
   actionNode   ActionNode          @relation(fields: [actionNodeId], references: [id])
   status       OperationStatusEnum @default(CREATED)
 
@@ -99,11 +112,11 @@ model TerminationOperation {
 }
 
 model BlockingOperation {
-  id                    String                @id @default(uuid()) @db.Uuid
+  id                    String                @id @db.VarChar(255)
   nextFunctionToCall    String
   args                  Json?
   blockingOperationEnum BlockingOperationEnum
-  actionNodeId          String
+  actionNodeId          String                @db.VarChar(255)
   actionNode            ActionNode            @relation(fields: [actionNodeId], references: [id])
   status                OperationStatusEnum   @default(CREATED)
 
@@ -112,49 +125,48 @@ model BlockingOperation {
 }
 
 model ActionNode {
-  id                     String                  @id @default(uuid()) @db.Uuid
+  id                     String                  @id @db.VarChar(255)
   goal                   String
   status                 ActionStatusEnum        @default(ACTIVE)
   terminationPolicyEnum  TerminationPolicyEnum   @default(SIMPLE)
   report                 String?
-  contextHistory         Json?                   @default("[]")
+  stringContextHistory   Json?                   @default("[]")
+  context                Json?
   actionEnum             ActionEnum
-  parentId               String?
+  parentId               String?                 @db.VarChar(255)
   parent                 ActionNode?             @relation("ActionNodeToActionNode", fields: [parentId], references: [id])
   children               ActionNode[]            @relation("ActionNodeToActionNode")
   spawnOperations        SpawnOperation[]
   functionCallOperations FunctionCallOperation[]
   terminationOperations  TerminationOperation[]
   blockingOperations     BlockingOperation[]
-  messages               Message[]
+  chats                  Chat[]
+
+  swarmId String @db.Uuid
+  swarm   Swarm  @relation(fields: [swarmId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-// model SwarmstarEvent {
-//   id        String            @id @default(uuid()) @db.Uuid
-//   operation String
-//   data      Json
-//   modelName DatabaseTableEnum
+model MemoryNode {
+  id          String         @id @db.VarChar(255)
+  title       String
+  description String
+  memoryType  MemoryTypeEnum
+  parentId    String?        @db.VarChar(255)
+  parent      MemoryNode?    @relation("MemoryNodeToMemoryNode", fields: [parentId], references: [id])
+  children    MemoryNode[]   @relation("MemoryNodeToMemoryNode")
 
-//   createdAt    DateTime    @default(now())
-//   updatedAt    DateTime    @updatedAt
-// }
+  swarmId String @db.Uuid
+  swarm   Swarm  @relation(fields: [swarmId], references: [id])
 
-// model SwarmstarHistory {
-//   id               Int               @id @default(autoincrement())
-//   swarmstarSpaceId String
-//   operation        String
-//   data             Json
-//   modelName        DatabaseTableEnum
-
-//   createdAt    DateTime    @default(now())
-//   updatedAt    DateTime    @updatedAt
-// }
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
 model ToolMetadataNode {
-  id          String             @id @default(uuid()) @db.Uuid
+  id          String             @id @db.VarChar(255)
   title       String
   description String
   parentId    String?
@@ -167,25 +179,12 @@ model ToolMetadataNode {
 }
 
 model ActionMetadataNode {
-  id          String               @id @default(uuid()) @db.Uuid
+  id          String               @id @db.VarChar(255)
   description String
   actionEnum  ActionEnum
   parentId    String?
   parent      ActionMetadataNode?  @relation("ActionMetadataNodeToActionMetadataNode", fields: [parentId], references: [id])
   children    ActionMetadataNode[] @relation("ActionMetadataNodeToActionMetadataNode")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model MemoryMetadataNode {
-  id          String               @id @default(uuid()) @db.Uuid
-  title       String
-  description String
-  memoryType  MemoryTypeEnum
-  parentId    String?
-  parent      MemoryMetadataNode?  @relation("MemoryMetadataNodeToMemoryMetadataNode", fields: [parentId], references: [id])
-  children    MemoryMetadataNode[] @relation("MemoryMetadataNodeToMemoryMetadataNode")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

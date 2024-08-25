@@ -3,6 +3,7 @@
 import * as React from "react"
 import { type DialogProps } from "@radix-ui/react-dialog"
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons"
+import { PlusCircleIcon } from "lucide-react"
 import { Command as CommandPrimitive } from "cmdk"
 
 import { cn } from "@/utils/cn"
@@ -18,6 +19,8 @@ const Command = React.forwardRef<
       "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground",
       className
     )}
+    shouldFilter={false}
+    loop={false}
     {...props}
   />
 ))
@@ -37,10 +40,14 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
   )
 }
 
+interface CommandInputProps extends React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> {
+  create?: () => void;
+}
+
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
+  CommandInputProps
+>(({ className, create, ...props }, ref) => (
   <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
     <MagnifyingGlassIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
     <CommandPrimitive.Input
@@ -51,6 +58,15 @@ const CommandInput = React.forwardRef<
       )}
       {...props}
     />
+    {create && (
+      <button
+        onClick={create}
+        className="ml-2 p-1 rounded-sm hover:bg-accent hover:text-accent-foreground"
+        aria-label="Create new item"
+      >
+        <PlusCircleIcon className="h-4 w-4 shrink-0 opacity-50" />
+      </button>
+    )}
   </div>
 ))
 

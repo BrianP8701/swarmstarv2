@@ -1,3 +1,8 @@
 client/node_modules/
-node_modules
-swarmstar_reference/
+server/node_modules/
+server/.env
+client/.env
+server/src/graphql/generated/
+client/src/graphql/generated/
+
+node_modules/
