@@ -39,13 +39,13 @@ export default function Chat() {
   };
 
   return (
-    <div className="relative flex h-full">
+    <div className="relative flex h-full flex-col rounded-xl bg-secondary">
       <Button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         className="absolute top-2 left-2 px-1 py-2 z-30"
         variant="ghost"
       >
-        {isSidebarOpen ? <PanelRightClose size={22} /> : <PanelRightOpen size={22} />}
+        {isSidebarOpen ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
       </Button>
       <div className={`z-20 absolute top-0 left-0 h-full transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-0'} overflow-hidden`}>
         <ChatSidebar
@@ -67,7 +67,7 @@ export default function Chat() {
       >
         <Dialog>
           <DialogTrigger>
-            <Expand size={22} />
+            <Expand size={20} />
           </DialogTrigger>
           <DialogContent className="w-[95vw] h-[95vh] max-w-full p-0 bg-secondary">
             <ExpandedChat chats={chats} onChatChange={handleChatChange} />

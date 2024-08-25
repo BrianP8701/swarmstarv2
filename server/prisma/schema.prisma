@@ -38,16 +38,17 @@ model Swarm {
   actionNodes ActionNode[]
   memoryNodes MemoryNode[]
 
-  // totalEventCount             Int
-  actionNodeCount             Int?
-  memoryNodeCount             Int?
-  spawnOperationCount         Int?
-  terminationOperationCount   Int?
-  blockingOperationCount      Int?
-  communicationOperationCount Int?
-  functionCallOperationCount  Int?
-  userId                      String @db.VarChar(255)
-  user                        User   @relation(fields: [userId], references: [id])
+  // totalEventCount          Int
+  actionCount                Int    @default(0)
+  memoryCount                Int    @default(0)
+  actionMetadataNodeCount    Int    @default(0)
+  toolMetadataNodeCount      Int    @default(0)
+  spawnOperationCount        Int    @default(0)
+  terminationOperationCount  Int    @default(0)
+  blockingOperationCount     Int    @default(0)
+  functionCallOperationCount Int    @default(0)
+  userId                     String @db.VarChar(255)
+  user                       User   @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -69,8 +70,8 @@ model Message {
   id      String          @id @default(uuid()) @db.Uuid
   content String
   role    MessageRoleEnum
-  chatId  String         @db.Uuid
-  chat    Chat           @relation(fields: [chatId], references: [id])
+  chatId  String          @db.Uuid
+  chat    Chat            @relation(fields: [chatId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -131,7 +132,7 @@ model ActionNode {
   terminationPolicyEnum  TerminationPolicyEnum   @default(SIMPLE)
   report                 String?
   stringContextHistory   Json?                   @default("[]")
-  context                Json?
+  context                Json                    @default("{}")
   actionEnum             ActionEnum
   parentId               String?                 @db.VarChar(255)
   parent                 ActionNode?             @relation("ActionNodeToActionNode", fields: [parentId], references: [id])
@@ -141,6 +142,7 @@ model ActionNode {
   terminationOperations  TerminationOperation[]
   blockingOperations     BlockingOperation[]
   chats                  Chat[]
+  logs                   String[]                @default([])
 
   swarmId String @db.Uuid
   swarm   Swarm  @relation(fields: [swarmId], references: [id])
@@ -261,7 +263,6 @@ enum DatabaseTableEnum {
   SPAWN_OPERATIONS
   TERMINATION_OPERATIONS
   BLOCKING_OPERATIONS
-  COMMUNICATION_OPERATIONS
   FUNCTION_CALL_OPERATIONS
   MESSAGES
   USERS

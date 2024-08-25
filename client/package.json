@@ -47,6 +47,7 @@
     "react-resizable-panels": "^2.0.19",
     "react-router-dom": "^6.26.1",
     "simplex-noise": "^4.0.1",
+    "svix": "^1.30.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.5.4",

@@ -37,6 +37,7 @@
     "@google-cloud/functions-framework": "^3.4.2",
     "@google-cloud/logging-winston": "^6.0.0",
     "@google-cloud/pubsub": "^4.5.0",
+    "@instructor-ai/instructor": "^1.5.0",
     "@prisma/client": "^5.18.0",
     "apollo-server": "^3.13.0",
     "dotenv": "^16.4.5",
@@ -46,6 +47,8 @@
     "openai": "^4.56.0",
     "prisma": "^5.18.0",
     "stripe": "^16.8.0",
-    "winston": "^3.14.2"
+    "twilio": "^5.2.2",
+    "winston": "^3.14.2",
+    "zod": "^3.23.8"
   }
 }

@@ -39,9 +39,7 @@ export default function HomePage() {
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={50} minSize={20}>
             <div className="h-full p-4">
-              <div className="relative flex h-full flex-col rounded-xl bg-secondary">
-                <Chat />
-              </div>
+              <Chat />
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle fadeStart fadeEnd />
@@ -49,7 +47,7 @@ export default function HomePage() {
             <ResizablePanelGroup direction="vertical">
               <ResizablePanel defaultSize={50} minSize={20}>
                 <div className="h-full p-4">
-                  <DialogPreview 
+                  <DialogPreview
                     previewComponent={
                       <div className="w-full h-full bg-secondary rounded-xl p-4"></div>
                     }
@@ -62,7 +60,7 @@ export default function HomePage() {
               <ResizableHandle withHandle fadeEnd />
               <ResizablePanel defaultSize={50} minSize={20}>
                 <div className="h-full p-4">
-                  <DialogPreview 
+                  <DialogPreview
                     previewComponent={
                       <div className="w-full h-full bg-secondary rounded-xl p-4"></div>
                     }
