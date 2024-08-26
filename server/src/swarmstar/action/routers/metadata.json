@@ -1,0 +1,6 @@
+{
+  "id": "routers",
+  "title": "Routers",
+  "parent_id": "root",
+  "description": "Routers are used to search a metadata tree."
+}

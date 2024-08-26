@@ -1,8 +1,7 @@
 import { Prisma } from '@prisma/client';
-import { BlockingOperation, FunctionCallOperation, SpawnOperation, TerminationOperation } from "@prisma/client";
+import { BlockingOperation, FunctionCallOperation, TerminationOperation } from "@prisma/client";
 
 export type SwarmOperation = 
-SpawnOperation | 
 TerminationOperation | 
 BlockingOperation | 
 FunctionCallOperation
@@ -20,10 +19,6 @@ export const DATABASE_MAP: Record<Prisma.ModelName, DatabaseMapEntry> = {
   MemoryNode: {
     abbreviation: "mm",
     countColumn: Prisma.SwarmScalarFieldEnum.memoryCount
-  },
-  SpawnOperation: {
-    abbreviation: "so",
-    countColumn: Prisma.SwarmScalarFieldEnum.spawnOperationCount
   },
   TerminationOperation: {
     abbreviation: "to",
@@ -48,7 +43,10 @@ export const DATABASE_MAP: Record<Prisma.ModelName, DatabaseMapEntry> = {
   User: {},
   Swarm: {},
   Chat: {},
-  Message: {}
+  Message: {},
+  PlanContext: {},
+  RouteActionContext: {},
+  SearchContext: {},
 };
 
 export const TABLE_ENUM_TO_ABBREVIATION = Object.fromEntries(

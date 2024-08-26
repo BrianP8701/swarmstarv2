@@ -4,7 +4,7 @@ import OpenAI from 'openai'
 import { z } from 'zod'
 import { TYPES } from '../utils/di/container'
 import { ContextLogger } from '../utils/logging/ContextLogger'
-import { ActionDao } from '../dao/ActionDao'
+import { ActionDao } from '../dao/nodes/ActionDao'
 
 export type GPT_MODEL = 'gpt-3.5-turbo' | 'gpt-4-1106-preview' | 'gpt-4-turbo-preview' | 'gpt-4o' | 'gpt-4o-mini'
 
@@ -14,7 +14,7 @@ export enum InstructorMessageRoleEnum {
   SYSTEM = 'system',
 }
 
-export type InstructorMessage = { 
+export type InstructorMessage = {
   role: InstructorMessageRoleEnum
   content: string
 }
@@ -39,7 +39,7 @@ export class InstructorService {
     @inject(OpenAI) private openAI: OpenAI,
     @inject(TYPES.Logger) @named('InstructorClient') private logger: ContextLogger,
     @inject(ActionDao) private actionDao: ActionDao
-  ) {}
+  ) { }
 
   public async run<T extends z.AnyZodObject>(request: InstructorRequest): Promise<z.infer<T>> {
     const timeoutPromise = new Promise<'timeout'>(resolve => {

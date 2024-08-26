@@ -7,3 +7,4 @@ client/src/graphql/generated/
 server/prisma/migrations/
 
 node_modules/
+v0.md

@@ -6,27 +6,6 @@ import { generateId } from '../utils/ids'
 export class OperationDao {
   constructor(@inject(PrismaClient) private prisma: PrismaClient) {}
 
-  // SpawnOperation methods
-  async createSpawnOperation(swarmId: string, createInput: Omit<Prisma.SpawnOperationCreateInput, 'id'>) {
-    const id = await generateId('SpawnOperation', swarmId);
-    return this.prisma.spawnOperation.create({
-      data: { ...createInput, id },
-    })
-  }
-
-  async updateSpawnOperation(id: string, updateInput: Prisma.SpawnOperationUpdateInput) {
-    return this.prisma.spawnOperation.update({
-      where: { id },
-      data: updateInput,
-    })
-  }
-
-  async getSpawnOperation(id: string) {
-    return this.prisma.spawnOperation.findUnique({
-      where: { id },
-    })
-  }
-
   // FunctionCallOperation methods
   async createFunctionCallOperation(swarmId: string, createInput: Omit<Prisma.FunctionCallOperationCreateInput, 'id'>) {
     const id = await generateId('FunctionCallOperation', swarmId)

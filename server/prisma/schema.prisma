@@ -77,19 +77,6 @@ model Message {
   updatedAt DateTime @updatedAt
 }
 
-model SpawnOperation {
-  id           String              @id @db.VarChar(255)
-  goal         String?
-  actionEnum   ActionEnum
-  context      Json?
-  actionNodeId String              @db.VarChar(255)
-  actionNode   ActionNode          @relation(fields: [actionNodeId], references: [id])
-  status       OperationStatusEnum @default(CREATED)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model FunctionCallOperation {
   id             String              @id @db.VarChar(255)
   functionToCall String
@@ -131,13 +118,11 @@ model ActionNode {
   status                 ActionStatusEnum        @default(ACTIVE)
   terminationPolicyEnum  TerminationPolicyEnum   @default(SIMPLE)
   report                 String?
-  stringContextHistory   Json?                   @default("[]")
-  context                Json                    @default("{}")
+  stringContextHistory   String[]                @default([])
   actionEnum             ActionEnum
   parentId               String?                 @db.VarChar(255)
   parent                 ActionNode?             @relation("ActionNodeToActionNode", fields: [parentId], references: [id])
   children               ActionNode[]            @relation("ActionNodeToActionNode")
-  spawnOperations        SpawnOperation[]
   functionCallOperations FunctionCallOperation[]
   terminationOperations  TerminationOperation[]
   blockingOperations     BlockingOperation[]
@@ -146,6 +131,10 @@ model ActionNode {
 
   swarmId String @db.Uuid
   swarm   Swarm  @relation(fields: [swarmId], references: [id])
+
+  planContext        PlanContext?
+  routeActionContext RouteActionContext?
+  searchContext      SearchContext?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -192,6 +181,35 @@ model ActionMetadataNode {
   updatedAt DateTime @updatedAt
 }
 
+model PlanContext {
+  id                             String     @id @default(uuid())
+  terminationHandlerFunctionName String?
+  attempts                       Int
+  planAttempts                   String[]   @default([])
+  planReviewFeedbackHistory      String[]   @default([])
+  actionNode                     ActionNode @relation(fields: [actionNodeId], references: [id])
+  actionNodeId                   String     @unique
+}
+
+model RouteActionContext {
+  id                             String     @id @default(uuid())
+  terminationHandlerFunctionName String?
+  content                        String
+  startNodeId                    String?
+  currentNodeId                  String?
+  markedNodeIds                  String[]   @default([])
+  actionNode                     ActionNode @relation(fields: [actionNodeId], references: [id])
+  actionNodeId                   String     @unique
+}
+
+model SearchContext {
+  id                             String     @id @default(uuid())
+  terminationHandlerFunctionName String?
+  questions                      String[]
+  actionNode                     ActionNode @relation(fields: [actionNodeId], references: [id])
+  actionNodeId                   String     @unique
+}
+
 //  ___________________________________________________________
 // /                                                           \
 // |                                                           |
@@ -225,8 +243,7 @@ enum MessageRoleEnum {
 
 enum ActionEnum {
   FOLDER
-  PARALLEL_PLAN
-  SEQUENTIAL_PLAN
+  PLAN
   ROUTE_ACTION
   CODE
   SEARCH
