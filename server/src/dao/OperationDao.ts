@@ -1,16 +1,14 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import { inject, injectable } from 'inversify'
-import { generateId } from '../utils/ids'
 
 @injectable()
 export class OperationDao {
   constructor(@inject(PrismaClient) private prisma: PrismaClient) {}
 
   // FunctionCallOperation methods
-  async createFunctionCallOperation(swarmId: string, createInput: Omit<Prisma.FunctionCallOperationCreateInput, 'id'>) {
-    const id = await generateId('FunctionCallOperation', swarmId)
+  async createFunctionCallOperation(createInput: Prisma.FunctionCallOperationCreateInput) {
     return this.prisma.functionCallOperation.create({
-      data: { ...createInput, id },
+      data: createInput
     })
   }
 
@@ -28,10 +26,9 @@ export class OperationDao {
   }
 
   // TerminationOperation methods
-  async createTerminationOperation(swarmId: string, createInput: Omit<Prisma.TerminationOperationCreateInput, 'id'>) {
-    const id = await generateId('TerminationOperation', swarmId)
+  async createTerminationOperation(createInput: Prisma.TerminationOperationCreateInput) {
     return this.prisma.terminationOperation.create({
-      data: { ...createInput, id },
+      data: createInput
     })
   }
 
@@ -49,10 +46,9 @@ export class OperationDao {
   }
 
   // BlockingOperation methods
-  async createBlockingOperation(swarmId: string, createInput: Omit<Prisma.BlockingOperationCreateInput, 'id'>) {
-    const id = await generateId('BlockingOperation', swarmId);
+  async createBlockingOperation(createInput: Prisma.BlockingOperationCreateInput) {
     return this.prisma.blockingOperation.create({
-      data: { ...createInput, id },
+      data: createInput
     });
   }
 

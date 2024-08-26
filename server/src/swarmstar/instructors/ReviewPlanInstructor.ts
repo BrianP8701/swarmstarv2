@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AbstractInstructor } from './AbstractInstructor';
-import { InstructorConversation, InstructorMessageRoleEnum } from '../../services/InstructorService';
+import { InstructorConversation, InstructorMessageRoleEnum } from '../../services/external/InstructorService';
 
 const ReviewPlanInstructorSchema = z.object({
   analysis: z.string().describe("Analyze the list of steps and determine if they can be executed in sequence or if they should be revised."),

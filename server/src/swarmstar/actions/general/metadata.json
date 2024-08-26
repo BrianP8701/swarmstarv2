@@ -1,0 +1,6 @@
+{
+  "id": "general",
+  "title": "General Actions",
+  "parent_id": "root",
+  "description": "General actions that routers can search over."
+}

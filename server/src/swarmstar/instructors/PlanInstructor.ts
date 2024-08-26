@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AbstractInstructor } from './AbstractInstructor';
-import { InstructorConversation, InstructorMessageRoleEnum } from '../../services/InstructorService';
+import { InstructorConversation, InstructorMessageRoleEnum } from '../../services/external/InstructorService';
 
 const PlanInstructorSchema = z.object({
   steps: z.array(z.string()).describe("Break the goal into actionable steps that must be executed in sequence."),

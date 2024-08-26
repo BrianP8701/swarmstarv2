@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, ButtonProps } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface TooltipDialogButtonProps extends ButtonProps {
   tooltipText: string;
@@ -10,28 +10,31 @@ interface TooltipDialogButtonProps extends ButtonProps {
 }
 
 export default function TooltipDialogButton({ children, className, variant = "ghost", size = "icon", ariaLabel, tooltipText, dialogContent }: TooltipDialogButtonProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   return (
-    <Tooltip>
-      <Dialog>
-        <DialogTrigger asChild>
-          <TooltipTrigger asChild>
-            <Button
-              variant={variant}
-              size={size}
-              className={className}
-              aria-label={ariaLabel}
-            >
-              {children}
-            </Button>
-          </TooltipTrigger>
-        </DialogTrigger>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant={variant}
+            size={size}
+            className={className}
+            aria-label={ariaLabel}
+            onClick={() => setIsDialogOpen(true)}
+          >
+            {children}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="right" sideOffset={5}>
+          {tooltipText}
+        </TooltipContent>
+      </Tooltip>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           {dialogContent}
         </DialogContent>
       </Dialog>
-      <TooltipContent side="right" sideOffset={5}>
-        {tooltipText}
-      </TooltipContent>
-    </Tooltip>
+    </TooltipProvider>
   );
 }

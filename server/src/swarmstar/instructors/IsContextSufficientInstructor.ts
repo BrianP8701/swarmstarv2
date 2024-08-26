@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { AbstractInstructor } from './AbstractInstructor';
-import { InstructorConversation } from '../../services/InstructorService';
-import { InstructorMessageRoleEnum } from '../../services/InstructorService';
+import { InstructorConversation } from '../../services/external/InstructorService';
+import { InstructorMessageRoleEnum } from '../../services/external/InstructorService';
 
 const IsContextSufficientInstructorSchema = z.object({
   isContextSufficient: z.boolean().describe("Do we have enough information to do what we need to do?"),

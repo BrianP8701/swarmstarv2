@@ -12,6 +12,8 @@ import { ResolverContext, createApolloServer } from './graphql/createApolloServe
 import { checkAuthenticated } from './utils/auth/auth'
 import { TraceContext } from './utils/logging/TraceContext'
 
+dotenv.config()
+
 const CORS_WHITELIST = [
   'http://localhost:5173',
   'https://studio.apollographql.com',
@@ -21,13 +23,14 @@ const CORS_WHITELIST = [
 dotenv.config()
 const app = express()
 
-const clerkAuth = ClerkExpressWithAuth()
+const clerkAuth = ClerkExpressWithAuth({})
 
-const PORT = process.env.PORT || 5173
+const PORT = process.env.PORT || 4000
 
 // Middleware
 app.use(express.json())
-app.use(clerkAuth, checkAuthenticated)
+app.use(clerkAuth)
+app.use(checkAuthenticated)
 app.use(TraceContext.expressMiddleware())
 
 // Paths setup

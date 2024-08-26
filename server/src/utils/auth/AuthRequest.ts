@@ -2,10 +2,13 @@ import { User } from '@prisma/client';
 import { Request } from 'express';
 
 export interface ClerkSessionClaims {
-  userId: string;
-  firstName?: string;
-  lastName?: string;
-  email: string;
+  azp: string;
+  exp: number;
+  iat: number;
+  iss: string;
+  nbf: number;
+  sid: string;
+  sub: string;
 }
 
 interface AuthenticatedPayload {

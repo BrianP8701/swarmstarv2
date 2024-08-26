@@ -1,23 +1,3 @@
-* If your reading this on vscode you can press Option + Z to make the text wrap.
-
-# August 23rd 2024
-## UI
-A swarm can have:
-    - Multiple chats
-    - Action tree
-    - Memory metadata tree
-    - Action metadata trees
-    - Tool metadata trees
-    - The app being built
-
-Left: Chat
-Top right: Trees
-Bottom right: App
-
-
-In addition we need a place for the user to view existing swarms and create new swarms.
-
-
 # July 21th 2024
 Well. This is awkward. We have to revert back to the original design of seemingly excessive blocking operations. This is because it allows easy exit and reentry points. Without seemingly excessive blocking operations we have, well less operations. I also thought it would allow the action code to become more concise. But question wrappers need to return it's operations directly back to the source. This basically means we want functions that directly return Operations. This brings back the question of how do we pass args between these functions. 
 

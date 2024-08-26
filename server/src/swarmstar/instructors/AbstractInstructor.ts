@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { InstructorConversation, InstructorService } from '../../services/InstructorService';
+import { InstructorConversation, InstructorService } from '../../services/external/InstructorService';
 import { inject } from 'inversify';
 
 export abstract class AbstractInstructor<ZodSchema extends z.AnyZodObject, TInstructorInput> {

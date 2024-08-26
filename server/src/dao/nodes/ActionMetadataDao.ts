@@ -26,9 +26,15 @@ export class ActionMetadataNodeDao extends AbstractNodeDao<ActionMetadataNode, P
 
   async create(createInput: Prisma.ActionMetadataNodeCreateInput): Promise<ActionMetadataNode> {
     return this.prisma.actionMetadataNode.create({
-      data: {
-        ...createInput
-      },
+      data: createInput
     });
+  }
+
+  async getAll(swarmId: string): Promise<ActionMetadataNode[]> {
+    return this.prisma.actionMetadataNode.findMany({
+      where: {
+        swarmId,
+      },
+    })
   }
 }

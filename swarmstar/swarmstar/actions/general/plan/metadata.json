@@ -1,6 +1,0 @@
-{
-  "id": "plan",
-  "title": "Plan",
-  "parent_id": "root",
-  "description": "Use this action when the task is too complex to be solved in a single prompt. The task can be broken down into smaller, manageable parts. This may involve creating a series of ordered steps or dividing the task into independent subgoals that can be tackled simultaneously. The goal is to develop a clear plan to achieve the overall objective efficiently."
-}

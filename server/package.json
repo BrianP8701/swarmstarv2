@@ -6,13 +6,15 @@
   "scripts": {
     "cli": "ts-node src/cli/index.ts",
     "generate-action-metadata": "ts-node src/cli/generateActionMetadata.ts",
-    "start": "ts-node src/index.ts",
+    "start:dev": "nodemon src/server.ts",
     "build": "tsc",
     "prisma": "prisma",
     "codegen": "graphql-codegen --config codegen.yml",
     "generate": "yarn codegen && yarn prisma generate",
     "lint": "eslint --config eslint.config.mjs",
-    "knip": "knip"
+    "knip": "knip",
+    "db:seed": "ts-node src/cli/databaseSeed.ts",
+    "db:reset-and-seed": "ts-node src/cli/resetAndSeed.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
@@ -29,6 +31,7 @@
     "eslint-plugin-react": "^7.35.0",
     "globals": "^15.9.0",
     "knip": "^5.27.2",
+    "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.1.0"

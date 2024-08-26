@@ -21,46 +21,72 @@ datasource db {
 // |                                                           |
 // \___________________________________________________________/
 
+model GlobalContext {
+  id             String @id @default(uuid()) @db.Uuid
+  defaultSwarmId String @db.Uuid
+}
+
 model User {
-  id        String   @id @db.VarChar(255) // id from clerk
+  id        String       @id @default(uuid()) @db.Uuid
+  clerkId   String       @unique
   stripeId  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  type      UserTypeEnum @default(USER)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
   swarms    Swarm[]
+  memories  Memory[]
+
+  @@index([clerkId])
 }
 
 model Swarm {
   id     String          @id @default(uuid()) @db.Uuid
-  goal   String?
-  title  String?
+  goal   String
+  title  String
   status SwarmStatusEnum @default(WAITING_FOR_USER_INPUT)
 
-  actionNodes ActionNode[]
-  memoryNodes MemoryNode[]
+  actionNodes         ActionNode[]         @relation("SwarmToActionNodes")
+  actionMetadataNodes ActionMetadataNode[] @relation("SwarmToActionMetadataNodes")
+  toolMetadataNodes   ToolMetadataNode[]   @relation("SwarmToToolMetadataNodes")
 
-  // totalEventCount          Int
-  actionCount                Int    @default(0)
-  memoryCount                Int    @default(0)
-  actionMetadataNodeCount    Int    @default(0)
-  toolMetadataNodeCount      Int    @default(0)
-  spawnOperationCount        Int    @default(0)
-  terminationOperationCount  Int    @default(0)
-  blockingOperationCount     Int    @default(0)
-  functionCallOperationCount Int    @default(0)
-  userId                     String @db.VarChar(255)
-  user                       User   @relation(fields: [userId], references: [id])
+  memoryId String @db.Uuid
+  memory   Memory @relation(fields: [memoryId], references: [id])
+
+  chats Chat[]
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Memory {
+  id    String @id @default(uuid()) @db.Uuid
+  title String
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id])
+
+  swarms      Swarm[]
+  memoryNodes MemoryNode[] @relation("MemoryToMemoryNodes")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Chat {
-  id           String     @id @default(uuid()) @db.Uuid
-  title        String
-  userId       String     @db.VarChar(255)
-  messages     Message[]
-  actionNodeId String     @db.VarChar(255)
+  id     String @id @default(uuid()) @db.Uuid
+  title  String
+  userId String @db.Uuid
+
+  messages Message[]
+
+  actionNodeId String     @db.Uuid
   actionNode   ActionNode @relation(fields: [actionNodeId], references: [id])
+
+  Swarm   Swarm?  @relation(fields: [swarmId], references: [id])
+  swarmId String? @db.Uuid
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -78,10 +104,10 @@ model Message {
 }
 
 model FunctionCallOperation {
-  id             String              @id @db.VarChar(255)
+  id             String              @id @default(uuid()) @db.Uuid
   functionToCall String
-  actionNodeId   String              @db.VarChar(255)
-  actionNode     ActionNode          @relation(fields: [actionNodeId], references: [id])
+  actionNodeId   String              @db.Uuid
+  actionNode     ActionNode          @relation("ActionNodeToFunctionCallOperations", fields: [actionNodeId], references: [id], onDelete: Cascade)
   status         OperationStatusEnum @default(CREATED)
 
   createdAt DateTime @default(now())
@@ -89,10 +115,10 @@ model FunctionCallOperation {
 }
 
 model TerminationOperation {
-  id           String              @id @db.VarChar(255)
+  id           String              @id @default(uuid()) @db.Uuid
   terminatorId String
-  actionNodeId String              @db.VarChar(255)
-  actionNode   ActionNode          @relation(fields: [actionNodeId], references: [id])
+  actionNodeId String              @db.Uuid
+  actionNode   ActionNode          @relation("ActionNodeToTerminationOperations", fields: [actionNodeId], references: [id], onDelete: Cascade)
   status       OperationStatusEnum @default(CREATED)
 
   createdAt DateTime @default(now())
@@ -100,12 +126,12 @@ model TerminationOperation {
 }
 
 model BlockingOperation {
-  id                    String                @id @db.VarChar(255)
+  id                    String                @id @default(uuid()) @db.Uuid
   nextFunctionToCall    String
   args                  Json?
   blockingOperationEnum BlockingOperationEnum
-  actionNodeId          String                @db.VarChar(255)
-  actionNode            ActionNode            @relation(fields: [actionNodeId], references: [id])
+  actionNodeId          String                @db.Uuid
+  actionNode            ActionNode            @relation("ActionNodeToBlockingOperations", fields: [actionNodeId], references: [id], onDelete: Cascade)
   status                OperationStatusEnum   @default(CREATED)
 
   createdAt DateTime @default(now())
@@ -113,24 +139,24 @@ model BlockingOperation {
 }
 
 model ActionNode {
-  id                     String                  @id @db.VarChar(255)
+  id                     String                  @id @default(uuid()) @db.Uuid
   goal                   String
   status                 ActionStatusEnum        @default(ACTIVE)
   terminationPolicyEnum  TerminationPolicyEnum   @default(SIMPLE)
   report                 String?
   stringContextHistory   String[]                @default([])
   actionEnum             ActionEnum
-  parentId               String?                 @db.VarChar(255)
+  parentId               String?                 @default(uuid()) @db.Uuid
   parent                 ActionNode?             @relation("ActionNodeToActionNode", fields: [parentId], references: [id])
   children               ActionNode[]            @relation("ActionNodeToActionNode")
-  functionCallOperations FunctionCallOperation[]
-  terminationOperations  TerminationOperation[]
-  blockingOperations     BlockingOperation[]
+  functionCallOperations FunctionCallOperation[] @relation("ActionNodeToFunctionCallOperations")
+  terminationOperations  TerminationOperation[]  @relation("ActionNodeToTerminationOperations")
+  blockingOperations     BlockingOperation[]     @relation("ActionNodeToBlockingOperations")
   chats                  Chat[]
   logs                   String[]                @default([])
 
   swarmId String @db.Uuid
-  swarm   Swarm  @relation(fields: [swarmId], references: [id])
+  swarm   Swarm  @relation("SwarmToActionNodes", fields: [swarmId], references: [id], onDelete: Cascade)
 
   planContext        PlanContext?
   routeActionContext RouteActionContext?
@@ -141,73 +167,80 @@ model ActionNode {
 }
 
 model MemoryNode {
-  id          String         @id @db.VarChar(255)
+  id          String         @id @default(uuid()) @db.Uuid
   title       String
   description String
   memoryType  MemoryTypeEnum
-  parentId    String?        @db.VarChar(255)
+  parentId    String?        @db.Uuid
   parent      MemoryNode?    @relation("MemoryNodeToMemoryNode", fields: [parentId], references: [id])
   children    MemoryNode[]   @relation("MemoryNodeToMemoryNode")
 
-  swarmId String @db.Uuid
-  swarm   Swarm  @relation(fields: [swarmId], references: [id])
+  memoryId String @db.Uuid
+  memory   Memory @relation("MemoryToMemoryNodes", fields: [memoryId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model ToolMetadataNode {
-  id          String             @id @db.VarChar(255)
-  title       String
+  id          String       @id @default(uuid()) @db.Uuid
   description String
-  parentId    String?
-  parent      ToolMetadataNode?  @relation("ToolMetadataNodeToToolMetadataNode", fields: [parentId], references: [id])
-  children    ToolMetadataNode[] @relation("ToolMetadataNodeToToolMetadataNode")
   toolType    ToolTypeEnum
+
+  parentId String?            @db.Uuid
+  parent   ToolMetadataNode?  @relation("ToolMetadataNodeToToolMetadataNode", fields: [parentId], references: [id])
+  children ToolMetadataNode[] @relation("ToolMetadataNodeToToolMetadataNode")
+
+  swarmId String @db.Uuid
+  swarm   Swarm  @relation("SwarmToToolMetadataNodes", fields: [swarmId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model ActionMetadataNode {
-  id          String               @id @db.VarChar(255)
+  id          String     @id @default(uuid()) @db.Uuid
   description String
   actionEnum  ActionEnum
-  parentId    String?
-  parent      ActionMetadataNode?  @relation("ActionMetadataNodeToActionMetadataNode", fields: [parentId], references: [id])
-  children    ActionMetadataNode[] @relation("ActionMetadataNodeToActionMetadataNode")
+
+  parentId String?              @db.Uuid
+  parent   ActionMetadataNode?  @relation("ActionMetadataNodeToActionMetadataNode", fields: [parentId], references: [id])
+  children ActionMetadataNode[] @relation("ActionMetadataNodeToActionMetadataNode")
+
+  swarmId String @db.Uuid
+  swarm   Swarm  @relation("SwarmToActionMetadataNodes", fields: [swarmId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model PlanContext {
-  id                             String     @id @default(uuid())
+  id                             String     @id @default(uuid()) @db.Uuid
   terminationHandlerFunctionName String?
   attempts                       Int
   planAttempts                   String[]   @default([])
   planReviewFeedbackHistory      String[]   @default([])
   actionNode                     ActionNode @relation(fields: [actionNodeId], references: [id])
-  actionNodeId                   String     @unique
+  actionNodeId                   String     @unique @db.Uuid
 }
 
 model RouteActionContext {
-  id                             String     @id @default(uuid())
+  id                             String     @id @default(uuid()) @db.Uuid
   terminationHandlerFunctionName String?
   content                        String
   startNodeId                    String?
   currentNodeId                  String?
   markedNodeIds                  String[]   @default([])
   actionNode                     ActionNode @relation(fields: [actionNodeId], references: [id])
-  actionNodeId                   String     @unique
+  actionNodeId                   String     @unique @db.Uuid
 }
 
 model SearchContext {
-  id                             String     @id @default(uuid())
+  id                             String     @id @default(uuid()) @db.Uuid
   terminationHandlerFunctionName String?
   questions                      String[]
   actionNode                     ActionNode @relation(fields: [actionNodeId], references: [id])
-  actionNodeId                   String     @unique
+  actionNodeId                   String     @unique @db.Uuid
 }
 
 //  ___________________________________________________________
@@ -225,6 +258,11 @@ model SearchContext {
 // |                    ENUM SECTION STARTS                    |
 // |                                                           |
 // \___________________________________________________________/
+
+enum UserTypeEnum {
+  ADMIN
+  USER
+}
 
 enum OperationStatusEnum {
   CREATED

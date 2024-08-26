@@ -1,11 +1,13 @@
 import { PropsWithChildren } from "react";
-import { BrowserRouter, Route, Routes, Navigate, Outlet } from 'react-router-dom';
-import { ClerkProvider, ClerkLoaded, RedirectToSignIn, SignedIn, SignedOut } from '@clerk/clerk-react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-react';
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import './App.css';
 import NewHomePage from './views/HomePage';
 import { ApolloClientProvider } from "./providers/ApolloClientProvider";
 import MainLayout from "@/components/layouts/MainLayout";
+import AuthWrapper from "./components/custom/AuthWrapper";
+
 
 const App = () => {
   return (
@@ -15,7 +17,6 @@ const App = () => {
           <Route element={<AuthWrapper />}>
             <Route element={<NewHomePage />} path='/' index />
           </Route>
-          <Route element={<Navigate to='/' />} path='/*' />
         </Routes>
       </Providers>
     </BrowserRouter>
@@ -23,12 +24,14 @@ const App = () => {
 }
 
 const Providers = (props: PropsWithChildren<NonNullable<unknown>>) => {
-  const clerkPubKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY
+  const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
+  console.log(clerkPubKey)
 
   return (
     <ClerkProvider publishableKey={clerkPubKey}>
       <ClerkLoaded>
-        <ApolloClientProvider url={import.meta.env.VITE_REACT_APP_GRAPHQL_URL!}>
+        <ApolloClientProvider url={import.meta.env.VITE_GRAPHQL_URL}>
           <TooltipProvider>
             <MainLayout>
               {props.children}
@@ -37,21 +40,6 @@ const Providers = (props: PropsWithChildren<NonNullable<unknown>>) => {
         </ApolloClientProvider>
       </ClerkLoaded>
     </ClerkProvider >
-  )
-}
-
-const AuthWrapper = () => {
-  return (
-    <>
-      <SignedIn>
-        <TooltipProvider>
-          <Outlet />
-        </TooltipProvider>
-      </SignedIn>
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
-    </>
   )
 }
 

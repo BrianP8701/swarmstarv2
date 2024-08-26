@@ -4,22 +4,21 @@ import path from 'path';
 import { ActionMetadataNode, Prisma } from '@prisma/client';
 import { container } from '../utils/di/container';
 import { ActionMetadataNodeDao } from '../dao/nodes/ActionMetadataDao';
-import { AbstractAction } from '../swarmstar/action/AbstractAction';
-import { AbstractRouter } from '../swarmstar/action/routers/AbstractRouter';
+import { AbstractAction } from '../swarmstar/actions/AbstractAction';
+import { AbstractRouter } from '../swarmstar/actions/routers/AbstractRouter';
+import { GlobalContextDao } from '../dao/nodes/GlobalContextDao';
+import { SwarmDao } from '../dao/SwarmDao';
 
 const ACTION_FOLDER_PATH = process.env.ACTION_FOLDER_PATH
 
-async function createActionMetadataNode(nodeData: any): Promise<ActionMetadataNode> {
+async function createActionMetadataNode(swarmId: string, nodeData: any): Promise<ActionMetadataNode> {
   const actionMetadataNodeDao = container.get(ActionMetadataNodeDao);
   console.log(nodeData);
-  const existingNode = await actionMetadataNodeDao.exists(nodeData.id);
-  if (existingNode) {
-    await actionMetadataNodeDao.delete(nodeData.id);
-  }
+
   const createInput: Prisma.ActionMetadataNodeCreateInput = {
-    id: nodeData.id,
     description: nodeData.description,
     actionEnum: nodeData.actionEnum,
+    swarm: { connect: { id: swarmId } }
   };
   if (nodeData.parentId) {
     createInput.parent = { connect: { id: nodeData.parentId } };
@@ -29,12 +28,12 @@ async function createActionMetadataNode(nodeData: any): Promise<ActionMetadataNo
   return node;
 }
 
-async function loadClassFromFile(filePath: string, className: string): Promise<typeof AbstractAction> {
+async function loadClassFromFile(filePath: string, className: string): Promise<any> {
   const module = await import(filePath);
   return module[className];
 }
 
-async function processFolder(folderPath: string, parentId: string | null = null): Promise<ActionMetadataNode[]> {
+async function processFolder(folderPath: string, swarmId: string, parentId: string | null = null): Promise<ActionMetadataNode[]> {
   console.log(`Processing folder: ${folderPath}`);
   const metadataPath = path.join(folderPath, 'metadata.json');
 
@@ -48,7 +47,7 @@ async function processFolder(folderPath: string, parentId: string | null = null)
   const metadata = JSON.parse(await fs.readFile(metadataPath, 'utf-8'));
   metadata.parentId = parentId;
   metadata.actionEnum = 'FOLDER';
-  const node = await createActionMetadataNode(metadata);
+  const node = await createActionMetadataNode(swarmId, metadata);
   const nodes = [node];
   const childrenRelationships: [ActionMetadataNode, ActionMetadataNode[]][] = [];
 
@@ -59,7 +58,7 @@ async function processFolder(folderPath: string, parentId: string | null = null)
     const stats = await fs.stat(itemPath);
     if (stats.isDirectory()) {
       console.log(`Processing subfolder: ${itemPath}`);
-      const childNodes = await processFolder(itemPath, node.id);
+      const childNodes = await processFolder(itemPath, swarmId, node.id);
       nodes.push(...childNodes);
       childrenRelationships.push([node, childNodes]);
     } else if (item.endsWith('.ts')) {
@@ -73,11 +72,10 @@ async function processFolder(folderPath: string, parentId: string | null = null)
           console.log(`Loaded class: ${cls.name}`);
           if (isConcreteAction(cls) && !content.includes('abstract class')) {
             console.log(`${className} is a concrete subclass of AbstractAction or AbstractRouter`);
-            const actionNode = await createActionMetadataNode({
-              id: cls.id,
+            const actionNode = await createActionMetadataNode(swarmId, {
               parentId: node.id,
               description: cls.description,
-              actionEnum: cls.actionEnum.toString(),
+              actionEnum: cls.actionEnum,
             });
             nodes.push(actionNode);
             childrenRelationships.push([node, [actionNode]]);
@@ -96,17 +94,42 @@ async function processFolder(folderPath: string, parentId: string | null = null)
 }
 
 function isConcreteAction(cls: any): cls is typeof AbstractAction | typeof AbstractRouter {
-  return typeof cls.id === 'string' &&
-         typeof cls.description === 'string' &&
-         typeof cls.actionEnum === 'string';
+  return typeof cls.description === 'string' &&
+    typeof cls.actionEnum === 'string';
 }
 
-async function generateActionMetadataTree() {
+export async function generateActionMetadataTree(userId: string): Promise<void> {
   if (!ACTION_FOLDER_PATH) {
     throw new Error('ACTION_FOLDER_PATH environment variable is not set');
   }
-  const nodes = await processFolder(ACTION_FOLDER_PATH);
+  const globalContextDao = container.get(GlobalContextDao);
+  const swarmDao = container.get(SwarmDao);
+
+  // Create the default swarm first
+  const swarm = await swarmDao.create({
+    title: 'Default Swarm',
+    goal: 'Default Swarm Goal',
+    user: { connect: { id: userId } },
+    memory: { create: { title: 'Default Memory', user: { connect: { id: userId } } } },
+  });
+
+  console.log(`Created default swarm with ID: ${swarm.id}`);
+
+  // Now process the action metadata
+  const nodes = await processFolder(ACTION_FOLDER_PATH, swarm.id);
   console.log(`Generated ${nodes.length} action metadata nodes`);
+
+  const globalContextId = process.env.GLOBAL_CONTEXT_ID;
+  await globalContextDao.upsertGlobalContext({
+    id: globalContextId,
+    defaultSwarmId: swarm.id,
+  });
 }
 
-generateActionMetadataTree().catch(console.error);
+if (require.main === module) {
+  const userId = process.env.SEED_USER_ID;
+  if (!userId) {
+    throw new Error('SEED_USER_ID environment variable is not set');
+  }
+  generateActionMetadataTree(userId).catch(console.error);
+}

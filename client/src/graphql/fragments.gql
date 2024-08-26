@@ -1,6 +1,12 @@
 fragment UserFragment on User {
   id
   type
+  swarms {
+    ...SwarmFragment
+  }
+  memories {
+    ...MemoryFragment
+  }
 }
 
 fragment SwarmFragment on Swarm {
@@ -25,12 +31,12 @@ fragment SwarmFragment on Swarm {
   }
 }
 
-fragment SwarmMemoryFragment on SwarmMemory {
+fragment MemoryFragment on Memory {
   id
   title
 }
 
-fragment SwarmChatFragment on SwarmChat {
+fragment ChatFragment on Chat {
   id
   title
 }
@@ -43,4 +49,11 @@ fragment ActionNodeFragment on ActionNode {
 fragment MemoryNodeFragment on MemoryNode {
   id
   title
+}
+
+fragment ActionMetadataNodeFragment on ActionMetadataNode {
+  id
+  description
+  actionEnum
+  parentId
 }

@@ -1,32 +1,48 @@
+#  ___________________________________________________________
+# /                                                           \
+# |                                                           |
+# |                     TYPE SECTION STARTS                   |
+# |                                                           |
+# \___________________________________________________________/
+
 
 enum UserTypeEnum {
-  FREE_USER
+  USER
   ADMIN
+}
+
+enum ActionEnum {
+  FOLDER
+  PLAN
+  ROUTE_ACTION
+  CODE
+  SEARCH
+  REVIEW_GOAL_PROGRESS
 }
 
 type User {
   id: ID!
   type: UserTypeEnum!
   swarms: [Swarm]
-  memories: [SwarmMemory]
+  memories: [Memory]
 }
 
 type Swarm {
-  id: ID!
-  title: String!
+  id: ID
+  title: String
   goal: String
-  memory: SwarmMemory
-  chats: [SwarmChat]
+  memory: Memory
+  chats: [Chat]
   actions: [ActionNode]
   memories: [MemoryNode]
 }
 
-type SwarmMemory {
+type Memory {
   id: ID!
   title: String!
 }
 
-type SwarmChat {
+type Chat {
   id: ID!
   title: String!
 }
@@ -41,28 +57,67 @@ type MemoryNode {
   title: String!
 }
 
-input CreateSwarmMemoryInput {
+type ActionMetadataNode {
+  id: ID!
+  parentId: ID
+  description: String!
+  actionEnum: ActionEnum!
+}
+
+#  ___________________________________________________________
+# /                                                           \
+# |                                                           |
+# |                     TYPE SECTION ENDS                     |
+# |                                                           |
+# \___________________________________________________________/
+
+# ___________________________________________________________
+
+#  ___________________________________________________________
+# /                                                           \
+# |                                                           |
+# |                   QUERY SECTION STARTS                    |
+# |                                                           |
+# \___________________________________________________________/
+
+input CreateMemoryRequest {
   title: String!
 }
 
-input CreateSwarmInput {
+input CreateSwarmRequest {
   title: String!
   goal: String!
-  createMemory: CreateSwarmMemoryInput
-  existingMemoryId: ID
+  memoryId: ID!
 }
 
 type SwarmMutation {
-  createSwarm(input: CreateSwarmInput!): Swarm!
+  createSwarm(input: CreateSwarmRequest!): Swarm
 }
 
+type MemoryMutation {
+  createMemory(input: CreateMemoryRequest!): Memory
+}
+
+type ActionMetadataQuery {
+  getActionMetadata: [ActionMetadataNode]
+}
+
+#  ___________________________________________________________
+# /                                                           \
+# |                                                           |
+# |                     QUERY SECTION ENDS                    |
+# |                                                           |
+# \___________________________________________________________/
+
 type RootMutation {
-  swarm: SwarmMutation
+  swarmMutation: SwarmMutation
+  memoryMutation: MemoryMutation
 }
 
 type RootQuery {
   user: User
   swarm(id: ID!): Swarm
+  actionMetadata: ActionMetadataQuery
 }
 
 schema {

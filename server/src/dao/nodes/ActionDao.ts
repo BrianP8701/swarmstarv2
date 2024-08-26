@@ -1,6 +1,5 @@
 import { ActionNode, Prisma, PrismaClient, RouteActionContext, SearchContext, PlanContext } from '@prisma/client'
 import { inject, injectable } from 'inversify'
-import { generateId } from '../../utils/ids'
 import { AbstractNodeDao } from './AbstractNodeDao'
 
 export type ActionNodeWithContext = ActionNode & {
@@ -26,10 +25,9 @@ export class ActionDao extends AbstractNodeDao<ActionNode, PrismaClient['actionN
     })
   }
 
-  async create(swarmId: string, createInput: Omit<Prisma.ActionNodeCreateInput, 'id'>): Promise<ActionNode> {
-    const id = await generateId(Prisma.ModelName.ActionNode, swarmId)
+  async create(createInput: Prisma.ActionNodeCreateInput): Promise<ActionNode> {
     return this.prisma.actionNode.create({
-      data: { ...createInput, id },
+      data: createInput
     })
   }
 
