@@ -5,7 +5,12 @@ export const TreeNode: React.FC<CustomNodeElementProps> = ({ nodeDatum }) => {
     return (
         <g>
             <circle r="40" fill="lightblue" />
-            <text className='text-sm' dy="0.35em" textAnchor="middle">
+            <text 
+                className='text-xs text-thin font-sans' 
+                dy="0.35em" 
+                textAnchor="middle"
+                style={{ fontFamily: 'inherit' }}
+            >
                 {nodeDatum.name}
             </text>
         </g>

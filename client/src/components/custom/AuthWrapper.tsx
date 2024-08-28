@@ -9,7 +9,7 @@ export const IsAdminContext = createContext<boolean>(false)
 const AuthWrapper = () => {
 
   const { data: user } = useFetchUserQuery()
-  const isAdmin = user?.user?.type === UserTypeEnum.Admin
+  const isAdmin = user?.fetchUser?.type === UserTypeEnum.Admin
 
   return (
     <IsAdminContext.Provider value={isAdmin}>

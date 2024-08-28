@@ -14,7 +14,8 @@
     "lint": "eslint --config eslint.config.mjs",
     "knip": "knip",
     "db:seed": "ts-node src/cli/databaseSeed.ts",
-    "db:reset-and-seed": "ts-node src/cli/resetAndSeed.ts"
+    "db:reset-and-seed": "ts-node src/cli/resetAndSeed.ts",
+    "start:prod": "node dist/server.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
