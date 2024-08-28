@@ -19,10 +19,3 @@ export const formatActionEnum = (actionEnum: ActionEnum): GqlActionEnum => {
       throw new Error(`Unknown action enum: ${actionEnum}`)
   }
 }
-
-export const formatActionMetadataNode = (actionMetadataNode: ActionMetadataNode): GqlActionMetadataNode => {
-  return {
-    ...actionMetadataNode,
-    actionEnum: formatActionEnum(actionMetadataNode.actionEnum),
-  }
-}

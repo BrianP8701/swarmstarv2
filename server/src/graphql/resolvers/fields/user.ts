@@ -7,22 +7,19 @@ import { formatUserTypeEnum } from '../../formatters/userFormatters'
 import { formatMemory, formatSwarm } from '../../formatters/swarmFormatter'
 
 export const User: UserResolvers = {
-  type: async (_first, _second, { req }: ResolverContext) => {
-    console.log('req.user in type', req.user)
+  type: async (_, __, { req }: ResolverContext) => {
     assert(req.user?.id, 'User is not authenticated')
     const userDao = container.get(UserDao)
     const user = await userDao.get(req.user.id)
     return formatUserTypeEnum(user.type)
   },
-  swarms: async (_first, _second, { req }: ResolverContext) => {
-    console.log('req.user in swarms', req.user)
+  swarms: async (_, __, { req }: ResolverContext) => {
     assert(req.user?.id, 'User is not authenticated')
     const userDao = container.get(UserDao)
     const swarms = await userDao.getSwarms(req.user.id)
-    return swarms.map(formatSwarm)
+    return swarms
   },
-  memories: async (_first, _second, { req }: ResolverContext) => {
-    console.log('req.user in memories', req.user)
+  memories: async (_, __, { req }: ResolverContext) => {
     assert(req.user?.id, 'User is not authenticated')
     const userDao = container.get(UserDao)
     const memories = await userDao.getMemories(req.user.id)

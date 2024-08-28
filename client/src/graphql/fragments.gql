@@ -1,59 +1,44 @@
-fragment UserFragment on User {
+fragment User on User {
   id
   type
   swarms {
-    ...SwarmFragment
+    ...Swarm
   }
   memories {
-    ...MemoryFragment
+    ...Memory
   }
 }
 
-fragment SwarmFragment on Swarm {
-  id
-  title
-  goal
-  memory {
-    id
-    title
-  }
-  chats {
-    id
-    title
-  }
-  actions {
-    id
-    title
-  }
-  memories {
-    id
-    title
-  }
-}
-
-fragment MemoryFragment on Memory {
+fragment Swarm on Swarm {
   id
   title
 }
 
-fragment ChatFragment on Chat {
+fragment Memory on Memory {
   id
   title
 }
 
-fragment ActionNodeFragment on ActionNode {
+fragment Chat on Chat {
   id
   title
 }
 
-fragment MemoryNodeFragment on MemoryNode {
+fragment ActionNode on ActionNode {
   id
   title
-}
-
-fragment ActionMetadataNodeFragment on ActionMetadataNode {
-  id
-  description
-  actionEnum
   parentId
+}
+
+fragment MemoryNode on MemoryNode {
+  id
+  title
+  parentId
+}
+
+fragment ActionMetadataNode on ActionMetadataNode {
+  id
+  title
+  parentId
+  description
 }

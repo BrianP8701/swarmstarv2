@@ -11,7 +11,7 @@ export default [
       parser: tsParser,
       ecmaVersion: 12,
       sourceType: "module",
-      globals: globals.browser,
+      globals: globals.node
     },
     plugins: {
       "@typescript-eslint": tseslint,

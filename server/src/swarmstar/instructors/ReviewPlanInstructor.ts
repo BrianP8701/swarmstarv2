@@ -24,7 +24,7 @@ export class ReviewPlanInstructor extends AbstractInstructor<
     return [
       {
         role: InstructorMessageRoleEnum.USER,
-        content: `The steps are: ${JSON.stringify(steps)}. Please analyze if they must be executed in sequence.${context ? `\n\nContext: ${context}` : ''}`,
+        content: `Goal: ${goal}\n\nThe generated plan we want to review is: ${JSON.stringify(steps)}. Please analyze if they must be executed in sequence.${context ? `\n\nContext: ${context}` : ''}`,
       },
     ];
   }

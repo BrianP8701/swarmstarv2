@@ -23,18 +23,19 @@ enum ActionEnum {
 type User {
   id: ID!
   type: UserTypeEnum!
-  swarms: [Swarm]
-  memories: [Memory]
+  swarms: [Swarm!]!
+  memories: [Memory!]!
 }
 
 type Swarm {
-  id: ID
-  title: String
-  goal: String
+  id: ID!
+  title: String!
+  goal: String!
   memory: Memory
-  chats: [Chat]
-  actions: [ActionNode]
-  memories: [MemoryNode]
+  chats: [Chat!]
+  actions: [ActionNode!]
+  memories: [MemoryNode!]
+  actionMetadata: [ActionMetadataNode!]
 }
 
 type Memory {
@@ -50,18 +51,20 @@ type Chat {
 type ActionNode {
   id: ID!
   title: String!
+  parentId: ID
 }
 
 type MemoryNode {
   id: ID!
   title: String!
+  parentId: ID
 }
 
 type ActionMetadataNode {
   id: ID!
+  title: String!
   parentId: ID
   description: String!
-  actionEnum: ActionEnum!
 }
 
 #  ___________________________________________________________
@@ -115,9 +118,9 @@ type RootMutation {
 }
 
 type RootQuery {
-  user: User
-  swarm(id: ID!): Swarm
   actionMetadata: ActionMetadataQuery
+  fetchSwarm(id: ID!): Swarm
+  fetchUser: User
 }
 
 schema {

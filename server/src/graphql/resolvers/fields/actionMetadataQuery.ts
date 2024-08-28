@@ -3,7 +3,7 @@ import { ResolverContext } from '../../createApolloServer'
 import { ActionMetadataQueryResolvers } from '../../generated/graphql'
 import { GlobalContextDao } from '../../../dao/nodes/GlobalContextDao'
 import { ActionMetadataNodeDao } from '../../../dao/nodes/ActionMetadataDao'
-import { formatActionMetadataNode } from '../../formatters/actionFormatter'
+import { formatActionMetadataNode } from '../../formatters/swarmFormatter'
 
 export const ActionMetadataQuery: ActionMetadataQueryResolvers = {
   getActionMetadata: async (_, __, { req, container }: ResolverContext) => {

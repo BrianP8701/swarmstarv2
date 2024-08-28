@@ -1,5 +1,6 @@
 import { RootQuery } from './fields'
 import { ActionMetadataQuery } from './fields/actionMetadataQuery'
+import { Swarm } from './fields/swarm'
 import { User } from './fields/user'
 import { RootMutation } from './mutations'
 import { MemoryMutation } from './mutations/memoryMutation'
@@ -12,4 +13,5 @@ export const resolvers = {
   ActionMetadataQuery,
   SwarmMutation,
   MemoryMutation,
+  Swarm,
 }

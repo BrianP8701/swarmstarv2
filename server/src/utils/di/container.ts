@@ -6,6 +6,7 @@ import Stripe from 'stripe'
 import { ContextLogger, LoggerFactory } from '../logging/ContextLogger'
 import { logger } from '../logging/logger'
 import dotenv from 'dotenv'
+import { Prisma } from '@prisma/client'
 
 dotenv.config()
 
@@ -29,13 +30,13 @@ export const coreBindingsModule = new ContainerModule((bind: interfaces.Bind) =>
       { emit: 'event', level: 'error' },
     ],
   })
-  prismaClient.$on('info', (e: any) => {
+  prismaClient.$on('info', (e: Prisma.LogEvent) => {
     prismaLogger.info(e)
   })
-  prismaClient.$on('warn', (e: any) => {
+  prismaClient.$on('warn', (e: Prisma.LogEvent) => {
     prismaLogger.warn(e)
   })
-  prismaClient.$on('error', (e: any) => {
+  prismaClient.$on('error', (e: Prisma.LogEvent) => {
     prismaLogger.error(e)
   })
   bind(PrismaClient).toConstantValue(prismaClient)

@@ -1,13 +1,15 @@
 import 'reflect-metadata';
 import fs from 'fs/promises';
 import path from 'path';
-import { ActionMetadataNode, Prisma } from '@prisma/client';
+import { ActionEnum, ActionMetadataNode, Prisma } from '@prisma/client';
 import { container } from '../utils/di/container';
 import { ActionMetadataNodeDao } from '../dao/nodes/ActionMetadataDao';
 import { AbstractAction } from '../swarmstar/actions/AbstractAction';
 import { AbstractRouter } from '../swarmstar/actions/routers/AbstractRouter';
 import { GlobalContextDao } from '../dao/nodes/GlobalContextDao';
 import { SwarmDao } from '../dao/SwarmDao';
+
+const abstractActionClassStrings = ["AbstractAction", "AbstractRouter"]
 
 const ACTION_FOLDER_PATH = process.env.ACTION_FOLDER_PATH
 
@@ -46,7 +48,7 @@ async function processFolder(folderPath: string, swarmId: string, parentId: stri
 
   const metadata = JSON.parse(await fs.readFile(metadataPath, 'utf-8'));
   metadata.parentId = parentId;
-  metadata.actionEnum = 'FOLDER';
+  metadata.actionEnum = ActionEnum.FOLDER
   const node = await createActionMetadataNode(swarmId, metadata);
   const nodes = [node];
   const childrenRelationships: [ActionMetadataNode, ActionMetadataNode[]][] = [];
@@ -64,14 +66,15 @@ async function processFolder(folderPath: string, swarmId: string, parentId: stri
     } else if (item.endsWith('.ts')) {
       console.log(`Found TypeScript file: ${itemPath}`);
       const content = await fs.readFile(itemPath, 'utf-8');
-      if (content.includes('class') && (content.includes('extends AbstractAction') || content.includes('extends AbstractRouter'))) {
+      // if (content.includes('class') && (content.includes('extends AbstractAction') || content.includes('extends AbstractRouter'))) {
+      if (content.includes('class') && (abstractActionClassStrings.map(classString => content.includes(`extends ${classString}`)))) {
         const className = content.split('class ')[1].split('extends')[0].trim();
         console.log(`Found class: ${className} in ${itemPath}`);
         try {
           const cls = await loadClassFromFile(itemPath, className);
           console.log(`Loaded class: ${cls.name}`);
           if (isConcreteAction(cls) && !content.includes('abstract class')) {
-            console.log(`${className} is a concrete subclass of AbstractAction or AbstractRouter`);
+            console.log(`${className} is a concrete subclass of AbstractAction`);
             const actionNode = await createActionMetadataNode(swarmId, {
               parentId: node.id,
               description: cls.description,

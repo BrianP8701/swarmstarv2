@@ -6,6 +6,8 @@ interface ContextLoggerOptions {
   context: string
 }
 
+type LogMetadata = Record<string, unknown>
+
 @injectable()
 class ContextLogger {
   private options: ContextLoggerOptions
@@ -50,11 +52,11 @@ class ContextLogger {
     })
   }
 
-  info(message: string, metadata?: any) {
+  info(message: string, metadata?: LogMetadata) {
     this.logger.info(message, metadata)
   }
 
-  error(message: string, metadata?: any) {
+  error(message: string, metadata?: LogMetadata) {
     this.logger.error(message, metadata)
   }
 }

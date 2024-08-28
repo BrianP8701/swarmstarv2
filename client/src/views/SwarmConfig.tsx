@@ -9,7 +9,7 @@ export default function SwarmConfig() {
     { value: "Memory 2", label: "Memory 2" },
     { value: "Memory 3", label: "Memory 3" },
   ];
-  const [selectedMemory, setSelectedMemory] = useState<string | null>(null);
+  const [selectedMemory, setSelectedMemory] = useState<string | undefined>(undefined);
 
   const createMemory = () => {
 
@@ -30,6 +30,7 @@ export default function SwarmConfig() {
           options={memoryOptions}
           onSelect={setSelectedMemory}
           placeholder="Memory"
+          selectedValue={selectedMemory}
         />
       </div>
         <Textarea

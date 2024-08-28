@@ -1,4 +1,4 @@
-import { Chat, Memory, Prisma, PrismaClient, Swarm } from '@prisma/client'
+import { Chat, Memory, Prisma, PrismaClient, Swarm, User } from '@prisma/client'
 import { inject, injectable } from 'inversify'
 
 @injectable()
@@ -11,13 +11,20 @@ export class UserDao {
     })
   }
 
+  async getWithData(id: string): Promise<User & { swarms: Swarm[], memories: Memory[] }> {
+    return this.prisma.user.findUniqueOrThrow({
+      where: { id },
+      include: { swarms: true, memories: true },
+    })
+  }
+
   async create(userCreateInput: Prisma.UserCreateInput) {
     return this.prisma.user.create({
       data: userCreateInput,
     })
   }
 
-  async getSwarms(id: string): Promise<Swarm[]> {
+  async getSwarms(id: string): Promise<Swarm []> {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { id },
       select: { swarms: true },

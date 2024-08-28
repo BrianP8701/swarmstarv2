@@ -6,11 +6,10 @@ export const PopoverButton = React.forwardRef<
   HTMLButtonElement,
   {
     title?: string
-    selectedOptions: { label: string; value: string }[]
     togglePopover?: () => void
     className?: string
   }
->(({ title, selectedOptions, togglePopover, className }, ref) => (
+>(({ title, togglePopover, className }, ref) => (
   <Button
     className={className}
     ref={ref}

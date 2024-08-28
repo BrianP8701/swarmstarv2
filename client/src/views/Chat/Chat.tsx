@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ChatInput } from "./ChatInput";
 import { PanelRightOpen, PanelRightClose, Expand } from "lucide-react";
-import ChatSidebar from "@/views/ChatSidebar";
+import ChatSidebar from "@/views/Chat/ChatSidebar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 

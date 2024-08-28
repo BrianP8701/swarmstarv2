@@ -1,5 +1,7 @@
-import { useState, ReactElement } from "react";
+import { ReactElement } from "react";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Expand } from "lucide-react";
 
 interface DialogPreviewProps {
   previewComponent: ReactElement;
@@ -7,18 +9,24 @@ interface DialogPreviewProps {
 }
 
 export default function DialogPreview({ previewComponent, dialogContent }: DialogPreviewProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <div className="w-full h-full cursor-pointer">
-          {previewComponent}
-        </div>
-      </DialogTrigger>
-      <DialogContent className="w-[95vw] h-[95vh] max-w-[95vw]">
-        {dialogContent}
-      </DialogContent>
-    </Dialog>
+    <div className="relative w-full h-full">
+      <div className="w-full h-full">
+        {previewComponent}
+      </div>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button
+            className="absolute top-2 right-2 px-1 py-2 z-30"
+            variant="ghost"
+          >
+            <Expand size={20} />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="w-[95vw] h-[95vh] max-w-[95vw] p-0">
+          {dialogContent}
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

@@ -1,19 +1,44 @@
 query FetchUser {
-  user {
-    ...UserFragment
+  fetchUser {
+    ...User
   }
 }
 
 query FetchSwarm($id: ID!) {
-  swarm(id: $id) {
-    ...SwarmFragment
+  fetchSwarm(id: $id) {
+    ...Swarm
+    goal
+    memory {
+      id
+      title
+    }
+    chats {
+      id
+      title
+    }
+    actions {
+      id
+      title
+      parentId
+    }
+    memories {
+      id
+      title
+      parentId
+    }
+    actionMetadata {
+      id
+      title
+      parentId
+      description
+    }
   }
 }
 
 mutation CreateSwarm($input: CreateSwarmRequest!) {
   swarmMutation {
     createSwarm(input: $input) {
-      ...SwarmFragment
+      ...Swarm
     }
   }
 }
@@ -21,7 +46,7 @@ mutation CreateSwarm($input: CreateSwarmRequest!) {
 mutation CreateMemory($input: CreateMemoryRequest!) {
   memoryMutation {
     createMemory(input: $input) {
-      ...MemoryFragment
+      ...Memory
     }
   }
 }
@@ -29,7 +54,7 @@ mutation CreateMemory($input: CreateMemoryRequest!) {
 query FetchActionMetadata {
   actionMetadata {
     getActionMetadata {
-      ...ActionMetadataNodeFragment
+      ...ActionMetadataNode
     }
   }
 }

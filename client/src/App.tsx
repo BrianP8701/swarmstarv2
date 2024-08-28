@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-react';
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import './App.css';
-import NewHomePage from './views/HomePage';
+import HomePage from './views/HomePage';
 import { ApolloClientProvider } from "./providers/ApolloClientProvider";
 import MainLayout from "@/components/layouts/MainLayout";
 import AuthWrapper from "./components/custom/AuthWrapper";
@@ -15,7 +15,7 @@ const App = () => {
       <Providers>
         <Routes>
           <Route element={<AuthWrapper />}>
-            <Route element={<NewHomePage />} path='/' index />
+            <Route element={<HomePage />} path='/' index />
           </Route>
         </Routes>
       </Providers>

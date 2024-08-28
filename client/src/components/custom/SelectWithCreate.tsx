@@ -40,7 +40,6 @@ const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <PopoverButton
-          selectedOptions={options}
           title={placeholder}
           togglePopover={togglePopover}
           className={className}

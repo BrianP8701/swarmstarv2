@@ -1,7 +1,6 @@
 import { generateActionMetadataTree } from './generateActionMetadata';
 import { UserDao } from '../dao/UserDao';
 import { container } from '../utils/di/container';
-import { GlobalContextDao } from '../dao/nodes/GlobalContextDao';
 
 export async function seed() {
   // Generate action metadata
