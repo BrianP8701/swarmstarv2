@@ -43,7 +43,6 @@ export const Swarm: SwarmResolvers = {
   actionMetadata: async (parent) => {
     const swarmDao = container.get(SwarmDao)
     const swarm = await swarmDao.getWithActionMetadata(parent.id)
-    console.log(JSON.stringify(swarm.actionMetadataNodes, null, 2))
     return swarm.actionMetadataNodes.map(formatActionMetadataNode)
   },
 }

@@ -1,16 +1,20 @@
 import { GlobalContext, Prisma, PrismaClient } from '@prisma/client'
 import { inject, injectable } from 'inversify'
+import { SecretService } from '../../services/SecretService';
 
 @injectable()
 export class GlobalContextDao {
-  constructor(@inject(PrismaClient) private prisma: PrismaClient) { }
+  constructor(
+    @inject(PrismaClient) private prisma: PrismaClient,
+    @inject(SecretService) private secretService: SecretService
+  ) { }
 
   
 
   public async getDefaultSwarmId(): Promise<string> {
     const globalContext = await this.prisma.globalContext.findUniqueOrThrow({
       where: {
-        id: process.env.GLOBAL_CONTEXT_ID,
+        id: this.secretService.getGlobalContextId(),
       },
     })
     return globalContext.defaultSwarmId

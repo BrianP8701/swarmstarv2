@@ -3,13 +3,26 @@ import { inject, injectable } from 'inversify'
 import { AbstractNodeDao } from './AbstractNodeDao'
 
 @injectable()
-export class MemoryDao extends AbstractNodeDao<MemoryNode, PrismaClient['memoryNode']> {
+export class MemoryDao extends AbstractNodeDao<MemoryNode, MemoryNode> {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
     super(prisma);
   }
 
-  get model() {
-    return this.prisma.memoryNode;
+  async exists(id: string): Promise<boolean> {
+    const node = await this.prisma.memoryNode.findUnique({ where: { id } });
+    return node !== null;
+  }
+
+  async getChildren(nodeId: string): Promise<MemoryNode[]> {
+    return this.prisma.memoryNode.findMany({ where: { parentId: nodeId } });
+  }
+
+  async getParent(nodeId: string): Promise<MemoryNode | null> {
+    const node = await this.prisma.memoryNode.findUnique({
+      where: { id: nodeId },
+      include: { parent: true }
+    });
+    return node?.parent || null;
   }
 
   public async createMemory(userId: string, title: string): Promise<Memory> {

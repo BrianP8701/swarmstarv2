@@ -1,13 +1,16 @@
 import { generateActionMetadataTree } from './generateActionMetadata';
 import { UserDao } from '../dao/UserDao';
 import { container } from '../utils/di/container';
+import { logger } from '../utils/logging/logger';
+import { SecretService } from '../services/SecretService';
 
 export async function seed() {
   // Generate action metadata
 
   // Create user with specific ID
   const userDao = container.get(UserDao);
-  const userId = process.env.SEED_USER_ID;
+  const secretService = container.get(SecretService);
+  const userId = secretService.getSeedUserId();
 
   if (!userId) {
     throw new Error('SEED_USER_ID environment variable is not set');
@@ -19,10 +22,10 @@ export async function seed() {
 
   await generateActionMetadataTree(user.id);
 
-  console.log(`Created seed user with ID: ${user.id}`);
+  logger.info(`Created seed user with ID: ${user.id}`);
 }
 
 // Add this for CLI execution
 if (require.main === module) {
-  seed().catch(console.error);
+  seed().catch(logger.error);
 }

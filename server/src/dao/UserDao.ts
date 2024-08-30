@@ -1,4 +1,4 @@
-import { Chat, Memory, Prisma, PrismaClient, Swarm, User } from '@prisma/client'
+import { Memory, Prisma, PrismaClient, Swarm, User } from '@prisma/client'
 import { inject, injectable } from 'inversify'
 
 @injectable()

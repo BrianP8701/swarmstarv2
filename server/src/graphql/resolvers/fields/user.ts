@@ -4,7 +4,7 @@ import { ResolverContext } from '../../createApolloServer'
 import { UserDao } from '../../../dao/UserDao'
 import { container } from '../../../utils/di/container'
 import { formatUserTypeEnum } from '../../formatters/userFormatters'
-import { formatMemory, formatSwarm } from '../../formatters/swarmFormatter'
+import { formatMemory } from '../../formatters/swarmFormatter'
 
 export const User: UserResolvers = {
   type: async (_, __, { req }: ResolverContext) => {

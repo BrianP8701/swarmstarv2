@@ -7,14 +7,14 @@ import { formatUserTypeEnum } from '../../formatters/userFormatters'
 import { RootQueryResolvers } from '../../generated/graphql'
 
 export const RootQuery: RootQueryResolvers = {
-  actionMetadata: async (_, __) => {
+  actionMetadata: async () => {
     return {}
   },
-  fetchSwarm: async (_, { id }) => {
+  fetchSwarm: async (_parent, { id }) => {
     const swarmDao = container.get(SwarmDao)
     return swarmDao.getBasic(id)
   },
-  fetchUser: async (_, __, { req, container }: ResolverContext) => {
+  fetchUser: async (_parent, _args, { req, container }: ResolverContext) => {
     const userDao = container.get(UserDao)
     assert(req.user, 'User is not logged in')
     const user = await userDao.getWithData(req.user.id)

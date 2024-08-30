@@ -1,4 +1,0 @@
-Stripe
-OpenAI
-Clerk
-Svix

@@ -2,11 +2,11 @@ import { Container, ContainerModule, interfaces } from 'inversify'
 import { PubSub } from '@google-cloud/pubsub'
 import { PrismaClient } from '@prisma/client'
 import OpenAI from 'openai'
-import Stripe from 'stripe'
 import { ContextLogger, LoggerFactory } from '../logging/ContextLogger'
 import { logger } from '../logging/logger'
 import dotenv from 'dotenv'
 import { Prisma } from '@prisma/client'
+import { SecretService } from '../../services/SecretService'
 
 dotenv.config()
 
@@ -22,6 +22,9 @@ export const TYPES = {
 }
 
 export const coreBindingsModule = new ContainerModule((bind: interfaces.Bind) => {
+  const secretService = new SecretService()
+  bind(SecretService).toConstantValue(secretService)
+
   const prismaLogger = logger.child({ module: 'PrismaClient' })
   const prismaClient = new PrismaClient({
     log: [
@@ -42,8 +45,7 @@ export const coreBindingsModule = new ContainerModule((bind: interfaces.Bind) =>
   bind(PrismaClient).toConstantValue(prismaClient)
 
   bind(PubSub).toConstantValue(new PubSub())
-  bind(Stripe).toConstantValue(new Stripe(process.env.STRIPE_KEY!, { apiVersion: '2024-06-20' }))
-  bind(OpenAI).toConstantValue(new OpenAI({ apiKey: process.env.OPENAI_API_KEY }))
+  bind(OpenAI).toConstantValue(new OpenAI({ apiKey: secretService.getOpenAIKey() }))
 
   bind<LoggerFactory>(TYPES.LoggerFactory).to(LoggerFactory).inSingletonScope()
   bind<ContextLogger>(TYPES.Logger).toDynamicValue(ctx => {

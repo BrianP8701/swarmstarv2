@@ -9,13 +9,9 @@ export type ActionNodeWithContext = ActionNode & {
 }
 
 @injectable()
-export class ActionDao extends AbstractNodeDao<ActionNode, PrismaClient['actionNode']> {
+export class ActionDao extends AbstractNodeDao<ActionNode, ActionNode> {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
     super(prisma);
-  }
-
-  get model() {
-    return this.prisma.actionNode;
   }
 
   async log(actionId: string, messages: string[]) {
@@ -36,5 +32,22 @@ export class ActionDao extends AbstractNodeDao<ActionNode, PrismaClient['actionN
       where: { id: actionId },
       data: actionUpdateInput,
     })
+  }
+
+  async exists(id: string): Promise<boolean> {
+    const node = await this.prisma.actionNode.findUnique({ where: { id } });
+    return node !== null;
+  }
+
+  async getChildren(nodeId: string): Promise<ActionNode[]> {
+    return this.prisma.actionNode.findMany({ where: { parentId: nodeId } });
+  }
+
+  async getParent(nodeId: string): Promise<ActionNode | null> {
+    const node = await this.prisma.actionNode.findUnique({
+      where: { id: nodeId },
+      include: { parent: true }
+    });
+    return node?.parent || null;
   }
 }

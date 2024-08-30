@@ -3,13 +3,9 @@ import { inject, injectable } from 'inversify'
 import { AbstractNodeDao } from './AbstractNodeDao'
 
 @injectable()
-export class ActionMetadataNodeDao extends AbstractNodeDao<ActionMetadataNode, PrismaClient['actionMetadataNode']> {
+export class ActionMetadataNodeDao extends AbstractNodeDao<ActionMetadataNode, ActionMetadataNode> {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
     super(prisma);
-  }
-
-  get model() {
-    return this.prisma.actionMetadataNode;
   }
 
   async get(id: string): Promise<ActionMetadataNode> {
@@ -36,5 +32,22 @@ export class ActionMetadataNodeDao extends AbstractNodeDao<ActionMetadataNode, P
         swarmId,
       },
     })
+  }
+
+  async exists(id: string): Promise<boolean> {
+    const node = await this.prisma.actionMetadataNode.findUnique({ where: { id } });
+    return node !== null;
+  }
+
+  async getChildren(nodeId: string): Promise<ActionMetadataNode[]> {
+    return this.prisma.actionMetadataNode.findMany({ where: { parentId: nodeId } });
+  }
+
+  async getParent(nodeId: string): Promise<ActionMetadataNode | null> {
+    const node = await this.prisma.actionMetadataNode.findUnique({
+      where: { id: nodeId },
+      include: { parent: true }
+    });
+    return node?.parent || null;
   }
 }

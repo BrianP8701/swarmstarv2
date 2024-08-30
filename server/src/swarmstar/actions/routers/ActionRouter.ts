@@ -3,9 +3,14 @@ import { AbstractRouter, RouterStatusEnum } from './AbstractRouter';
 import { ActionEnum, ActionMetadataNode, RouteActionContext } from '@prisma/client';
 import { ActionMetadataNodeDao } from '../../../dao/nodes/ActionMetadataDao';
 import { ActionNodeWithContext } from '../../../dao/nodes/ActionDao';
+import { container } from '../../../utils/di/container';
 
 @injectable()
-export class ActionRouter extends AbstractRouter<ActionMetadataNode, ActionMetadataNodeDao, RouteActionContext> {
+export class ActionRouter extends AbstractRouter<
+  ActionMetadataNode,
+  ActionMetadataNodeDao,
+  RouteActionContext
+> {
   static readonly description = "Find the most appropriate action based on the current context and goal.";
   static readonly actionEnum = ActionEnum.ROUTE_ACTION;
 
@@ -14,10 +19,12 @@ export class ActionRouter extends AbstractRouter<ActionMetadataNode, ActionMetad
 
   static systemPrompt = "You are an AI assistant helping to navigate through a tree of actions. Choose the most appropriate action based on the current context and goal.";
 
-  constructor(
-    @inject('ActionNode') actionNode: ActionNodeWithContext
-  ) {
-    super(actionNode, ActionMetadataNodeDao);
+  constructor(@inject('ActionNode') actionNode: ActionNodeWithContext) {
+    super(actionNode);
+  }
+
+  protected getNodeDao(): ActionMetadataNodeDao {
+    return container.get(ActionMetadataNodeDao);
   }
 
   protected getContext(): RouteActionContext {

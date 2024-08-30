@@ -1,18 +1,18 @@
 # https://cloud.google.com/sql/docs/mysql/connect-build
 steps:
   # ----------------- Decrypting JSON ENV file -----------------
-  - id: 'decrypt-client-env-var'
+  - id: 'decrypt-swarmstar-secrets'
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        gcloud secrets versions access latest --secret=$_ENV_SECRET_NAME > /workspace/client_env.json
+        gcloud secrets versions access latest --secret=$_ENV_SECRET_NAME > /workspace/swarmstar-secrets.json
 
   # ----------------- Build App Docker Image -----------------
   # Need to build app at root directory due to schema.gql being in ./server
   # This step creates the .env file for the production react app build
-  - id: 'create-client-env-file'
+  - id: 'create-swarmstar-secrets-file'
     name: 'gcr.io/cloud-builders/docker'
     dir: './client'
     entrypoint: '/bin/bash'
@@ -20,10 +20,7 @@ steps:
       - '-c'
       - |
         apt-get update && apt-get install -y jq
-        echo VITE_REACT_APP_GRAPHQL_URL=\"$(jq -r '."_REACT_APP_GRAPHQL_URL"' /workspace/client_env.json)\">> .env
-        echo VITE_REACT_APP_CLERK_PUBLISHABLE_KEY=\"$(jq -r '."_REACT_APP_CLERK_PUBLISHABLE_KEY"' /workspace/client_env.json)\">> .env
-        echo VITE_REACT_APP_STRIPE_PUB_KEY=\"$(jq -r '."_REACT_APP_STRIPE_PUB_KEY"' /workspace/client_env.json)\">> .env
-        echo VITE_REACT_APP_GOOGLE_MAPS_API_KEY=\"$(jq -r '."_REACT_APP_GOOGLE_MAPS_API_KEY"' /workspace/client_env.json)\">> .env
+        echo VITE_CLERK_PUBLISHABLE_KEY=\"$(jq -r '."VITE_CLERK_PUBLISHABLE_KEY"' /workspace/swarmstar-secrets.json)\">> .env
         cat .env
 
   - id: 'build-client-docker-image'
@@ -50,7 +47,7 @@ steps:
 images: ['gcr.io/$PROJECT_ID/client-image:$COMMIT_SHA']
 
 substitutions:
-  _ENV_SECRET_NAME: client-env-var
+  _ENV_SECRET_NAME: swarmstar-secrets
   _CLOUD_RUN_SERVICE_NAME: client
 
 options:

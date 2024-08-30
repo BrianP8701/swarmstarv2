@@ -6,11 +6,11 @@ import { AbstractNodeDao } from '../../../dao/nodes/AbstractNodeDao';
 import { ActionNodeWithContext } from '../../../dao/nodes/ActionDao';
 
 export enum RouterStatusEnum {
-    SEARCHING,
-    NO_VIABLE_OPTIONS,
-    NO_CHILDREN,
-    SUCCESS,
-    FAILURE
+  SEARCHING,
+  NO_VIABLE_OPTIONS,
+  NO_CHILDREN,
+  SUCCESS,
+  FAILURE
 }
 
 type RouterContext = ActionContext & {
@@ -25,20 +25,25 @@ interface RouterNode {
 }
 
 @injectable()
-export abstract class AbstractRouter<T extends RouterNode, D extends AbstractNodeDao<T, any>, C extends RouterContext> extends AbstractAction<C> {
+export abstract class AbstractRouter<
+  T extends RouterNode,
+  D extends AbstractNodeDao<T, T>,
+  C extends RouterContext
+> extends AbstractAction<C> {
   protected routerInstructor: RouterInstructor;
   protected nodeDao: D;
 
-  static systemPrompt: string;
+  static get systemPrompt(): string {
+    throw new Error('systemPrompt must be implemented in derived class');
+  }
 
-  constructor(
-    actionNode: ActionNodeWithContext,
-    NodeDaoClass: new (...args: any[]) => D
-  ) {
+  constructor(actionNode: ActionNodeWithContext) {
     super(actionNode);
     this.routerInstructor = container.get(RouterInstructor);
-    this.nodeDao = container.get(NodeDaoClass);
+    this.nodeDao = this.getNodeDao();
   }
+
+  protected abstract getNodeDao(): D;
 
   abstract getStartNode(): Promise<T>;
   abstract handleNoChildren(node: T): Promise<[RouterStatusEnum, T]>;
@@ -96,7 +101,7 @@ export abstract class AbstractRouter<T extends RouterNode, D extends AbstractNod
       {
         options: viableChildren.map(child => child.description),
         content: this.context.content,
-        systemMessage: (this.constructor as typeof AbstractRouter<T, D, C>).systemPrompt,
+        systemMessage: (this.constructor as unknown as typeof AbstractRouter<T, D, C>).systemPrompt,
       },
       this.actionNode.id
     );
@@ -124,7 +129,7 @@ export abstract class AbstractRouter<T extends RouterNode, D extends AbstractNod
     while (true) {
       const parentNode = await this.nodeDao.getParent(node.id);
       if (parentNode) {
-        node = parentNode;
+        node = parentNode as T; // Type assertion needed here
         this.context.markedNodeIds.push(node.id);
         const children = await this.nodeDao.getChildren(node.id);
         const filteredChildren = this.removeUnviableNodes(children);

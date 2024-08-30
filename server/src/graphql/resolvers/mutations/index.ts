@@ -1,10 +1,10 @@
 import { RootMutationResolvers } from "../../generated/graphql";
 
 export const RootMutation: RootMutationResolvers = {
-  memoryMutation: async (_, __) => {
+  memoryMutation: async () => {
     return {}
   },
-  swarmMutation: async (_, __) => {
+  swarmMutation: async () => {
     return {}
   },
 }
