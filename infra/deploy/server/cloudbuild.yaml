@@ -65,7 +65,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - '$_CLOUD_RUN_SERVICE_NAME'
+      - '$_SERVICE_NAME'
       - '--image'
       - 'gcr.io/$PROJECT_ID/server-image:$COMMIT_SHA'
       - '--region'
@@ -74,13 +74,6 @@ steps:
       - 'NODE_ENV=$_NODE_ENV'
 
 images: ['gcr.io/$PROJECT_ID/server-image:$COMMIT_SHA']
-
-substitutions:
-  _ENV_SECRET_NAME: swarmstar-secrets
-  _SERVER_CONFIG_FILE_NAME: secrets.json
-  _CLOUD_RUN_SERVICE_NAME: server
-  _IMAGE_NAME: gcr.io/${PROJECT_ID}/sql-proxy
-  _NODE_ENV: production
 
 options:
   logging: CLOUD_LOGGING_ONLY
