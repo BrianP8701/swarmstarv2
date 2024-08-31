@@ -1,85 +1,86 @@
 # https://cloud.google.com/sql/docs/mysql/connect-build
 steps:
   # ----------------- Decrypting JSON ENV file -----------------
-  - id: "decrypt-swarmstar-secrets"
-    name: "gcr.io/cloud-builders/gcloud"
-    entrypoint: "bash"
+  - id: 'decrypt-swarmstar-secrets'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
     args:
-      - "-c"
+      - '-c'
       - |
-        gcloud secrets versions access latest --secret="$_ENV_SECRET_NAME" > /workspace/swarmstar-secrets.json
-        echo "Contents of swarmstar-secrets.json:"
-        cat /workspace/swarmstar-secrets.json
+        gcloud secrets versions access latest --secret=$_ENV_SECRET_NAME > /workspace/secrets.json
 
   # ----------------- Build Server Docker Image -----------------
-  - id: "create-server-env-file"
-    name: "gcr.io/cloud-builders/docker"
-    dir: "./server"
-    entrypoint: "/bin/bash"
+  - id: 'create-server-env-file'
+    name: 'gcr.io/cloud-builders/docker'
+    dir: './server'
+    entrypoint: '/bin/bash'
     args:
-      - "-c"
+      - '-c'
       - |
         apt-get update && apt-get install -y jq
-        cp /workspace/swarmstar-secrets.json secrets.json
-        echo "Contents of secrets.json:"
-        cat secrets.json
-        echo "SQL_INSTANCE_CONNECTION_NAME=$_SQL_INSTANCE_CONNECTION_NAME" >> .env
-        echo "DATABASE_URL=$(jq -r '.DATABASE_URL' secrets.json)" >> .env
-        echo "CLERK_SECRET_KEY=$(jq -r '.CLERK_SECRET_KEY' secrets.json)" >> .env
-        echo "Contents of .env file:"
+        cp /workspace/secrets.json $_SERVER_CONFIG_FILE_NAME
+        echo SQL_INSTANCE_CONNECTION_NAME=\"$(jq -r '.SQL_INSTANCE_CONNECTION_NAME' $_SERVER_CONFIG_FILE_NAME)\">> .env
+        echo DATABASE_URL=\"$(jq -r '.DATABASE_URL' $_SERVER_CONFIG_FILE_NAME)\">> .env
+        echo CLERK_SECRET_KEY=\"$(jq -r '.CLERK_SECRET_KEY' $_SERVER_CONFIG_FILE_NAME)\">> .env
         cat .env
-  - id: "build-server-docker-image"
-    name: "gcr.io/cloud-builders/docker"
-    args:
-      ["build", "-t", "gcr.io/$PROJECT_ID/server-image:$COMMIT_SHA", "./server"]
-  - id: "push-server-docker-image"
-    name: "gcr.io/cloud-builders/docker"
-    args: ["push", "gcr.io/$PROJECT_ID/server-image:$COMMIT_SHA"]
+
+  - id: 'build-server-docker-image'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/server-image:$COMMIT_SHA', './server']
+
+  - id: 'push-server-docker-image'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/server-image:$COMMIT_SHA']
+
   # ----------------- Build Sql Proxy Layer-----------------
   # Generate dockerfile that copies "Cloud SQL Auth proxy binary" and build
-  - id: "build-sql-auth-proxy-image"
-    name: "gcr.io/cloud-builders/docker"
-    entrypoint: "/bin/bash"
+  - id: 'build-sql-auth-proxy-image'
+    name: 'gcr.io/cloud-builders/docker'
+    entrypoint: '/bin/bash'
     args:
-      - "-c"
+      - '-c'
       - |
         echo "FROM gcr.io/$PROJECT_ID/server-image:$COMMIT_SHA
         COPY --from=gcr.io/cloudsql-docker/gce-proxy /cloud_sql_proxy /cloudsql/cloud_sql_proxy" > Dockerfile-proxy;
         docker build -f Dockerfile-proxy -t ${_IMAGE_NAME}-proxy .
+
   # Starts the Cloud SQL Auth proxy and run migration
-  - id: "migrate-socket-and-migrate-db"
-    name: "${_IMAGE_NAME}-proxy"
-    dir: "./server"
-    entrypoint: "/bin/bash"
+  - id: 'migrate-socket-and-migrate-db'
+    name: '${_IMAGE_NAME}-proxy'
+    dir: './server'
+    entrypoint: '/bin/bash'
     args:
-      - "-c"
+      - '-c'
       - |
         set -a
         source .env
         set +a
         /cloudsql/cloud_sql_proxy -instances=$$SQL_INSTANCE_CONNECTION_NAME -dir=/cloudsql & sleep 2;
         npx prisma migrate deploy
+
   # ----------------- Deploying Server Docker Image to Cloud Run Service -----------------
-  - id: "deploy-server-docker-image"
-    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+  - id: 'deploy-server-docker-image'
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
-      - "run"
-      - "deploy"
-      - "$_CLOUD_RUN_SERVICE_NAME"
-      - "--image"
-      - "gcr.io/$PROJECT_ID/server-image:$COMMIT_SHA"
-      - "--region"
-      - "us-central1"
-      - "--set-env-vars"
-      - 'NODE_ENV=$_NODE_ENV,SQL_INSTANCE_CONNECTION_NAME=$_SQL_INSTANCE_CONNECTION_NAME'
-images: ["gcr.io/$PROJECT_ID/server-image:$COMMIT_SHA"]
+      - 'run'
+      - 'deploy'
+      - '$_CLOUD_RUN_SERVICE_NAME'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/server-image:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--set-env-vars'
+      - 'NODE_ENV=$_NODE_ENV'
+
+images: ['gcr.io/$PROJECT_ID/server-image:$COMMIT_SHA']
+
 substitutions:
   _ENV_SECRET_NAME: swarmstar-secrets
+  _SERVER_CONFIG_FILE_NAME: secrets.json
   _CLOUD_RUN_SERVICE_NAME: server
   _IMAGE_NAME: gcr.io/${PROJECT_ID}/sql-proxy
   _NODE_ENV: production
-  _SQL_INSTANCE_CONNECTION_NAME: swarmstar:us-central1:swarmstarv2
 
 options:
   logging: CLOUD_LOGGING_ONLY
