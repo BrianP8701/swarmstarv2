@@ -8,6 +8,6 @@ RUN yarn lint
 RUN yarn generate
 RUN yarn build
 
-ENV PORT=8080
+EXPOSE 5001
 
-CMD ["sh", "-c", "yarn start:prod --port $PORT"]
+CMD ["yarn", "start:prod"]
