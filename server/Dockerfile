@@ -1,3 +1,5 @@
+# NOTE: docker build -t server_app -f Dockerfile .
+
 FROM node:18
 
 WORKDIR /usr/src/app
