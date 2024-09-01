@@ -61,19 +61,19 @@ export default function Chat() {
           <ChatInput />
         </div>
       </div>
-      <Button
-        className="absolute top-2 right-2 px-1 py-2 z-30"
-        variant="ghost"
-      >
-        <Dialog>
-          <DialogTrigger>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button
+            className="absolute top-2 right-2 px-1 py-2 z-30"
+            variant="ghost"
+          >
             <Expand size={20} />
-          </DialogTrigger>
-          <DialogContent className="w-[95vw] h-[95vh] max-w-full p-0 bg-secondary">
-            <ExpandedChat chats={chats} onChatChange={handleChatChange} />
-          </DialogContent>
-        </Dialog>
-      </Button>
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="w-[95vw] h-[95vh] max-w-full p-0 bg-secondary">
+          <ExpandedChat chats={chats} onChatChange={handleChatChange} />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -27,6 +27,12 @@ const clerkAuth = ClerkExpressWithAuth({})
 
 const PORT = process.env.PORT || 8080
 
+// Add CORS middleware before other middleware
+app.use(cors({
+  origin: CORS_WHITELIST,
+  credentials: true,
+}))
+
 // Middleware
 app.use(express.json())
 app.use(clerkAuth)
@@ -45,7 +51,6 @@ const startServer = async () => {
 
   app.use(
     '/graphql',
-    cors<cors.CorsRequest>({ origin: CORS_WHITELIST, credentials: true }),
     expressMiddleware(apolloServer, {
       context: async ({ req }): Promise<ResolverContext> => {
         return {

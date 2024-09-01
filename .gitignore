@@ -12,3 +12,4 @@ private/
 server/secrets.json
 
 **/dist/
+**/yarn.lock

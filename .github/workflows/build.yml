@@ -1,0 +1,24 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js 18
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+
+    - name: Check lint and build
+      run: echo "::remove-matcher owner=eslint-compact::" &&
+        echo "::remove-matcher owner=eslint-stylish::" &&
+        cd server && yarn install && yarn lint && yarn generate && yarn build && cd ../client && yarn install && yarn generate && yarn build
