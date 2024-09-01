@@ -15,7 +15,6 @@ export function CreateSwarmDialog({ open, onOpenChange }: { open: boolean; onOpe
           <Button className="max-w-[100px]">Spawn</Button>
         </div>
       </DialogContent>
-
     </Dialog>
   );
 }

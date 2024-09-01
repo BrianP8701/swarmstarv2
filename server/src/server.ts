@@ -11,14 +11,7 @@ import { container } from './utils/di/container'
 import { ResolverContext, createApolloServer } from './graphql/createApolloServer'
 import { checkAuthenticated } from './utils/auth/auth'
 import { TraceContext } from './utils/logging/TraceContext'
-
-dotenv.config()
-
-// const CORS_WHITELIST = [
-//   'http://localhost:5173',
-//   'https://studio.apollographql.com',
-//   'https://swarmstar.ai',
-// ]
+import { logger } from './utils/logging/logger' // Add this import if not already present
 
 dotenv.config()
 const app = express()
@@ -27,9 +20,23 @@ const clerkAuth = ClerkExpressWithAuth({})
 
 const PORT = process.env.PORT || 8080
 
-// Add CORS middleware before other middleware
+const CORS_WHITELIST = [
+  'http://localhost:5173',
+  'https://studio.apollographql.com',
+  'https://swarmstar.ai',
+  'https://www.swarmstar.ai'
+]
+
 app.use(cors({
-  origin: '*',
+  origin: (origin, callback) => {
+    logger.info(`Incoming request from origin: ${origin}`)
+    if (!origin || CORS_WHITELIST.includes(origin)) {
+      callback(null, true)
+    } else {
+      logger.warn(`Origin not allowed by CORS: ${origin}`)
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true,
 }))
 
@@ -38,6 +45,13 @@ app.use(express.json())
 app.use(clerkAuth)
 app.use(checkAuthenticated)
 app.use(TraceContext.expressMiddleware())
+
+// Add this after all middleware
+app.use((req, res, next) => {
+  logger.info(`Request headers: ${JSON.stringify(req.headers)}`)
+  logger.info(`Response headers: ${JSON.stringify(res.getHeaders())}`)
+  next()
+})
 
 // Paths setup
 app.get('/', (_req, res) => {
