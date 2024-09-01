@@ -14,11 +14,11 @@ import { TraceContext } from './utils/logging/TraceContext'
 
 dotenv.config()
 
-const CORS_WHITELIST = [
-  'http://localhost:5173',
-  'https://studio.apollographql.com',
-  'https://swarmstar.ai',
-]
+// const CORS_WHITELIST = [
+//   'http://localhost:5173',
+//   'https://studio.apollographql.com',
+//   'https://swarmstar.ai',
+// ]
 
 dotenv.config()
 const app = express()
