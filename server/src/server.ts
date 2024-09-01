@@ -29,7 +29,7 @@ const PORT = process.env.PORT || 8080
 
 // Add CORS middleware before other middleware
 app.use(cors({
-  origin: CORS_WHITELIST,
+  origin: '*',
   credentials: true,
 }))
 
