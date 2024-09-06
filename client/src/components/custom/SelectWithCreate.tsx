@@ -13,6 +13,7 @@ interface SelectWithCreateProps {
   className?: string;
   placeholder: string;
   selectedValue?: string;
+  emptyMessage?: string;
 }
 
 const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
@@ -22,6 +23,7 @@ const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
   className,
   placeholder,
   selectedValue,
+  emptyMessage,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -40,7 +42,7 @@ const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <PopoverButton
-          title={placeholder}
+          title={options.find(option => option.value === selectedValue)?.label ?? placeholder}
           togglePopover={togglePopover}
           className={className}
         />
@@ -49,7 +51,7 @@ const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
         <Command>
           <CommandInput placeholder="Search" create={create} />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>{emptyMessage ?? 'No results found'}</CommandEmpty>
             <CommandGroup>
               {options.map(option => (
                 <CommandItem

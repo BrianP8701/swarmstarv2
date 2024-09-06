@@ -99,11 +99,11 @@ input CreateSwarmRequest {
 }
 
 type SwarmMutation {
-  createSwarm(input: CreateSwarmRequest!): Swarm
+  createSwarm(input: CreateSwarmRequest!): User
 }
 
 type MemoryMutation {
-  createMemory(input: CreateMemoryRequest!): Memory
+  createMemory(input: CreateMemoryRequest!): User
 }
 
 type ActionMetadataQuery {
