@@ -1,6 +1,5 @@
 import { MemoryResolvers } from '../../generated/graphql'
 import { container } from '../../../utils/di/container'
-import { SwarmDao } from '../../../dao/SwarmDao'
 import {
   formatMemoryNode,
 } from '../../formatters/swarmFormatter'
