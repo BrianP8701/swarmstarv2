@@ -1,7 +1,5 @@
 import assert from 'assert'
-import { SwarmDao } from '../../../dao/SwarmDao'
 import { UserDao } from '../../../dao/UserDao'
-import { container } from '../../../utils/di/container'
 import { ResolverContext } from '../../createApolloServer'
 import { formatUserTypeEnum } from '../../formatters/userFormatters'
 import { RootQueryResolvers } from '../../generated/graphql'
@@ -11,8 +9,10 @@ export const RootQuery: RootQueryResolvers = {
     return {}
   },
   fetchSwarm: async (_parent, { id }) => {
-    const swarmDao = container.get(SwarmDao)
-    return swarmDao.getBasic(id)
+    return { id }
+  },
+  fetchMemory: async (_parent, { id }) => {
+    return { id }
   },
   fetchUser: async (_parent, _args, { req, container }: ResolverContext) => {
     const userDao = container.get(UserDao)

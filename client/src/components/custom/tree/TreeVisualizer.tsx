@@ -4,14 +4,14 @@ import { TreeNode } from './TreeNode';
 
 export type TreeNode = {
     id: string
-    title: string
+    title?: string | null
     parentId?: string | null
 }
 
 interface CustomNodeDatum extends RawNodeDatum {
     id: string;
-    title: string;
-    parentId?: string | null;
+    title?: string | null
+    parentId?: string | null
 }
 
 interface TreeVisualizerProps {
@@ -24,7 +24,7 @@ export const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes }) => {
 
         // Create CustomNodeDatum objects for each node
         nodes.forEach(node => {
-            nodeMap.set(node.id, { ...node, name: node.title, children: [] });
+            nodeMap.set(node.id, { ...node, name: node.title ?? 'Untitled Node', children: [] });
         });
 
         // Build the tree structure
