@@ -13,6 +13,8 @@ export default function SwarmConfig() {
 
   }
 
+  const memories = user?.memories ?? [];
+
   return (
     <div className="grid w-full items-start h-full overflow-auto gap-6 p-2 mt-4">
       <div className="grid grid-cols-2 gap-6">
@@ -25,7 +27,7 @@ export default function SwarmConfig() {
           className="hover:bg-muted/50 text-sm h-9"
           create={createMemory}
           createMessage="Create"
-          options={user?.memories.map(memory => ({ value: memory.id, label: memory.title })) ?? []}
+          options={memories.map(memory => ({ value: memory.id, label: memory.title ?? 'Untitled Memory' })) ?? []}
           onSelect={setSelectedMemory}
           placeholder="Memory"
           selectedValue={selectedMemory}

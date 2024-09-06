@@ -36,6 +36,9 @@ export default function HomePage() {
     }
   }, [swarmData]);
 
+  const swarms = user?.swarms ?? [];
+  const actionMetadataNodes = swarm?.fetchSwarm?.data?.actionMetadataNodes ?? [];
+
   return (
     <div className="flex flex-col h-full">
       <header className="sticky top-0 h-15 flex items-center">
@@ -43,7 +46,7 @@ export default function HomePage() {
           className="border-none text-lg hover:bg-muted/50"
           create={openCreateSwarmDialog}
           createMessage="Create"
-          options={user?.swarms.map(swarm => ({ value: swarm.id, label: swarm.title })) ?? []}
+          options={swarms.map(swarm => ({ value: swarm.id, label: swarm.title ?? 'Untitled Swarm' })) ?? []}
           onSelect={setSelectedSwarmId}
           placeholder="swarmstarv2"
           selectedValue={selectedSwarmId}
@@ -76,10 +79,10 @@ export default function HomePage() {
                 <div className="h-full p-4">
                   <DialogPreview
                     previewComponent={
-                      <TreeVisualizer nodes={swarm?.fetchSwarm?.data?.actionMetadataNodes ?? []} />
+                      <TreeVisualizer nodes={actionMetadataNodes} />
                     }
                     dialogContent={
-                      <TreeVisualizer nodes={swarm?.fetchSwarm?.data?.actionMetadataNodes ?? []} />
+                      <TreeVisualizer nodes={actionMetadataNodes} />
                     }
                   />
                 </div>
