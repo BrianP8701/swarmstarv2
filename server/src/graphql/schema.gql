@@ -125,7 +125,7 @@ type RootMutation {
 type RootQuery {
   fetchSwarm(id: ID!): Swarm
   fetchMemory(id: ID!): Memory
-  fetchUser(id: ID!): User
+  fetchUser: User
   actionMetadata: ActionMetadataQuery
 }
 
