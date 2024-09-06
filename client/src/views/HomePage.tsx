@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Chat from "@/views/Chat/Chat";
 import DialogPreview from "@/components/custom/DialogPreview";
 import SelectWithCreate from "@/components/custom/SelectWithCreate";
-import { CreateSwarmDialog } from "./CreateSwarmDialog";
+import { CreateSwarmDialog } from "./Dialogs/CreateSwarmDialog";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -50,6 +50,7 @@ export default function HomePage() {
           onSelect={setSelectedSwarmId}
           placeholder="swarmstarv2"
           selectedValue={selectedSwarmId}
+          emptyMessage="No swarms found"
         />
       </header>
       <main className="flex-1">

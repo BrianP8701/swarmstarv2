@@ -45,6 +45,14 @@ export class MemoryDao extends AbstractNodeDao<MemoryNode, MemoryNode> {
     return memory
   }
 
+  public async get(memoryId: string): Promise<Memory> {
+    return this.prisma.memory.findUniqueOrThrow({
+      where: {
+        id: memoryId,
+      },
+    })
+  }
+
   async getAll(memoryId: string): Promise<MemoryNode[]> {
     return this.prisma.memoryNode.findMany({
       where: {

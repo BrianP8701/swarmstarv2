@@ -8,9 +8,9 @@ import { MemoryDao } from '../../../dao/nodes/MemoryDao'
 
 export const Memory: MemoryResolvers = {
   title: async (parent) => {
-    const swarmDao = container.get(SwarmDao)
-    const swarm = await swarmDao.getBasic(parent.id)
-    return swarm.title
+    const memoryDao = container.get(MemoryDao)
+    const memory = await memoryDao.get(parent.id)
+    return memory.title
   },
   memoryNodes: async (parent) => {
     const memoryDao = container.get(MemoryDao)

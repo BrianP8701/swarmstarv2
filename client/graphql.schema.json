@@ -439,7 +439,7 @@
             ],
             "type": {
               "kind": "OBJECT",
-              "name": "Memory",
+              "name": "User",
               "ofType": null
             },
             "isDeprecated": false,
@@ -845,7 +845,7 @@
             ],
             "type": {
               "kind": "OBJECT",
-              "name": "Swarm",
+              "name": "User",
               "ofType": null
             },
             "isDeprecated": false,

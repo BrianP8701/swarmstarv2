@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronsUpDown } from 'lucide-react'
 import * as React from 'react'
 import { Button } from '../ui/button'
 
@@ -11,14 +11,14 @@ export const PopoverButton = React.forwardRef<
   }
 >(({ title, togglePopover, className }, ref) => (
   <Button
-    className={className}
+    className={`flex justify-between items-center ${className}`}
     ref={ref}
     size='sm'
     variant='outline'
     onClick={togglePopover}
   >
-    <ChevronDown className='w-4 h-4 mr-2' />
-    <div className='overflow-hidden max-w-[180px] truncate'>{title}</div>
+    <div className='overflow-hidden max-w-[180px] truncate text-left'>{title}</div>
+    <ChevronsUpDown className='w-4 h-4 ml-2 flex-shrink-0' />
   </Button>
 ))
 

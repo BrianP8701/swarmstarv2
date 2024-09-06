@@ -12,7 +12,8 @@
         "lint:python": "cd swarmstar && yarn lint:python",
         "generate": "yarn server:generate && yarn client:generate",
         "client:generate": "cd client && yarn generate",
-        "server:generate": "cd server && yarn generate"
+        "server:generate": "cd server && yarn generate",
+        "db:reset-and-seed": "cd server && yarn ts-node src/cli/resetAndSeed.ts"
     },
     "devDependencies": {
         "concurrently": "^6.0.0",
