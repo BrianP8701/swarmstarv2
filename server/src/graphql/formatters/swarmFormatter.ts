@@ -14,20 +14,26 @@ import {
   MemoryNode as GqlMemoryNode, 
   ActionNode as GqlActionNode, 
   ActionMetadataNode as GqlActionMetadataNode,
-  ActionEnum as GqlActionEnum
+  ActionEnum as GqlActionEnum,
+  SwarmData as GqlSwarmData
 } from "../generated/graphql"
 import { snakeToTitleCase } from "./utils"
 
-export const formatSwarm = (swarm: Swarm & { chats: Chat[], memory: Memory, memories: MemoryNode[], actions: ActionNode[], actionMetadata: ActionMetadataNode[] }): GqlSwarm => {
+export const formatSwarm = (swarm: Swarm ): GqlSwarm => {
   return {
     id: swarm.id,
     title: swarm.title,
     goal: swarm.goal,
-    memory: formatMemory(swarm.memory),
-    chats: swarm.chats.map(formatChat),
-    memories: swarm.memories.map(formatMemoryNode),
-    actions: swarm.actions.map(formatActionNode),
-    actionMetadata: swarm.actionMetadata.map(formatActionMetadataNode),
+  }
+}
+
+export const formatSwarmData = (swarmData: Swarm & { chats: Chat[], memory: Memory, memories: MemoryNode[], actions: ActionNode[], actionMetadata: ActionMetadataNode[] }): GqlSwarmData => {
+  return {
+    id: swarmData.id,
+    chats: swarmData.chats.map(formatChat),
+    actionNodes: swarmData.actions.map(formatActionNode),
+    memoryNodes: swarmData.memories.map(formatMemoryNode),
+    actionMetadataNodes: swarmData.actionMetadata.map(formatActionMetadataNode),
   }
 }
 

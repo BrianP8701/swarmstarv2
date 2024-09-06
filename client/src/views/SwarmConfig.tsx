@@ -2,13 +2,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import SelectWithCreate from "@/components/custom/SelectWithCreate";
 import { useState } from "react";
+import { useFetchUser } from "../hooks/fetchUser";
 
 export default function SwarmConfig() {
-  const memoryOptions: { value: string; label: string }[] = [
-    { value: "Memory 1", label: "Memory 1" },
-    { value: "Memory 2", label: "Memory 2" },
-    { value: "Memory 3", label: "Memory 3" },
-  ];
+  const { user } = useFetchUser();
+
   const [selectedMemory, setSelectedMemory] = useState<string | undefined>(undefined);
 
   const createMemory = () => {
@@ -24,20 +22,20 @@ export default function SwarmConfig() {
           autoComplete="off"
         />
         <SelectWithCreate
-          className="hover:bg-muted/50 h-9 text-sm"
+          className="hover:bg-muted/50 text-sm h-9"
           create={createMemory}
           createMessage="Create"
-          options={memoryOptions}
+          options={user?.memories.map(memory => ({ value: memory.id, label: memory.title })) ?? []}
           onSelect={setSelectedMemory}
           placeholder="Memory"
           selectedValue={selectedMemory}
         />
       </div>
-        <Textarea
-          className="min-h-[9.5rem] max-h-[60vh]"
-          id="source"
-          placeholder="Create a new feature in the sourcing app."
-        />
+      <Textarea
+        className="min-h-[9.5rem] max-h-[60vh]"
+        id="source"
+        placeholder="Create a new feature in the sourcing app."
+      />
     </div>
   )
 }

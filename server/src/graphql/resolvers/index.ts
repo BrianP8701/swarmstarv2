@@ -1,5 +1,5 @@
-import { RootQuery } from './fields'
-import { ActionMetadataQuery } from './fields/actionMetadataQuery'
+import { RootQuery } from './queries'
+import { ActionMetadataQuery } from './queries/actionMetadataQuery'
 import { Swarm } from './fields/swarm'
 import { User } from './fields/user'
 import { RootMutation } from './mutations'

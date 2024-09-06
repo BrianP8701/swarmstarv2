@@ -1,5 +1,5 @@
-query FetchUser {
-  fetchUser {
+query FetchUser($id: ID!) {
+  fetchUser(id: $id) {
     ...User
   }
 }
@@ -7,30 +7,8 @@ query FetchUser {
 query FetchSwarm($id: ID!) {
   fetchSwarm(id: $id) {
     ...Swarm
-    goal
-    memory {
-      id
-      title
-    }
-    chats {
-      id
-      title
-    }
-    actions {
-      id
-      title
-      parentId
-    }
-    memories {
-      id
-      title
-      parentId
-    }
-    actionMetadata {
-      id
-      title
-      parentId
-      description
+    data {
+      ...SwarmData
     }
   }
 }
@@ -47,14 +25,6 @@ mutation CreateMemory($input: CreateMemoryRequest!) {
   memoryMutation {
     createMemory(input: $input) {
       ...Memory
-    }
-  }
-}
-
-query FetchActionMetadata {
-  actionMetadata {
-    getActionMetadata {
-      ...ActionMetadataNode
     }
   }
 }

@@ -36,6 +36,15 @@ app.get('/', (_req, res) => {
   res.send('Nothing to see here')
 })
 
+// Update the CORS configuration
+const corsOptions: cors.CorsOptions = {
+  origin: CORS_WHITELIST,
+  credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Access-Control-Allow-Origin'],
+}
+
 const startServer = async () => {
   const httpServer = createServer(app)
   const apolloServer = createApolloServer(httpServer)
@@ -43,7 +52,7 @@ const startServer = async () => {
 
   app.use(
     '/graphql',
-    cors<cors.CorsRequest>({ origin: CORS_WHITELIST, credentials: true }),
+    cors(corsOptions),
     expressMiddleware(apolloServer, {
       context: async ({ req }): Promise<ResolverContext> => {
         return {
@@ -53,6 +62,9 @@ const startServer = async () => {
       },
     })
   )
+
+  // Add CORS middleware to the entire app
+  app.use(cors(corsOptions))
 
   httpServer.listen(PORT)
 }

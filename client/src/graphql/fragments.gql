@@ -12,11 +12,30 @@ fragment User on User {
 fragment Swarm on Swarm {
   id
   title
+  goal
+}
+
+fragment SwarmData on SwarmData {
+  memoryNodes {
+    ...MemoryNode
+  }
+  chats {
+    ...Chat
+  }
+  actionNodes {
+    ...ActionNode
+  }
+  actionMetadataNodes {
+    ...ActionMetadataNode
+  }
 }
 
 fragment Memory on Memory {
   id
   title
+  memoryNodes {
+    ...MemoryNode
+  }
 }
 
 fragment Chat on Chat {

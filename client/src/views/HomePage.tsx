@@ -8,11 +8,12 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { useFetchUserQuery, useFetchSwarmLazyQuery, FetchSwarmQuery } from "../graphql/generated/graphql";
+import { useFetchSwarmLazyQuery, FetchSwarmQuery } from "../graphql/generated/graphql";
 import { TreeVisualizer } from "../components/custom/tree/TreeVisualizer";
+import { useFetchUser } from "../hooks/fetchUser";
 
 export default function HomePage() {
-  const { data: user } = useFetchUserQuery()
+  const { user } = useFetchUser();
   const [fetchSwarm, { data: swarmData }] = useFetchSwarmLazyQuery();
 
   const [selectedSwarmId, setSelectedSwarmId] = useState<string | undefined>(undefined);
@@ -42,7 +43,7 @@ export default function HomePage() {
           className="border-none text-lg hover:bg-muted/50"
           create={openCreateSwarmDialog}
           createMessage="Create"
-          options={user?.fetchUser?.swarms.map(swarm => ({ value: swarm.id, label: swarm.title })) ?? []}
+          options={user?.swarms.map(swarm => ({ value: swarm.id, label: swarm.title })) ?? []}
           onSelect={setSelectedSwarmId}
           placeholder="swarmstarv2"
           selectedValue={selectedSwarmId}
@@ -75,10 +76,10 @@ export default function HomePage() {
                 <div className="h-full p-4">
                   <DialogPreview
                     previewComponent={
-                      <TreeVisualizer nodes={swarm?.fetchSwarm?.actionMetadata ?? []} />
+                      <TreeVisualizer nodes={swarm?.fetchSwarm?.data?.actionMetadataNodes ?? []} />
                     }
                     dialogContent={
-                      <TreeVisualizer nodes={swarm?.fetchSwarm?.actionMetadata ?? []} />
+                      <TreeVisualizer nodes={swarm?.fetchSwarm?.data?.actionMetadataNodes ?? []} />
                     }
                   />
                 </div>

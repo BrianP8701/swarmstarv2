@@ -45,7 +45,7 @@ const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
           className={className}
         />
       </PopoverTrigger>
-      <PopoverContent align='start' className={`p-0 relative ${className}`}>
+      <PopoverContent align='start' className={`p-0 relative`}>
         <Command>
           <CommandInput placeholder="Search" create={create} />
           <CommandList>
