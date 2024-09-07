@@ -12,19 +12,21 @@ import { ResolverContext, createApolloServer } from './graphql/createApolloServe
 import { checkAuthenticated } from './utils/auth/auth'
 import { TraceContext } from './utils/logging/TraceContext'
 
+const CORS_WHITELIST = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'https://studio.apollographql.com',
+  'https://client-7xir3z4nfa-uc.a.run.app',
+  'https://client-911903497338.us-central1.run.app',
+  'https://swarmstar.ai',
+]
+
 dotenv.config()
 const app = express()
 
-const clerkAuth = ClerkExpressWithAuth({})
+const clerkAuth = ClerkExpressWithAuth()
 
-const PORT = 8080
-
-const CORS_WHITELIST = [
-  'http://localhost:5173',
-  'https://studio.apollographql.com',
-  'https://swarmstar.ai',
-  'https://www.swarmstar.ai'
-]
+const PORT = process.env.PORT || 5001
 
 // Middleware
 app.use(express.json())
@@ -36,15 +38,6 @@ app.get('/', (_req, res) => {
   res.send('Nothing to see here')
 })
 
-// Update the CORS configuration
-const corsOptions: cors.CorsOptions = {
-  origin: CORS_WHITELIST,
-  credentials: true,
-  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Access-Control-Allow-Origin'],
-}
-
 const startServer = async () => {
   const httpServer = createServer(app)
   const apolloServer = createApolloServer(httpServer)
@@ -52,7 +45,7 @@ const startServer = async () => {
 
   app.use(
     '/graphql',
-    cors(corsOptions),
+    cors<cors.CorsRequest>({ origin: CORS_WHITELIST, credentials: true }),
     expressMiddleware(apolloServer, {
       context: async ({ req }): Promise<ResolverContext> => {
         return {
@@ -62,9 +55,6 @@ const startServer = async () => {
       },
     })
   )
-
-  // Add CORS middleware to the entire app
-  app.use(cors(corsOptions))
 
   httpServer.listen(PORT)
 }
