@@ -101,11 +101,6 @@ async function processFolder(folderPath: string, swarmId: string, parentId: stri
   return nodes;
 }
 
-interface ActionLike {
-  description: string;
-  actionEnum: string;
-}
-
 function isConcreteAction(cls: unknown): cls is typeof AbstractAction | typeof AbstractRouter {
   return (
     typeof cls === 'function' &&

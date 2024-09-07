@@ -1,9 +1,8 @@
 name: Auto Create PR
 
 on:
-  create:
-    branches:
-      - '*'
+  push:
+    branches: ['*']
 
 jobs:
   auto-create-pr:
