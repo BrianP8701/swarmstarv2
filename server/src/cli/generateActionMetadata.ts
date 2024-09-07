@@ -106,17 +106,6 @@ interface ActionLike {
   actionEnum: string;
 }
 
-function isActionLike(value: unknown): value is ActionLike {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'description' in value &&
-    'actionEnum' in value &&
-    typeof (value as ActionLike).description === 'string' &&
-    typeof (value as ActionLike).actionEnum === 'string'
-  );
-}
-
 function isConcreteAction(cls: unknown): cls is typeof AbstractAction | typeof AbstractRouter {
   return (
     typeof cls === 'function' &&

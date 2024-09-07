@@ -1,0 +1,19 @@
+name: Auto Create PR
+
+on:
+  create:
+    branches:
+      - '*'
+
+jobs:
+  auto-create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: ${{ github.ref }}
+          title: "Auto PR for ${{ github.ref }}"
+          body: "Automatically created PR for new branch ${{ github.ref }}"
+          base: main
