@@ -80,18 +80,23 @@ export default function HomePage() {
                 <div className="h-full p-4">
                   <DialogPreview
                     previewComponent={
-                      <TreeVisualizer nodes={actionMetadataNodes} />
+                      <div className="w-full h-full">
+                        <TreeVisualizer nodes={actionMetadataNodes} />
+                      </div>
                     }
                     dialogContent={
-                      <TreeVisualizer nodes={actionMetadataNodes} />
+                      <div className="w-full h-full">
+                        <TreeVisualizer nodes={actionMetadataNodes} />
+                      </div>
                     }
                   />
                 </div>
               </ResizablePanel>
+
             </ResizablePanelGroup>
           </ResizablePanel>
         </ResizablePanelGroup>
-      </main>
+      </main >
       <CreateSwarmDialog
         open={isCreateSwarmDialogOpen}
         onOpenChange={setIsCreateSwarmDialogOpen}

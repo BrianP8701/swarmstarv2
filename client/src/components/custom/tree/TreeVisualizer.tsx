@@ -1,15 +1,8 @@
-import React from 'react';
-import Tree, { RawNodeDatum } from 'react-d3-tree';
-import { TreeNode } from './TreeNode';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
+import Graph from 'react-vis-network-graph';
 
 export type TreeNode = {
     id: string
-    title?: string | null
-    parentId?: string | null
-}
-
-interface CustomNodeDatum extends RawNodeDatum {
-    id: string;
     title?: string | null
     parentId?: string | null
 }
@@ -19,49 +12,84 @@ interface TreeVisualizerProps {
 }
 
 export const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes }) => {
-    const buildTree = (nodes: TreeNode[]): RawNodeDatum => {
-        const nodeMap = new Map<string, CustomNodeDatum>();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [key, setKey] = useState(0);
 
-        // Create CustomNodeDatum objects for each node
-        nodes.forEach(node => {
-            nodeMap.set(node.id, { ...node, name: node.title ?? 'Untitled Node', children: [] });
-        });
+    const graphData = useMemo(() => {
+        const uniqueNodes = new Map<string, { id: string; label: string }>();
+        const edges: { from: string; to: string }[] = [];
+        const duplicates: string[] = [];
 
-        // Build the tree structure
-        const root: CustomNodeDatum = { name: 'Root', children: [], id: 'root', title: 'Root', parentId: null };
         nodes.forEach(node => {
-            if (node.parentId === null) {
-                root.children?.push(nodeMap.get(node.id)!);
-            } else {
-                const parent = nodeMap.get(node.parentId!);
-                if (parent && parent.children) {
-                    parent.children.push(nodeMap.get(node.id)!);
-                }
+            if (uniqueNodes.has(node.id)) {
+                duplicates.push(node.id);
+                return; // Skip this node
+            }
+
+            uniqueNodes.set(node.id, {
+                id: node.id,
+                label: node.title || 'Untitled Node',
+            });
+
+            if (node.parentId && uniqueNodes.has(node.parentId)) {
+                edges.push({
+                    from: node.parentId,
+                    to: node.id,
+                });
             }
         });
 
-        return root;
+        if (duplicates.length > 0) {
+            console.warn('Duplicate node IDs found:', duplicates);
+        }
+
+        return {
+            nodes: Array.from(uniqueNodes.values()),
+            edges: edges,
+        };
+    }, [nodes]);
+
+    const options = {
+        layout: {
+            hierarchical: {
+                enabled: true,
+                direction: 'UD',
+                sortMethod: 'directed',
+            },
+        },
+        nodes: {
+            shape: 'circle',
+        },
+        physics: {
+            enabled: false,
+        },
     };
 
-    const treeData = buildTree(nodes);
+    useEffect(() => {
+        const resizeObserver = new ResizeObserver(() => {
+            // Force re-render of the Graph component
+            setKey(prevKey => prevKey + 1);
+        });
+
+        if (containerRef.current) {
+            resizeObserver.observe(containerRef.current);
+        }
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
 
     return (
-        <div className='w-full h-full bg-secondary rounded-xl'>
-            <Tree
-                data={treeData}
-                orientation="vertical"
-                pathFunc="diagonal"
-                translate={{ x: 300, y: 300 }}
-                zoom={0.5}
-                separation={{ siblings: 1.5, nonSiblings: 2 }}
-                zoomable={true}
-                scaleExtent={{ min: 0.1, max: 3 }}
-                renderCustomNodeElement={(rd3tProps) => {
-                    return (
-                        <TreeNode {...rd3tProps} />
-                    );
-                }}
-            />
+        <div ref={containerRef} className="w-full h-full bg-secondary rounded-xl">
+            {graphData.nodes.length > 0 && (
+                <Graph
+                    key={key}
+                    graph={graphData}
+                    options={options}
+                    style={{ width: '100%', height: '100%' }}
+                />
+            )}
         </div>
     );
 };

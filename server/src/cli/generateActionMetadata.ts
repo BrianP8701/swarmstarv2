@@ -72,15 +72,14 @@ async function processFolder(folderPath: string, swarmId: string, parentId: stri
     } else if (item.endsWith('.ts')) {
       logger.info(`Found TypeScript file: ${itemPath}`);
       const content = await fs.readFile(itemPath, 'utf-8');
-      // if (content.includes('class') && (content.includes('extends AbstractAction') || content.includes('extends AbstractRouter'))) {
-      if (content.includes('class') && (abstractActionClassStrings.map(classString => content.includes(`extends ${classString}`)))) {
-        const className = content.split('class ')[1].split('extends')[0].trim();
+      if (content.includes('class') && abstractActionClassStrings.some(classString => content.includes(`extends ${classString}`))) {
+        const className = content.split('class ')[1].split(' ')[0].trim();
         logger.info(`Found class: ${className} in ${itemPath}`);
         try {
           const cls = await loadClassFromFile(itemPath, className);
           logger.info(`Loaded class: ${cls.name}`);
           if (isConcreteAction(cls) && !content.includes('abstract class')) {
-            logger.info(`${className} is a concrete subclass of AbstractAction`);
+            logger.info(`${className} is a concrete subclass of AbstractAction or AbstractRouter`);
             const actionNode = await createActionMetadataNode(swarmId, {
               parentId: node.id,
               description: cls.description,
@@ -119,7 +118,13 @@ function isActionLike(value: unknown): value is ActionLike {
 }
 
 function isConcreteAction(cls: unknown): cls is typeof AbstractAction | typeof AbstractRouter {
-  return isActionLike(cls);
+  return (
+    typeof cls === 'function' &&
+    'description' in cls &&
+    'actionEnum' in cls &&
+    typeof cls.description === 'string' &&
+    typeof cls.actionEnum === 'string'
+  );
 }
 
 export async function generateActionMetadataTree(userId: string): Promise<void> {
@@ -136,7 +141,7 @@ export async function generateActionMetadataTree(userId: string): Promise<void> 
     title: 'Default Swarm',
     goal: 'Default Swarm Goal',
     user: { connect: { id: userId } },
-    memory: { create: { title: 'Default Memory', user: { connect: { id: userId } } } },
+    memory: { create: { title: 'Default Memory', user: { connect: { id: userId } } } }
   });
 
   logger.info(`Created default swarm with ID: ${swarm.id}`);
