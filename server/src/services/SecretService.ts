@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { injectable } from 'inversify';
+import { logger } from '@/utils/logging/logger';
 
 export enum Environment {
   LOCAL = 'local',
@@ -35,7 +36,7 @@ export class SecretService {
   constructor() {
     const result = envSchema.safeParse(process.env);
     if (!result.success) {
-      console.error('Invalid environment variables:', result.error.format());
+      logger.error('Invalid environment variables:', result.error.format());
       throw new Error('Invalid environment configuration');
     }
     this.config = result.data;
