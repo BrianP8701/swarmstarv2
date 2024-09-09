@@ -38,6 +38,10 @@ export class SecretService {
     }
   }
 
+  public getClerkWebhookSecret(): string {
+    return this.getConfig('CLERK_WEBHOOK_SECRET')
+  }
+
   public getTwilioPhoneNumber(): string {
     return this.getConfig('TWILIO_PHONE_NUMBER')
   }

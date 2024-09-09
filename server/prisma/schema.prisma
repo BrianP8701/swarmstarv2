@@ -108,7 +108,7 @@ model FunctionCallOperation {
   functionToCall String
   actionNodeId   String              @db.Uuid
   actionNode     ActionNode          @relation("ActionNodeToFunctionCallOperations", fields: [actionNodeId], references: [id], onDelete: Cascade)
-  status         OperationStatusEnum @default(CREATED)
+  status         OperationStatusEnum @default(QUEUED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -119,7 +119,7 @@ model TerminationOperation {
   terminatorId String
   actionNodeId String              @db.Uuid
   actionNode   ActionNode          @relation("ActionNodeToTerminationOperations", fields: [actionNodeId], references: [id], onDelete: Cascade)
-  status       OperationStatusEnum @default(CREATED)
+  status       OperationStatusEnum @default(QUEUED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -132,7 +132,7 @@ model BlockingOperation {
   blockingOperationEnum BlockingOperationEnum
   actionNodeId          String                @db.Uuid
   actionNode            ActionNode            @relation("ActionNodeToBlockingOperations", fields: [actionNodeId], references: [id], onDelete: Cascade)
-  status                OperationStatusEnum   @default(CREATED)
+  status                OperationStatusEnum   @default(QUEUED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -265,7 +265,6 @@ enum UserTypeEnum {
 }
 
 enum OperationStatusEnum {
-  CREATED
   QUEUED
   RUNNING
   COMPLETED
