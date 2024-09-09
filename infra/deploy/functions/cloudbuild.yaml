@@ -34,7 +34,8 @@ steps:
         yarn custom-build
         cp $_SERVER_CONFIG_FILE_NAME ./dist/$_SERVER_CONFIG_FILE_NAME
         cp .env ./dist/.env
-  
+        cp ./dist/functions/index.js ./dist/index.js
+
   - id: 'deploy-functions'
     name: 'gcr.io/cloud-builders/gcloud'
     dir: './server'
