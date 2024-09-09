@@ -16,7 +16,7 @@ function getHandlerForTopic(topic: PubSubTopic): Handler | null {
 
 export function initializePubSubHandlers() {
   const secretService = container.get(SecretService)
-  if (secretService.getEnvironment() === Environment.LOCAL) {
+  if (secretService.getEnvVars().MODE === Environment.LOCAL) {
     // Initialize PubSub handlers
     Object.values(PubSubTopic).forEach(topic => {
       const handler = getHandlerForTopic(topic)

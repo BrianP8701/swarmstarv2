@@ -7,23 +7,10 @@ steps:
     args:
       - "-c"
       - |
-        gcloud secrets versions access latest --secret=$_ENV_SECRET_NAME > /workspace/swarmstar-secrets.json
+        gcloud secrets versions access latest --secret=$_ENV_SECRET_NAME > ./client/.env
 
   # ----------------- Build App Docker Image -----------------
   # Need to build app at root directory due to schema.gql being in ./server
-  # This step creates the .env file for the production react app build
-  - id: "create-swarmstar-secrets-file"
-    name: "gcr.io/cloud-builders/docker"
-    dir: "./client"
-    entrypoint: "/bin/bash"
-    args:
-      - "-c"
-      - |
-        apt-get update && apt-get install -y jq
-        echo VITE_CLERK_PUBLISHABLE_KEY=\"$(jq -r '."VITE_CLERK_PUBLISHABLE_KEY"' /workspace/swarmstar-secrets.json)\">> .env
-        echo VITE_GRAPHQL_URL=\"$(jq -r '."VITE_GRAPHQL_URL"' /workspace/swarmstar-secrets.json)\">> .env
-        cat .env
-
   - id: "build-client-docker-image"
     name: "gcr.io/cloud-builders/docker"
     args:
@@ -33,6 +20,8 @@ steps:
         "gcr.io/$PROJECT_ID/client-image:$COMMIT_SHA",
         "-f",
         "./client/Dockerfile",
+        "--build-arg",
+        "ENV_FILE=.env",
         ".",
       ]
 

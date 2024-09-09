@@ -2,6 +2,9 @@
 
 FROM node:18
 
+ARG ENV_FILE=.env
+COPY ${ENV_FILE} .env
+
 WORKDIR /usr/src/app
 COPY . .
 

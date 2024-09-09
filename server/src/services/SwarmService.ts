@@ -3,13 +3,11 @@ import { Swarm } from '@prisma/client'
 import { CreateSwarmRequest } from '../graphql/generated/graphql'
 import { v4 as uuidv4 } from 'uuid'
 import { SwarmDao } from '../dao/SwarmDao'
-import { MemoryDao } from '../dao/nodes/MemoryDao'
 
 @injectable()
 export class SwarmService {
   constructor(
-    @inject(SwarmDao) private swarmDao: SwarmDao,
-    @inject(MemoryDao) private memoryDao: MemoryDao
+    @inject(SwarmDao) private swarmDao: SwarmDao
   ) { }
 
   public async createSwarm(userId: string, createSwarmRequest: CreateSwarmRequest): Promise<Swarm> {

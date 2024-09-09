@@ -11,8 +11,8 @@ export class TwilioService {
     @inject(SecretService) private secretService: SecretService
   ) {
     this.twilio = new Twilio(
-      this.secretService.getTwilioAccountSid(),
-      this.secretService.getTwilioAuthToken()
+      this.secretService.getEnvVars().TWILIO_ACCOUNT_SID,
+      this.secretService.getEnvVars().TWILIO_AUTH_TOKEN
     );
   }
 
@@ -20,8 +20,8 @@ export class TwilioService {
     try {
       await this.twilio.messages.create({
         body: message,
-        from: this.secretService.getTwilioPhoneNumber(),
-        to: this.secretService.getMyPhoneNumber(),
+        from: this.secretService.getEnvVars().TWILIO_PHONE_NUMBER,
+        to: this.secretService.getEnvVars().MY_PHONE_NUMBER,
       });
     } catch (error) {
       logger.error('Failed to send SMS notification', { error });

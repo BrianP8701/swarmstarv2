@@ -17,7 +17,9 @@
     "db:seed": "ts-node src/cli/databaseSeed.ts",
     "db:reset-and-seed": "ts-node src/cli/resetAndSeed.ts",
     "start:prod": "node dist/server.js",
-    "pre": "yarn lint && yarn build"
+    "pre": "yarn lint && yarn build",
+    "post-build": "cd dist && yarn install && yarn prisma generate",
+    "custom-build": "yarn build && yarn post-build"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

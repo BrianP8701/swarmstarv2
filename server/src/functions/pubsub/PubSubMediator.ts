@@ -19,7 +19,7 @@ export class PubSubMediator {
     payload: TopicPayload[T],
     attributes?: Attributes
   ): Promise<string | void> {
-    if (this.secretService.getEnvironment() === Environment.LOCAL) {
+    if (this.secretService.getEnvVars().MODE === Environment.LOCAL) {
       logger.info('Publishing event locally', { topicKey, payload })
       await this.localPubSubEmulator.publishEvent(topicKey, payload)
       return
