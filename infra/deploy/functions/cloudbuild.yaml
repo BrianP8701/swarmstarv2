@@ -1,12 +1,12 @@
 steps:
   # ----------------- Decrypting JSON ENV file -----------------
-  - id: 'decrypt-server-env-var'
+  - id: 'decrypt-swarmstar-secrets'
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        gcloud secrets versions access latest --secret=$_ENV_SECRET_NAME > /workspace/secrets.json
+        gcloud secrets versions access latest --secret=$_ENV_SECRET_NAME > /workspace/swarmstar-secrets.json
 
   # ----------------- Build Server Docker Image -----------------
   - id: 'create-server-env-file'
@@ -46,7 +46,6 @@ steps:
         sh ../infra/deploy/functions/deploy-functions.sh ./dist
 
 substitutions:
-  _ENV_SECRET_NAME: secrets
   _SERVER_CONFIG_FILE_NAME: .secrets.json
 
 options:
