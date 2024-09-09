@@ -4,10 +4,10 @@
  */
 import * as functionsFramework from '@google-cloud/functions-framework'
 import 'reflect-metadata'
-import { ClerkEventHttp } from './http/ClerkEvent'
-import { PubSubTopic } from './pubsub/PubSubTopic'
-import { AlertHandler } from './pubsub/handler/AlertHandler'
-import { OperationHandler } from './pubsub/handler/OperationHandler'
+import { ClerkEventHttp } from '@/functions/http/ClerkEvent'
+import { PubSubTopic } from '@/functions/pubsub/PubSubTopic'
+import { AlertHandler } from '@/functions/pubsub/handler/AlertHandler'
+import { OperationHandler } from '@/functions/pubsub/handler/OperationHandler'
 
 functionsFramework.http('clerk-event-http', ClerkEventHttp)
 

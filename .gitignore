@@ -13,3 +13,5 @@ server/secrets.json
 
 **/dist/
 **/yarn.lock
+.env.prod
+.env

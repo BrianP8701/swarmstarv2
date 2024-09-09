@@ -21,7 +21,7 @@ export const ClerkEventHttp: HttpFunction = async (req: Request, res: Response):
 
   await TraceContext.runAsync(context, async () => {
     const signature = req.header(CLERK_SIGNATURE_HEADER)
-    const webhookSecret = container.get(SecretService).getClerkWebhookSecret()
+    const webhookSecret = container.get(SecretService).getEnvVars().CLERK_WEBHOOK_SECRET
 
     assert(webhookSecret, 'CLERK_WEBHOOK_SECRET is not set')
 

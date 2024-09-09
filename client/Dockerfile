@@ -11,6 +11,9 @@ COPY server/src/graphql/schema.gql ./server/src/graphql/
 # Copy the client folder contents
 COPY client ./client
 
+# Copy the .env file
+COPY client/.env ./client/.env
+
 WORKDIR /app/client
 
 RUN yarn install

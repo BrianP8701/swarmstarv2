@@ -6,7 +6,7 @@ import { Attributes } from '@google-cloud/pubsub'
 import { logger } from '../../utils/logging/logger'
 import { TraceContext } from '../../utils/logging/TraceContext'
 import { PubSubMediator } from './PubSubMediator'
-import { Environment, SecretService } from '../../services/SecretService'
+import { SecretService, Environment } from '../../services/SecretService'
 import { container } from '../../utils/di/container'
 
 // TODO: Replace with official GCP managed type
@@ -50,7 +50,7 @@ export abstract class CloudEventSubscriberFunction<T extends PubSubTopic> {
   protected abstract getTopic(): T
 
   public registerLocalHandler(): void {
-    if (this.secretService.getEnvironment() === Environment.LOCAL) {
+    if (this.secretService.getEnvVars().MODE === Environment.LOCAL) {
       this.pubSubMediator.registerLocalHandler(this.getTopic(), this.handle.bind(this))
     }
   }

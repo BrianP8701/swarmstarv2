@@ -14,7 +14,7 @@ export class GlobalContextDao {
   public async getDefaultSwarmId(): Promise<string> {
     const globalContext = await this.prisma.globalContext.findUniqueOrThrow({
       where: {
-        id: this.secretService.getGlobalContextId(),
+        id: this.secretService.getEnvVars().GLOBAL_CONTEXT_ID,
       },
     })
     return globalContext.defaultSwarmId

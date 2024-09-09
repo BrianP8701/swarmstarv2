@@ -10,7 +10,7 @@ export async function seed() {
   // Create user with specific ID
   const userDao = container.get(UserDao);
   const secretService = container.get(SecretService);
-  const userId = secretService.getSeedUserId();
+  const userId = secretService.getEnvVars().SEED_USER_ID;
 
   if (!userId) {
     throw new Error('SEED_USER_ID environment variable is not set');

@@ -113,7 +113,8 @@ function isConcreteAction(cls: unknown): cls is typeof AbstractAction | typeof A
 
 export async function generateActionMetadataTree(userId: string): Promise<void> {
   const secretService = container.get(SecretService);
-  const ACTION_FOLDER_PATH = secretService.getActionFolderPath();
+  const envVars = secretService.getEnvVars();
+  const ACTION_FOLDER_PATH = envVars.ACTION_FOLDER_PATH;
   if (!ACTION_FOLDER_PATH) {
     throw new Error('ACTION_FOLDER_PATH environment variable is not set');
   }
@@ -134,7 +135,7 @@ export async function generateActionMetadataTree(userId: string): Promise<void> 
   const nodes = await processFolder(ACTION_FOLDER_PATH, swarm.id);
   logger.info(`Generated ${nodes.length} action metadata nodes`);
 
-  const globalContextId = secretService.getGlobalContextId();
+  const globalContextId =envVars.GLOBAL_CONTEXT_ID;
   await globalContextDao.upsertGlobalContext({
     id: globalContextId,
     defaultSwarmId: swarm.id,
@@ -143,7 +144,7 @@ export async function generateActionMetadataTree(userId: string): Promise<void> 
 
 if (require.main === module) {
   const secretService = container.get(SecretService);
-  const userId = secretService.getSeedUserId();
+  const userId = secretService.getEnvVars().SEED_USER_ID;
   if (!userId) {
     throw new Error('SEED_USER_ID environment variable is not set');
   }

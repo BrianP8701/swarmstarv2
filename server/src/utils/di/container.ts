@@ -45,7 +45,7 @@ export const coreBindingsModule = new ContainerModule((bind: interfaces.Bind) =>
   bind(PrismaClient).toConstantValue(prismaClient)
 
   bind(PubSub).toConstantValue(new PubSub())
-  bind(OpenAI).toConstantValue(new OpenAI({ apiKey: secretService.getOpenAIKey() }))
+  bind(OpenAI).toConstantValue(new OpenAI({ apiKey: secretService.getEnvVars().OPENAI_API_KEY }))
 
   bind<LoggerFactory>(TYPES.LoggerFactory).to(LoggerFactory).inSingletonScope()
   bind<ContextLogger>(TYPES.Logger).toDynamicValue(ctx => {
