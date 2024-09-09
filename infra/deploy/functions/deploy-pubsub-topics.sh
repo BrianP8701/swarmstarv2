@@ -36,3 +36,6 @@ for TOPIC_NAME in $TOPICS; do
         fi
     fi
 done
+
+# Add the new WebSocket topic
+gcloud pubsub topics create websocket-messages || true

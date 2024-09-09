@@ -53,6 +53,9 @@ export const ApolloClientProvider = ({ children, url }: PropsWithChildren<Props>
       }
       return {};
     },
+    retryAttempts: 5,
+    retryWait: (retries) => new Promise((resolve) => setTimeout(resolve, retries * 1000)),
+    shouldRetry: (errOrCloseEvent) => true,
   }));
 
   const splitLink = split(
