@@ -3,6 +3,10 @@ import { PropsWithChildren, useCallback, useMemo } from 'react'
 import { ApolloClient, ApolloProvider, createHttpLink, from, InMemoryCache } from '@apollo/client'
 import { onError } from '@apollo/client/link/error'
 import { setContext } from '@apollo/client/link/context'
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { createClient } from 'graphql-ws';
+import { split, HttpLink } from '@apollo/client';
+import { getMainDefinition } from '@apollo/client/utilities';
 
 import { useAuth } from '@clerk/clerk-react'
 
@@ -40,8 +44,31 @@ export const ApolloClientProvider = ({ children, url }: PropsWithChildren<Props>
     }
   })
 
+  const wsLink = new GraphQLWsLink(createClient({
+    url: url.replace('http', 'ws'),
+    connectionParams: async () => {
+      if (isSignedIn) {
+        const token = await getToken();
+        return { Authorization: `Bearer ${token}` };
+      }
+      return {};
+    },
+  }));
+
+  const splitLink = split(
+    ({ query }) => {
+      const definition = getMainDefinition(query);
+      return (
+        definition.kind === 'OperationDefinition' &&
+        definition.operation === 'subscription'
+      );
+    },
+    wsLink,
+    httpLink,
+  );
+
   const client = new ApolloClient({
-    link: from([authLink, errorLink, httpLink]),
+    link: from([authLink, errorLink, splitLink]),
     uri: url,
     cache: new InMemoryCache({
       typePolicies: {
