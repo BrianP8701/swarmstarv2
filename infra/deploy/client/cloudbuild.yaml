@@ -7,7 +7,7 @@ steps:
     args:
       - "-c"
       - |
-        gcloud secrets versions access latest --secret=$_ENV_SECRET_NAME > /workspace/swarmstar-secrets.json
+        gcloud secrets versions access latest --secret=$_ENV_SECRET_NAME > /workspace/secrets.json
 
   # ----------------- Build App Docker Image -----------------
   # Need to build app at root directory due to schema.gql being in ./server
