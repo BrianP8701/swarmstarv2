@@ -16,7 +16,8 @@
     "knip": "knip",
     "db:seed": "ts-node src/cli/databaseSeed.ts",
     "db:reset-and-seed": "ts-node src/cli/resetAndSeed.ts",
-    "start:prod": "node dist/server.js"
+    "start:prod": "node dist/server.js",
+    "pre": "yarn lint && yarn build"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

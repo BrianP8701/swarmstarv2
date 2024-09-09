@@ -3,21 +3,26 @@ import functions from '@google-cloud/functions-framework'
 import { inject, injectable } from 'inversify'
 import { container } from '../../../utils/di/container'
 import { CloudEventPayload, CloudEventSubscriberFunction } from '../CloudEventSubscriber'
-import { AlertHandlerPayload } from '../payload/AlertPayload'
+import { AlertPayload } from '../payload/AlertPayload'
 import { logger } from '../../../utils/logging/logger'
 import { AlertType } from '../payload/AlertPayload'
 import assert from 'assert'
 import { TwilioService } from '../../../services/external/TwilioService'
+import { PubSubTopic } from '../PubSubTopic'
 
 @injectable()
-export class AlertHandler extends CloudEventSubscriberFunction<AlertHandlerPayload> {
+export class AlertHandler extends CloudEventSubscriberFunction<PubSubTopic.AlertHandler> {
   constructor(
     @inject(TwilioService) private twilioService: TwilioService
   ) {
     super()
   }
 
-  public handle = async (_payload: AlertHandlerPayload) => {
+  protected getTopic(): PubSubTopic.AlertHandler {
+    return PubSubTopic.AlertHandler
+  }
+
+  public handle = async (_payload: AlertPayload) => {
     switch (_payload.eventType) {
       case AlertType.NewUser: {
         assert(_payload.body, 'Alert Body is required')

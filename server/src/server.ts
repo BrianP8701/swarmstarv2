@@ -13,8 +13,7 @@ import { checkAuthenticated } from './utils/auth/auth'
 import { TraceContext } from './utils/logging/TraceContext'
 
 const CORS_WHITELIST = [
-  'http://localhost:3000',
-  'http://localhost:3001',
+  'http://localhost:5173',
   'https://studio.apollographql.com',
   'https://client-7xir3z4nfa-uc.a.run.app',
   'https://client-911903497338.us-central1.run.app',

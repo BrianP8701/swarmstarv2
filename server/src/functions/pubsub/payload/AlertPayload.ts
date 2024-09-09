@@ -10,7 +10,7 @@ export type SlackBodyForNewUser = {
   userId: string
 }
 
-export interface AlertHandlerPayload {
+export interface AlertPayload {
   eventType: AlertType
   body?: AlertBody
 }

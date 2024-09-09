@@ -1,12 +1,13 @@
 import functions, { CloudEventFunction } from '@google-cloud/functions-framework'
 import assert from 'assert'
 import { injectable } from 'inversify'
-import { TopicPayload } from '../PubSubTopic'
-
+import { PubSubTopic, TopicPayload } from './PubSubTopic'
 import { Attributes } from '@google-cloud/pubsub'
 import { logger } from '../../utils/logging/logger'
 import { TraceContext } from '../../utils/logging/TraceContext'
-import { Buffer } from 'buffer'
+import { PubSubMediator } from './PubSubMediator'
+import { Environment, SecretService } from '../../services/SecretService'
+import { container } from '../../utils/di/container'
 
 // TODO: Replace with official GCP managed type
 export interface CloudEventPayload {
@@ -17,7 +18,14 @@ export interface CloudEventPayload {
 }
 
 @injectable()
-export abstract class CloudEventSubscriberFunction<PayloadType extends TopicPayload[keyof TopicPayload]> {
+export abstract class CloudEventSubscriberFunction<T extends PubSubTopic> {
+  protected secretService: SecretService
+  protected pubSubMediator: PubSubMediator
+  constructor() {
+    this.secretService = container.get(SecretService)
+    this.pubSubMediator = container.get(PubSubMediator)
+  }
+
   protected async handleEvent(cloudEvent: functions.CloudEvent<CloudEventPayload>): Promise<void> {
     const context = TraceContext.fromCloudEvent(cloudEvent)
     await TraceContext.runAsync(context, async () => {
@@ -26,16 +34,24 @@ export abstract class CloudEventSubscriberFunction<PayloadType extends TopicPayl
     })
   }
 
-  protected extractPayload = (cloudEvent: functions.CloudEvent<CloudEventPayload>): PayloadType => {
+  protected extractPayload = (cloudEvent: functions.CloudEvent<CloudEventPayload>): TopicPayload[T] => {
     assert(cloudEvent.data, 'cloudEvent.data must be defined')
 
     const base64Data = cloudEvent.data.message.data
     const jsonString = Buffer.from(base64Data, 'base64').toString()
-    const payload = JSON.parse(jsonString) as PayloadType // dataObject is the object you sent
+    const payload = JSON.parse(jsonString) as TopicPayload[T] // dataObject is the object you sent
     logger.info(`Received payload: ${JSON.stringify(payload)}`)
     return payload
   }
 
-  protected abstract handle(payload: PayloadType): Promise<void>
+  protected abstract handle(payload: TopicPayload[T]): Promise<void>
   protected static eventHandler: CloudEventFunction<CloudEventPayload>
+
+  protected abstract getTopic(): T
+
+  public registerLocalHandler(): void {
+    if (this.secretService.getEnvironment() === Environment.LOCAL) {
+      this.pubSubMediator.registerLocalHandler(this.getTopic(), this.handle.bind(this))
+    }
+  }
 }

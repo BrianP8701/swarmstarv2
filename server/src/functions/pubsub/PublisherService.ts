@@ -4,7 +4,7 @@ import assert from 'assert'
 import { inject, injectable } from 'inversify'
 import { TraceContext } from '../../utils/logging/TraceContext'
 import { logger } from '../../utils/logging/logger'
-import { TopicPayload } from '../PubSubTopic'
+import { TopicPayload } from './PubSubTopic'
 
 @injectable()
 export class PublisherService {
@@ -12,7 +12,6 @@ export class PublisherService {
 
   constructor(@inject(PubSub) private pubsub: PubSub) {}
 
-  // populate topicMap with all topics using this.pubsub.getTopics()
   public async setupTopics() {
     if (this.topicMap.size !== 0) {
       return
@@ -32,7 +31,6 @@ export class PublisherService {
     payload: TopicPayload[TopicKey],
     attributes?: Attributes
   ): Promise<string> {
-    // Make sure the topics are initialized
     logger.info('Publishing Pubsub Event', { topicKey, payload, attributes })
     await this.setupTopics()
     const topic = this.topicMap.get(topicKey)
@@ -40,7 +38,6 @@ export class PublisherService {
 
     const attr: Attributes = {
       ...attributes,
-      // Assume parent span = span for now
       ...TraceContext.toMessageAttributes(),
     }
     const pubsubMessage: PubsubMessage = {
