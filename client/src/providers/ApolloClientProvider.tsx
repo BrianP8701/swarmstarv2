@@ -5,7 +5,7 @@ import { onError } from '@apollo/client/link/error'
 import { setContext } from '@apollo/client/link/context'
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
-import { split, HttpLink } from '@apollo/client';
+import { split } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 
 import { useAuth } from '@clerk/clerk-react'
@@ -55,7 +55,10 @@ export const ApolloClientProvider = ({ children, url }: PropsWithChildren<Props>
     },
     retryAttempts: 5,
     retryWait: (retries) => new Promise((resolve) => setTimeout(resolve, retries * 1000)),
-    shouldRetry: (errOrCloseEvent) => true,
+    shouldRetry: (error: unknown) => {
+      const err = error as { message: string };
+      return !err.message.includes('Unauthorized') && !err.message.includes('Invalid token');
+    },
   }));
 
   const splitLink = split(

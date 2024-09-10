@@ -1,46 +1,62 @@
-import { WebSocketServer } from 'ws';
+import { WebSocketServer as WSServer, WebSocket } from 'ws';
 import { PubSub } from '@google-cloud/pubsub';
-import { Redis } from 'ioredis';
 import express from 'express';
 import http from 'http';
+import { injectable } from 'inversify';
 
-const app = express();
-const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
+@injectable()
+export class WebSocketServer {
+  private wss: WSServer;
+  private userConnections: Map<string, WebSocket> = new Map();
 
-const pubsub = new PubSub();
-const redis = new Redis(process.env.REDIS_URL);
+  constructor() {
+    const app = express();
+    const server = http.createServer(app);
+    this.wss = new WSServer({ server });
 
-wss.on('connection', (ws) => {
-  const clientId = generateClientId();
-  redis.set(`client:${clientId}`, process.env.INSTANCE_ID);
+    this.wss.on('connection', this.handleConnection.bind(this));
 
-  ws.on('close', () => {
-    redis.del(`client:${clientId}`);
-  });
-});
+    const pubsub = new PubSub();
+    pubsub.subscription('websocket-messages').on('message', this.handlePubSubMessage.bind(this));
 
-pubsub.subscription('websocket-messages').on('message', async (message) => {
-  const { clientId, data } = JSON.parse(message.data.toString());
-  const instanceId = await redis.get(`client:${clientId}`);
-  
-  if (instanceId === process.env.INSTANCE_ID) {
-    // Send message to the client
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(data));
-      }
+    const PORT = process.env.PORT || 8080;
+    server.listen(PORT, () => {
+      console.log(`WebSocket server is running on port ${PORT}`);
     });
   }
 
-  message.ack();
-});
+  private handleConnection(ws: WebSocket, req: http.IncomingMessage) {
+    const userId = req.url?.split('=')[1];
+    if (userId) {
+      this.userConnections.set(userId, ws);
+      console.log(`User ${userId} connected`);
 
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
-  console.log(`WebSocket server is running on port ${PORT}`);
-});
+      ws.on('close', () => {
+        this.userConnections.delete(userId);
+        console.log(`User ${userId} disconnected`);
+      });
+    } else {
+      ws.close(1008, 'User ID not provided');
+    }
+  }
 
-function generateClientId(): string {
-  return Math.random().toString(36).substr(2, 9);
+  private handlePubSubMessage(message: any) {
+    const { userId, data } = JSON.parse(message.data.toString());
+    this.sendMessageToUser(userId, data);
+    message.ack();
+  }
+
+  public sendMessageToUser(userId: string, data: any) {
+    const userWs = this.userConnections.get(userId);
+    if (userWs && userWs.readyState === WebSocket.OPEN) {
+      userWs.send(JSON.stringify(data));
+      console.log(`Message sent to user ${userId}`);
+    } else {
+      console.log(`User ${userId} not connected or connection not open`);
+    }
+  }
 }
+
+// Create an instance of the WebSocketServer
+const webSocketServer = new WebSocketServer();
+export default webSocketServer;

@@ -1,5 +1,5 @@
 import functions from '@google-cloud/functions-framework'
-import { injectable } from 'inversify'
+import { injectable, inject } from 'inversify'
 import { container } from '../../../utils/di/container'
 import { CloudEventPayload, CloudEventSubscriberFunction } from '../CloudEventSubscriber'
 import { PubSubTopic } from '../PubSubTopic'
@@ -8,7 +8,7 @@ import { WebSocketServer } from '../../../websocket-server'
 
 @injectable()
 export class WebSocketHandler extends CloudEventSubscriberFunction<PubSubTopic.WebSocketHandler> {
-  constructor(private webSocketServer: WebSocketServer) {
+  constructor(@inject(WebSocketServer) private webSocketServer: WebSocketServer) {
     super()
   }
 
@@ -17,7 +17,7 @@ export class WebSocketHandler extends CloudEventSubscriberFunction<PubSubTopic.W
   }
 
   public handle = async (payload: WebSocketPayload) => {
-    await this.webSocketServer.sendMessageToClient(payload.clientId, payload.message)
+    await this.webSocketServer.sendMessageToUser(payload.userId, payload.message)
   }
 
   static eventHandler = async (cloudEvent: functions.CloudEvent<CloudEventPayload>) => {

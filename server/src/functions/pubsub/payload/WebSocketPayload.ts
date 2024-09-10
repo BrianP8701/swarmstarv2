@@ -1,4 +1,4 @@
 export interface WebSocketPayload {
-  clientId: string;
-  message: any;
+  userId: string;
+  message: string; // temporary
 }
