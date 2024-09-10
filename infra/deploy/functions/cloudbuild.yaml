@@ -19,8 +19,6 @@ steps:
         yarn generate
         yarn custom-build
         cp .env ./dist/.env
-        mkdir -p ./dist/functions
-        cp -r ./dist/src/functions/* ./dist/functions/
 
   - id: 'deploy-functions'
     name: 'gcr.io/cloud-builders/gcloud'
