@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify'
-import { Swarm } from '@prisma/client'
+import { ActionEnum, MessageRoleEnum, Swarm } from '@prisma/client'
 import { CreateSwarmRequest } from '../graphql/generated/graphql'
 import { v4 as uuidv4 } from 'uuid'
 import { SwarmDao } from '../dao/SwarmDao'
@@ -15,6 +15,8 @@ export class SwarmService {
 
     const swarm = await this.swarmDao.create({
       id: swarmId,
+      title: createSwarmRequest.title,
+      goal: createSwarmRequest.goal,
       memory: {
         connect: {
           id: createSwarmRequest.memoryId
@@ -25,8 +27,24 @@ export class SwarmService {
           id: userId
         }
       },
-      title: createSwarmRequest.title,
-      goal: createSwarmRequest.goal
+      actionNodes: {
+        create: [{
+          goal: createSwarmRequest.goal,
+          actionEnum: ActionEnum.PLAN,
+          chats: {
+            create: [{
+              title: createSwarmRequest.title + " Goal",
+              userId: userId,
+              messages: {
+                create: [{
+                  content: createSwarmRequest.goal,
+                  role: MessageRoleEnum.USER
+                }]
+              }
+            }]
+          }
+        }]
+      },
     })
 
     return swarm

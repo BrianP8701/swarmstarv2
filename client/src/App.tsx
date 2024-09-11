@@ -26,8 +26,6 @@ const App = () => {
 const Providers = (props: PropsWithChildren<NonNullable<unknown>>) => {
   const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
-  console.log(clerkPubKey)
-
   return (
     <ClerkProvider publishableKey={clerkPubKey}>
       <ClerkLoaded>

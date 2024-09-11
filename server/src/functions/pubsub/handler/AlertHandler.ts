@@ -18,7 +18,7 @@ export class AlertHandler extends CloudEventSubscriberFunction<PubSubTopic.Alert
     super()
   }
 
-  protected getTopic(): PubSubTopic.AlertHandler {
+  public getTopic(): PubSubTopic.AlertHandler {
     return PubSubTopic.AlertHandler
   }
 

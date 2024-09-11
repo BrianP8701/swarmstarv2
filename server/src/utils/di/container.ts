@@ -7,7 +7,6 @@ import { logger } from '../logging/logger'
 import dotenv from 'dotenv'
 import { Prisma } from '@prisma/client'
 import { SecretService } from '../../services/SecretService'
-import webSocketServer, { WebSocketServer } from '../../websocket-server';
 
 dotenv.config()
 
@@ -58,8 +57,6 @@ export const coreBindingsModule = new ContainerModule((bind: interfaces.Bind) =>
     }
     return loggerFactory.create('RootLogger')
   })
-
-  container.bind<WebSocketServer>(WebSocketServer).toConstantValue(webSocketServer);
 })
 
 container.load(coreBindingsModule)

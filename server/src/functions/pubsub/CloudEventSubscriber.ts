@@ -8,6 +8,7 @@ import { TraceContext } from '../../utils/logging/TraceContext'
 import { PubSubMediator } from './PubSubMediator'
 import { SecretService, Environment } from '../../services/SecretService'
 import { container } from '../../utils/di/container'
+import { PubSubHandler } from './PubSubHandler'
 
 // TODO: Replace with official GCP managed type
 export interface CloudEventPayload {
@@ -18,7 +19,7 @@ export interface CloudEventPayload {
 }
 
 @injectable()
-export abstract class CloudEventSubscriberFunction<T extends PubSubTopic> {
+export abstract class CloudEventSubscriberFunction<T extends PubSubTopic> implements PubSubHandler<T> {
   protected secretService: SecretService
   protected pubSubMediator: PubSubMediator
   constructor() {
@@ -44,10 +45,10 @@ export abstract class CloudEventSubscriberFunction<T extends PubSubTopic> {
     return payload
   }
 
-  protected abstract handle(payload: TopicPayload[T]): Promise<void>
+  public abstract handle(payload: TopicPayload[T]): Promise<void>
   protected static eventHandler: CloudEventFunction<CloudEventPayload>
 
-  protected abstract getTopic(): T
+  public abstract getTopic(): T;
 
   public registerLocalHandler(): void {
     if (this.secretService.getEnvVars().MODE === Environment.LOCAL) {
