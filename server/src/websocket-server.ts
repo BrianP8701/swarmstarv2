@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { WebSocketServer as WSServer, WebSocket } from 'ws';
 import { PubSub } from '@google-cloud/pubsub';
 import http from 'http';
