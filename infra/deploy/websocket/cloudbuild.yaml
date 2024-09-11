@@ -1,45 +1,44 @@
 steps:
-  # Decrypt secrets
-  - id: 'decrypt-secrets'
+  # ----------------- Decrypting JSON ENV file -----------------
+  - id: 'decrypt-swarmstar-secrets'
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        gcloud secrets versions access latest --secret=$_ENV_SECRET_NAME > /workspace/secrets.json
+        gcloud secrets versions access latest --secret=$_ENV_SECRET_NAME > ./server/.env
 
-  # Build Docker image
-  - id: 'build-websocket-server'
+  # ----------------- Build WebSocket Server Docker Image -----------------
+  - id: 'build-websocket-server-docker-image'
     name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/websocket-server:$COMMIT_SHA', '-f', './server/Dockerfile.websocket', './server']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/websocket-server:$COMMIT_SHA', '--build-arg', 'ENV_FILE=.env', '-f', './server/Dockerfile.websocket', './server']
 
-  # Push Docker image to Container Registry
-  - id: 'push-websocket-server'
+  - id: 'push-websocket-server-docker-image'
     name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/websocket-server:$COMMIT_SHA']
 
-  # Deploy to Cloud Run
-  - id: 'deploy-websocket-server'
+  # ----------------- Deploying WebSocket Server Docker Image to Cloud Run Service -----------------
+  - id: 'deploy-websocket-server-docker-image'
     name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
-      - 'websocket-server'
+      - '$_SERVICE_NAME'
       - '--image'
       - 'gcr.io/$PROJECT_ID/websocket-server:$COMMIT_SHA'
       - '--region'
       - 'us-central1'
       - '--set-env-vars'
-      - 'REDIS_URL=${_REDIS_URL},INSTANCE_ID=$(cat /proc/sys/kernel/random/uuid)'
+      - 'NODE_ENV=$_NODE_ENV'
       - '--allow-unauthenticated'
 
-images:
-  - 'gcr.io/$PROJECT_ID/websocket-server:$COMMIT_SHA'
+images: ['gcr.io/$PROJECT_ID/websocket-server:$COMMIT_SHA']
 
 substitutions:
-  _ENV_SECRET_NAME: websocket-server-secrets
-  _REDIS_URL: ${_REDIS_URL}
+  _ENV_SECRET_NAME: swarmstar-secrets
+  _SERVICE_NAME: websocket-server
+  _NODE_ENV: production
 
 options:
   logging: CLOUD_LOGGING_ONLY
