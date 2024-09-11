@@ -1,6 +1,5 @@
 import { WebSocketServer as WSServer, WebSocket } from 'ws';
 import { PubSub } from '@google-cloud/pubsub';
-import express from 'express';
 import http from 'http';
 import { injectable } from 'inversify';
 import { logger } from './utils/logging/logger';
@@ -12,10 +11,10 @@ export class WebSocketServer {
   private wss: WSServer;
   private userConnections: Map<string, WebSocket> = new Map();
   private secretService: SecretService
+
   constructor() {
     this.secretService = container.get(SecretService)
-    const app = express();
-    const server = http.createServer(app);
+    const server = http.createServer();
     this.wss = new WSServer({ server });
 
     this.wss.on('connection', this.handleConnection.bind(this));
@@ -25,9 +24,9 @@ export class WebSocketServer {
       this.setupPubSub();
     }
 
-    const PORT = process.env.PORT || 8080;
-    server.listen(PORT, () => {
-      logger.info(`WebSocket server is running on port ${PORT}`);
+    const WS_PORT = process.env.WS_PORT || 8080;
+    server.listen(WS_PORT, () => {
+      logger.info(`WebSocket server is running on port ${WS_PORT}`);
     });
   }
 
@@ -71,3 +70,6 @@ export class WebSocketServer {
     }
   }
 }
+
+// Initialize the WebSocket server
+new WebSocketServer();
