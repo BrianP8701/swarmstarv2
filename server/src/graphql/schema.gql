@@ -20,6 +20,13 @@ enum ActionEnum {
   REVIEW_GOAL_PROGRESS
 }
 
+enum MessageRoleEnum {
+  USER
+  SYSTEM
+  ASSISTANT
+  SWARMSTAR
+}
+
 type User {
   id: ID!
   type: UserTypeEnum
@@ -51,6 +58,7 @@ type Memory {
 type Chat {
   id: ID!
   title: String
+  messages: [Message!]
 }
 
 type ActionNode {
@@ -70,6 +78,12 @@ type ActionMetadataNode {
   title: String
   parentId: ID
   description: String
+}
+
+type Message {
+  id: ID!
+  content: String
+  role: MessageRoleEnum
 }
 
 #  ___________________________________________________________

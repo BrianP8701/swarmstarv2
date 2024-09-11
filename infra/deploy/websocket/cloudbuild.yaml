@@ -1,0 +1,45 @@
+steps:
+  # Decrypt secrets
+  - id: 'decrypt-secrets'
+    name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud secrets versions access latest --secret=$_ENV_SECRET_NAME > /workspace/secrets.json
+
+  # Build Docker image
+  - id: 'build-websocket-server'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/websocket-server:$COMMIT_SHA', '-f', './server/Dockerfile.websocket', './server']
+
+  # Push Docker image to Container Registry
+  - id: 'push-websocket-server'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/websocket-server:$COMMIT_SHA']
+
+  # Deploy to Cloud Run
+  - id: 'deploy-websocket-server'
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'websocket-server'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/websocket-server:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--set-env-vars'
+      - 'REDIS_URL=${_REDIS_URL},INSTANCE_ID=$(cat /proc/sys/kernel/random/uuid)'
+      - '--allow-unauthenticated'
+
+images:
+  - 'gcr.io/$PROJECT_ID/websocket-server:$COMMIT_SHA'
+
+substitutions:
+  _ENV_SECRET_NAME: websocket-server-secrets
+  _REDIS_URL: ${_REDIS_URL}
+
+options:
+  logging: CLOUD_LOGGING_ONLY

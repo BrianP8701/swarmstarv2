@@ -13,7 +13,7 @@ export class OperationHandler extends CloudEventSubscriberFunction<PubSubTopic.O
     super()
   }
 
-  protected getTopic(): PubSubTopic.OperationHandler {
+  public getTopic(): PubSubTopic.OperationHandler {
     return PubSubTopic.OperationHandler
   }
 

@@ -41,6 +41,15 @@ fragment Memory on Memory {
 fragment Chat on Chat {
   id
   title
+  messages {
+    ...Message
+  }
+}
+
+fragment Message on Message {
+  id
+  content
+  role
 }
 
 fragment ActionNode on ActionNode {

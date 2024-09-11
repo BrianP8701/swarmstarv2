@@ -17,7 +17,9 @@ export class ActionRouter extends AbstractRouter<
   readonly description = ActionRouter.description;
   readonly actionEnum = ActionRouter.actionEnum;
 
-  static systemPrompt = "You are an AI assistant helping to navigate through a tree of actions. Choose the most appropriate action based on the current context and goal.";
+  static get systemPrompt() {
+    return "You are an AI assistant helping to navigate through a tree of actions. Choose the most appropriate action based on the current context and goal.";
+  }
 
   constructor(@inject('ActionNode') actionNode: ActionNodeWithContext) {
     super(actionNode);

@@ -41,8 +41,6 @@ export function CreateSwarmDialog({ open, onOpenChange }: { open: boolean, onOpe
 
   const isSpawnButtonDisabled = !createSwarmRequest.memoryId || !createSwarmRequest.title || !createSwarmRequest.goal
 
-  console.log(createSwarmRequest)
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent >
