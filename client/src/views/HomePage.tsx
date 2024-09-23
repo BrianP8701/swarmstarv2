@@ -8,16 +8,20 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { useFetchSwarmLazyQuery, FetchSwarmQuery } from "../graphql/generated/graphql";
+import { 
+  useFetchSwarmLazyQuery, 
+  SwarmWithDataFragment
+} from "../graphql/generated/graphql";
 import { TreeVisualizer } from "../components/custom/tree/TreeVisualizer";
 import { useFetchUser } from "../hooks/fetchUser";
+import { Loader2Icon } from "lucide-react";
 
 export default function HomePage() {
-  const { user } = useFetchUser();
+  const { user, loading } = useFetchUser();
   const [fetchSwarm, { data: swarmData }] = useFetchSwarmLazyQuery();
 
   const [selectedSwarmId, setSelectedSwarmId] = useState<string | undefined>(undefined);
-  const [swarm, setSwarm] = useState<FetchSwarmQuery | undefined>(undefined);
+  const [swarm, setSwarm] = useState<SwarmWithDataFragment | undefined>(undefined);
   const [isCreateSwarmDialogOpen, setIsCreateSwarmDialogOpen] = useState(false);
 
   const openCreateSwarmDialog = () => {
@@ -31,13 +35,30 @@ export default function HomePage() {
   }, [selectedSwarmId, fetchSwarm]);
 
   useEffect(() => {
-    if (swarmData) {
-      setSwarm(swarmData ?? undefined);
+    if (swarmData?.fetchSwarm) {
+      setSwarm({
+        ...swarmData.fetchSwarm,
+        data: swarmData.fetchSwarm.data ?? undefined
+      });
     }
   }, [swarmData]);
 
+  useEffect(() => {
+    if (user && user.swarms && user.swarms.length > 0 && !selectedSwarmId) {
+      setSelectedSwarmId(user.swarms[0].id);
+    }
+  }, [user, selectedSwarmId]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2Icon className="animate-spin" size={48} />
+      </div>
+    );
+  }
+
   const swarms = user?.swarms ?? [];
-  const actionMetadataNodes = swarm?.fetchSwarm?.data?.actionMetadataNodes ?? [];
+  const actionMetadataNodes = swarm?.data?.actionMetadataNodes ?? [];
 
   return (
     <div className="flex flex-col h-full">
@@ -57,7 +78,7 @@ export default function HomePage() {
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={50} minSize={20}>
             <div className="h-full p-4">
-              <Chat />
+              <Chat swarm={swarm} />
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle fadeStart fadeEnd />

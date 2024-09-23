@@ -78,12 +78,11 @@ model Memory {
 model Chat {
   id     String @id @default(uuid()) @db.Uuid
   title  String
-  userId String @db.Uuid
 
   messages Message[]
 
-  actionNodeId String     @db.Uuid
-  actionNode   ActionNode @relation(fields: [actionNodeId], references: [id])
+  actionNodeId String?     @db.Uuid
+  actionNode   ActionNode? @relation(fields: [actionNodeId], references: [id])
 
   Swarm   Swarm?  @relation(fields: [swarmId], references: [id])
   swarmId String? @db.Uuid

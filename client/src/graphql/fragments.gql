@@ -16,6 +16,7 @@ fragment Swarm on Swarm {
 }
 
 fragment SwarmData on SwarmData {
+  id
   memoryNodes {
     ...MemoryNode
   }
@@ -30,6 +31,13 @@ fragment SwarmData on SwarmData {
   }
 }
 
+fragment SwarmWithData on Swarm {
+  ...Swarm
+  data {
+    ...SwarmData
+  }
+}
+
 fragment Memory on Memory {
   id
   title
@@ -41,6 +49,9 @@ fragment Memory on Memory {
 fragment Chat on Chat {
   id
   title
+}
+
+fragment ChatData on ChatData {
   messages {
     ...Message
   }

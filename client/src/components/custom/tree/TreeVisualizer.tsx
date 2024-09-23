@@ -81,7 +81,7 @@ export const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes }) => {
     }, []);
 
     return (
-        <div ref={containerRef} className="w-full h-full bg-secondary rounded-xl">
+        <div ref={containerRef} className="w-full h-full rounded-xl">
             {graphData.nodes.length > 0 && (
                 <Graph
                     key={key}

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import fs from 'fs/promises';
 import path from 'path';
-import { ActionEnum, ActionMetadataNode, Prisma } from '@prisma/client';
+import { ActionEnum, ActionMetadataNode, MessageRoleEnum, Prisma } from '@prisma/client';
 import { container } from '../utils/di/container';
 import { ActionMetadataNodeDao } from '../dao/nodes/ActionMetadataDao';
 import { AbstractAction } from '../swarmstar/actions/AbstractAction';
@@ -120,14 +120,23 @@ export async function generateActionMetadataTree(userId: string): Promise<void> 
   }
   const globalContextDao = container.get(GlobalContextDao);
   const swarmDao = container.get(SwarmDao);
+  const defaultSwarmGoal = 'Achieve AGI';
 
   // Create the default swarm first
   const swarm = await swarmDao.create({
     title: 'Default Swarm',
-    goal: 'Default Swarm Goal',
+    goal: defaultSwarmGoal,
     user: { connect: { id: userId } },
-    memory: { create: { title: 'Default Memory', user: { connect: { id: userId } } } }
-  });
+    memory: { create: { title: 'Default Memory', user: { connect: { id: userId } } } },
+    chats: { 
+      create: [{ 
+        title: 'Default Chat', 
+        messages: { 
+          create: [{ content: defaultSwarmGoal, role: MessageRoleEnum.USER }] 
+        } 
+      }]
+    },
+   });
 
   logger.info(`Created default swarm with ID: ${swarm.id}`);
 

@@ -58,6 +58,11 @@ type Memory {
 type Chat {
   id: ID!
   title: String
+  data: ChatData
+}
+
+type ChatData {
+  id: ID!
   messages: [Message!]
 }
 

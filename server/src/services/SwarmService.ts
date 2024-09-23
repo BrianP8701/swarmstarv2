@@ -33,8 +33,7 @@ export class SwarmService {
           actionEnum: ActionEnum.PLAN,
           chats: {
             create: [{
-              title: createSwarmRequest.title + " Goal",
-              userId: userId,
+              title: createSwarmRequest.title,
               messages: {
                 create: [{
                   content: createSwarmRequest.goal,
