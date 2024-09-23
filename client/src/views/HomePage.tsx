@@ -23,6 +23,7 @@ export default function HomePage() {
   const [selectedSwarmId, setSelectedSwarmId] = useState<string | undefined>(undefined);
   const [swarm, setSwarm] = useState<SwarmWithDataFragment | undefined>(undefined);
   const [isCreateSwarmDialogOpen, setIsCreateSwarmDialogOpen] = useState(false);
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
 
   const openCreateSwarmDialog = () => {
     setIsCreateSwarmDialogOpen(true);
@@ -48,6 +49,12 @@ export default function HomePage() {
       setSelectedSwarmId(user.swarms[0].id);
     }
   }, [user, selectedSwarmId]);
+
+  useEffect(() => {
+    if (swarm && swarm.data?.chats && swarm.data.chats.length > 0 && !selectedChatId) {
+      setSelectedChatId(swarm.data.chats[0].id);
+    }
+  }, [swarm, selectedChatId]);
 
   if (loading) {
     return (
@@ -77,16 +84,16 @@ export default function HomePage() {
       <main className="flex-1">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={50} minSize={20}>
-          <div className="h-full p-4">
-            <DialogPreview
-              previewComponent={
-                <Chat swarm={swarm} />
-              }
-              dialogContent={
-                <Chat swarm={swarm} />
-              }
-              dialogProps={{ swarm }}
-            />
+            <div className="h-full p-4">
+              <DialogPreview
+                previewComponent={
+                  <Chat swarm={swarm} selectedChatId={selectedChatId} setSelectedChatId={setSelectedChatId} />
+                }
+                dialogContent={
+                  <Chat swarm={swarm} selectedChatId={selectedChatId} setSelectedChatId={setSelectedChatId} />
+                }
+                dialogProps={{ swarm, selectedChatId, setSelectedChatId }}
+              />
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle fadeStart fadeEnd />

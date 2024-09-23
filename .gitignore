@@ -15,3 +15,4 @@ server/secrets.json
 **/yarn.lock
 .env.prod
 .env
+client/graphql.schema.json

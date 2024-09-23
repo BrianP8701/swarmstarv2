@@ -7,7 +7,9 @@ import { MemoryMutation } from './mutations/memoryMutation'
 import { SwarmMutation } from './mutations/swarmMutation'
 import { Memory } from './fields/memory'
 import { SwarmData } from './fields/swarmData'
-
+import { ChatMutation } from './mutations/chatMutation'
+import { ChatData } from './fields/chatData'
+import { Chat } from './fields/chat'
 export const resolvers = {
   // Root
   RootQuery,
@@ -21,8 +23,11 @@ export const resolvers = {
   Memory,
   SwarmData,
   User,
+  Chat,
+  ChatData,
 
   // Mutations
   SwarmMutation,
   MemoryMutation,
+  ChatMutation
 }

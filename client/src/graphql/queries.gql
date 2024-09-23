@@ -10,6 +10,12 @@ query FetchSwarm($id: ID!) {
   }
 }
 
+query FetchChat($id: ID!) {
+  fetchChat(id: $id) {
+    ...ChatWithData
+  }
+}
+
 mutation CreateSwarm($input: CreateSwarmRequest!) {
   swarmMutation {
     createSwarm(input: $input) {
@@ -22,6 +28,14 @@ mutation CreateMemory($input: CreateMemoryRequest!) {
   memoryMutation {
     createMemory(input: $input) {
       ...User
+    }
+  }
+}
+
+mutation SendMessage($input: SendMessageRequest!) {
+  chatMutation {
+    sendMessage(input: $input) {
+      ...ChatWithData
     }
   }
 }

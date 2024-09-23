@@ -7,4 +7,7 @@ export const RootMutation: RootMutationResolvers = {
   swarmMutation: async () => {
     return {}
   },
+  chatMutation: async () => {
+    return {}
+  }
 }

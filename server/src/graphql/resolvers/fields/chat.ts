@@ -2,7 +2,7 @@ import { container } from '../../../utils/di/container'
 import { ChatResolvers } from '../../generated/graphql'
 import { ChatDao } from '../../../dao/ChatDao'
 
-export const ChatData: ChatResolvers = {
+export const Chat: ChatResolvers = {
   title: async (parent) => {
     const chatDao = container.get(ChatDao)
     const chat = await chatDao.get(parent.id)

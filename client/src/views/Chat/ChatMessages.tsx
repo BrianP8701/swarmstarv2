@@ -1,11 +1,5 @@
-import { useEffect, useRef } from "react";
-import { MessageRoleEnum } from "@/graphql/generated/graphql";
-
-interface Message {
-  id: string;
-  content: string;
-  role: MessageRoleEnum;
-}
+import { useEffect, useRef, useState } from "react";
+import { MessageFragment, MessageRoleEnum, useFetchChatLazyQuery } from "@/graphql/generated/graphql";
 
 interface UserMessageProps {
   content: string;
@@ -34,29 +28,43 @@ const AiMessage: React.FC<AiMessageProps> = ({ content }) => (
 );
 
 interface ChatMessagesProps {
-  messages: Message[];
+  selectedChatId: string | null;
   isDialogMode?: boolean;
 }
 
-export function ChatMessages({ messages, isDialogMode }: ChatMessagesProps) {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+export function ChatMessages({selectedChatId, isDialogMode }: ChatMessagesProps) {
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [messages, setMessages] = useState<MessageFragment[]>([])
+  const [fetchChat, { data: chatData }] = useFetchChatLazyQuery()
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (selectedChatId) {
+      fetchChat({ variables: { id: selectedChatId } })
+    }
+  }, [selectedChatId, fetchChat]);
 
-  const heightClass = isDialogMode ? "h-[calc(100vh-163px)]" : "h-[calc(100vh-200px)]";
+  useEffect(() => {
+    if (chatData?.fetchChat) {
+      setMessages(chatData.fetchChat.data?.messages ?? [])
+    }
+  }, [chatData])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
+
+  const heightClass = isDialogMode ? "h-[calc(100vh-163px)]" : "h-[calc(100vh-200px)]"
 
   return (
     <div className={`flex flex-col justify-start overflow-y-auto mt-10 gap-4 ${heightClass}`}>
       {messages.map((message) => (
         message.role === MessageRoleEnum.User ? (
-          <UserMessage key={message.id} content={message.content} />
+          <UserMessage key={message.id} content={message.content ?? ""} />
         ) : (
-          <AiMessage key={message.id} content={message.content} />
+          <AiMessage key={message.id} content={message.content ?? ""} />
         )
       ))}
       <div ref={messagesEndRef} />
     </div>
-  );
+  )
 }

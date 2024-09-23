@@ -57,6 +57,13 @@ fragment ChatData on ChatData {
   }
 }
 
+fragment ChatWithData on Chat {
+  ...Chat
+  data {
+    ...ChatData
+  }
+}
+
 fragment Message on Message {
   id
   content

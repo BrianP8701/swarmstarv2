@@ -1,4 +1,4 @@
-import { Chat, Message, Prisma, PrismaClient } from '@prisma/client'
+import { Chat, Message, MessageRoleEnum, Prisma, PrismaClient } from '@prisma/client'
 import { inject, injectable } from 'inversify'
 
 @injectable()
@@ -23,6 +23,25 @@ export class ChatDao {
     return this.prisma.chat.findUniqueOrThrow({
       where: {
         id: chatId,
+      },
+      include: {
+        messages: true,
+      },
+    })
+  }
+
+  async sendMessage(chatId: string, message: string): Promise<Chat & { messages: Message[] }> {
+    return this.prisma.chat.update({
+      where: {
+        id: chatId,
+      },
+      data: {
+        messages: {
+          create: {
+            content: message,
+            role: MessageRoleEnum.USER,
+          },
+        },
       },
       include: {
         messages: true,

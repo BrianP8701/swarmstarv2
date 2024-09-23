@@ -14,6 +14,9 @@ export const RootQuery: RootQueryResolvers = {
   fetchMemory: async (_parent, { id }) => {
     return { id }
   },
+  fetchChat: async (_parent, { id }) => {
+    return { id }
+  },
   fetchUser: async (_parent, _args, { req, container }: ResolverContext) => {
     const userDao = container.get(UserDao)
     assert(req.user, 'User is not logged in')

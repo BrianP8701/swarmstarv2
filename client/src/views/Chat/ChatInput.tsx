@@ -3,7 +3,12 @@ import { ArrowUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 
-export function ChatInput() {
+interface ChatInputProps {
+  loading: boolean
+  onSendMessage: (message: string) => void
+}
+
+export function ChatInput({ loading, onSendMessage }: ChatInputProps) {
   const [message, setMessage] = useState("")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -28,6 +33,8 @@ export function ChatInput() {
         type="submit"
         size="icon"
         className="absolute right-2 bottom-3.5 rounded-full"
+        disabled={loading}
+        onClick={() => onSendMessage(message)}
       >
         <ArrowUp className="h-4 w-4" />
       </Button>
