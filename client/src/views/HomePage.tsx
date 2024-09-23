@@ -8,8 +8,8 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { 
-  useFetchSwarmLazyQuery, 
+import {
+  useFetchSwarmLazyQuery,
   SwarmWithDataFragment
 } from "../graphql/generated/graphql";
 import { TreeVisualizer } from "../components/custom/tree/TreeVisualizer";
@@ -77,8 +77,16 @@ export default function HomePage() {
       <main className="flex-1">
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={50} minSize={20}>
-            <div className="h-full p-4">
-              <Chat swarm={swarm} />
+          <div className="h-full p-4">
+            <DialogPreview
+              previewComponent={
+                <Chat swarm={swarm} />
+              }
+              dialogContent={
+                <Chat swarm={swarm} />
+              }
+              dialogProps={{ swarm }}
+            />
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle fadeStart fadeEnd />

@@ -15,13 +15,13 @@ export function ChatInput() {
   }, [message])
 
   return (
-    <div className="relative overflow-hidden rounded-lg bg-background w-full min-h-[48px] max-h-[240px]">
+    <div className="relative overflow-hidden rounded-3xl bg-background w-full min-h-[48px] max-h-[240px]">
       <Textarea
         ref={textareaRef}
         id="message"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        placeholder="Type your message here..."
+        placeholder=""
         className=" resize-none border-0 py-3 pl-3 pr-14 w-full"
       />
       <Button
