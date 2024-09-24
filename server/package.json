@@ -58,6 +58,7 @@
     "dotenv": "^16.4.5",
     "eslint": "^9.9.0",
     "graphql": "^16.9.0",
+    "graphql-subscriptions": "^2.0.0",
     "inversify": "^6.0.2",
     "ioredis": "^5.4.1",
     "openai": "^4.56.0",

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { AbstractInstructor } from './AbstractInstructor';
-import { InstructorConversation } from '../../services/external/InstructorService';
-import { InstructorMessageRoleEnum } from '../../services/external/InstructorService';
+import { InstructorMessage, InstructorMessageRoleEnum } from '../../services/InstructorService';
 
 const IsContextSufficientInstructorSchema = z.object({
   isContextSufficient: z.boolean().describe("Do we have enough information to do what we need to do?"),
@@ -18,7 +17,7 @@ export class IsContextSufficientInstructor extends AbstractInstructor<
 > {
   ZodSchema = IsContextSufficientInstructorSchema;
 
-  protected writeInstructions({ content, context }: IsContextSufficientInstructorInput): InstructorConversation {
+  protected writeInstructions({ content, context }: IsContextSufficientInstructorInput): InstructorMessage[] {
     const userContent = `What we need to do: ${content}${context ? `\n\nContext: ${context}` : ''}`;
 
     return [

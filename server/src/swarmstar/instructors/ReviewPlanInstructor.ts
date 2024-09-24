@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AbstractInstructor } from './AbstractInstructor';
-import { InstructorConversation, InstructorMessageRoleEnum } from '../../services/external/InstructorService';
+import { InstructorMessage, InstructorMessageRoleEnum } from '../../services/InstructorService';
 
 const ReviewPlanInstructorSchema = z.object({
   analysis: z.string().describe("Analyze the list of steps and determine if they can be executed in sequence or if they should be revised."),
@@ -20,7 +20,7 @@ export class ReviewPlanInstructor extends AbstractInstructor<
 > {
   ZodSchema = ReviewPlanInstructorSchema;
 
-  protected writeInstructions({ goal, steps, context }: ReviewPlanInstructorInput): InstructorConversation {
+  protected writeInstructions({ goal, steps, context }: ReviewPlanInstructorInput): InstructorMessage[] {
     return [
       {
         role: InstructorMessageRoleEnum.USER,

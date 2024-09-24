@@ -178,4 +178,9 @@ type ChatMutation {
 schema {
   query: RootQuery
   mutation: RootMutation
+  subscription: Subscription
+}
+
+type Subscription {
+  messageReceived(userId: ID!): Chat
 }

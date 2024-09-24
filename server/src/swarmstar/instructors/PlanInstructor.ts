@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AbstractInstructor } from './AbstractInstructor';
-import { InstructorConversation, InstructorMessageRoleEnum } from '../../services/external/InstructorService';
+import { InstructorMessage, InstructorMessageRoleEnum } from '../../services/InstructorService';
 
 const PlanInstructorSchema = z.object({
   steps: z.array(z.string()).describe("Break the goal into actionable steps that must be executed in sequence."),
@@ -19,8 +19,8 @@ export class PlanInstructor extends AbstractInstructor<
 > {
   ZodSchema = PlanInstructorSchema;
 
-  protected writeInstructions({ goal, context, review, lastPlanAttempt }: PlanInstructorInput): InstructorConversation {
-    const messages: InstructorConversation = [
+  protected writeInstructions({ goal, context, review, lastPlanAttempt }: PlanInstructorInput): InstructorMessage[] {
+    const messages: InstructorMessage[] = [
       {
         role: InstructorMessageRoleEnum.USER,
         content: `The goal is: ${goal}. Please break it down into  steps.${context ? `\n\nContext: ${context}` : ''}`,

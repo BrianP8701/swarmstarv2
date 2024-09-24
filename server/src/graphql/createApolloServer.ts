@@ -1,3 +1,5 @@
+import { WebSocketServer } from 'ws';
+import { useServer } from 'graphql-ws/lib/use/ws';
 import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { makeExecutableSchema } from '@graphql-tools/schema';
@@ -18,6 +20,13 @@ export const createApolloServer = (httpServer: Server): ApolloServer => {
     schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/graphql',
+  });
+
+  useServer({ schema }, wsServer);
+
 
   return server;
 };

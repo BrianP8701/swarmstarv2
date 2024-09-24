@@ -6,15 +6,18 @@ import { injectable } from 'inversify';
 import { logger } from './utils/logging/logger';
 import { SecretService, Environment } from './services/SecretService';
 import { container } from './utils/di/container';
+import { checkAuthenticated } from './utils/auth/auth';
+import { AuthenticatedRequest } from './utils/auth/AuthRequest';
+import { Response } from 'express';
 
 @injectable()
 export class WebSocketServer {
   private wss: WSServer;
   private userConnections: Map<string, WebSocket> = new Map();
-  private secretService: SecretService
+  private secretService: SecretService;
 
   constructor() {
-    this.secretService = container.get(SecretService)
+    this.secretService = container.get(SecretService);
     const server = http.createServer();
     this.wss = new WSServer({ server });
 
@@ -40,19 +43,34 @@ export class WebSocketServer {
     pubsub.subscription(subscriptionName).on('message', this.handlePubSubMessage.bind(this));
   }
 
-  private handleConnection(ws: WebSocket, req: http.IncomingMessage) {
-    const userId = req.url?.split('=')[1];
-    if (userId) {
-      this.userConnections.set(userId, ws);
-      logger.info(`User ${userId} connected`);
+  private async handleConnection(ws: WebSocket, req: http.IncomingMessage) {
+    const token = new URLSearchParams(req.url?.split('?')[1]).get('token');
+    if (token) {
+      const userId = await this.verifyToken(token);
+      if (userId) {
+        this.userConnections.set(userId, ws);
+        logger.info(`User ${userId} connected`);
 
-      ws.on('close', () => {
-        this.userConnections.delete(userId);
-        logger.info(`User ${userId} disconnected`);
-      });
+        ws.on('close', () => {
+          this.userConnections.delete(userId);
+          logger.info(`User ${userId} disconnected`);
+        });
+      } else {
+        ws.close(1008, 'Invalid token');
+      }
     } else {
-      ws.close(1008, 'User ID not provided');
+      ws.close(1008, 'Token not provided');
     }
+  }
+
+  private async verifyToken(token: string): Promise<string | null> {
+    const req = { headers: { authorization: `Bearer ${token}` } } as AuthenticatedRequest;
+    const res = {} as http.ServerResponse;
+    const next = () => {};
+
+    await checkAuthenticated(req, res as Response, next);
+
+    return req.user ? req.user.id : null;
   }
 
   private handlePubSubMessage(message: { data: Buffer; ack: () => void }) {
@@ -69,6 +87,10 @@ export class WebSocketServer {
     } else {
       logger.info(`User ${userId} not connected or connection not open`);
     }
+  }
+
+  public getUserConnection(userId: string): WebSocket | null {
+    return this.userConnections.get(userId) || null;
   }
 }
 

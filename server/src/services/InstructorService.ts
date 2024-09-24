@@ -1,10 +1,8 @@
 import Instructor from '@instructor-ai/instructor'
-import { inject, injectable, named } from 'inversify'
+import { inject, injectable } from 'inversify'
 import OpenAI from 'openai'
 import { z } from 'zod'
-import { TYPES } from '../../utils/di/container'
-import { ContextLogger } from '../../utils/logging/ContextLogger'
-import { ActionDao } from '../../dao/nodes/ActionDao'
+import { ActionDao } from '../dao/nodes/ActionDao'
 
 export type GPT_MODEL = 'gpt-3.5-turbo' | 'gpt-4-1106-preview' | 'gpt-4-turbo-preview' | 'gpt-4o' | 'gpt-4o-mini'
 
@@ -19,10 +17,8 @@ export type InstructorMessage = {
   content: string
 }
 
-export type InstructorConversation = InstructorMessage[]
-
 export type InstructorRequest = {
-  messages: InstructorConversation
+  messages: InstructorMessage[]
   response_model: {
     schema: z.AnyZodObject
     name: string
@@ -37,7 +33,6 @@ export type InstructorRequest = {
 export class InstructorService {
   constructor(
     @inject(OpenAI) private openAI: OpenAI,
-    @inject(TYPES.Logger) @named('InstructorClient') private logger: ContextLogger,
     @inject(ActionDao) private actionDao: ActionDao
   ) { }
 
@@ -53,7 +48,6 @@ export class InstructorService {
       mode: 'FUNCTIONS',
     })
 
-    this.logger.info('Creating OpenAI Instructor request')
     const responsePromise = client.chat.completions.create({
       messages: request.messages,
       model: request.model ?? 'gpt-4o',
