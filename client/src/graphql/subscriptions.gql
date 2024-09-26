@@ -1,0 +1,5 @@
+subscription NewMessage($chatId: ID!) {
+  messageSent(chatId: $chatId) {
+    ...Message
+  }
+}

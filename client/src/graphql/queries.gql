@@ -4,14 +4,14 @@ query FetchUser {
   }
 }
 
-query FetchSwarm($id: ID!) {
-  fetchSwarm(id: $id) {
+query FetchSwarm($swarmId: ID!) {
+  fetchSwarm(swarmId: $swarmId) {
     ...SwarmWithData
   }
 }
 
-query FetchChat($id: ID!) {
-  fetchChat(id: $id) {
+query FetchChat($chatId: ID!) {
+  fetchChat(chatId: $chatId) {
     ...ChatWithData
   }
 }

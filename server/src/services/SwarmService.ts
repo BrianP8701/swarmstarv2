@@ -1,7 +1,6 @@
 import { inject, injectable } from 'inversify'
 import { ActionEnum, MessageRoleEnum, Swarm } from '@prisma/client'
 import { CreateSwarmRequest } from '../graphql/generated/graphql'
-import { v4 as uuidv4 } from 'uuid'
 import { SwarmDao } from '../dao/SwarmDao'
 
 @injectable()
@@ -11,10 +10,8 @@ export class SwarmService {
   ) { }
 
   public async createSwarm(userId: string, createSwarmRequest: CreateSwarmRequest): Promise<Swarm> {
-    const swarmId = uuidv4()
-
+    // Step 1: Create the swarm without chats
     const swarm = await this.swarmDao.create({
-      id: swarmId,
       title: createSwarmRequest.title,
       goal: createSwarmRequest.goal,
       memory: {
@@ -26,25 +23,34 @@ export class SwarmService {
         connect: {
           id: userId
         }
-      },
+      }
+    });
+
+    // Step 2: Now that the swarm exists, create the chats and actionNodes
+    await this.swarmDao.update(swarm.id, {
       actionNodes: {
         create: [{
-          goal: createSwarmRequest.goal,
-          actionEnum: ActionEnum.PLAN,
-          chats: {
-            create: [{
-              title: createSwarmRequest.title,
-              messages: {
-                create: [{
-                  content: createSwarmRequest.goal,
-                  role: MessageRoleEnum.USER
-                }]
-              }
-            }]
-          }
-        }]
-      },
-    })
+            goal: createSwarmRequest.goal,
+            actionEnum: ActionEnum.PLAN,
+            chats: {
+              create: [{
+                title: createSwarmRequest.title,
+                messages: {
+                  create: [{
+                    content: createSwarmRequest.goal,
+                    role: MessageRoleEnum.USER
+                  }]
+                },
+                swarm: {
+                  connect: {
+                    id: swarm.id // Now you have the swarm id
+                  }
+                }
+              }]
+            }
+          }]
+        }
+      })
 
     return swarm
   }

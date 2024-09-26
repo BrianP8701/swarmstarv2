@@ -4,13 +4,16 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
 import { createServer } from 'http'
-
 import { expressMiddleware } from '@apollo/server/express4'
 import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node'
 import { container } from './utils/di/container'
 import { ResolverContext, createApolloServer } from './graphql/createApolloServer'
 import { checkAuthenticated } from './utils/auth/auth'
 import { TraceContext } from './utils/logging/TraceContext'
+import { Environment } from './services/SecretService'
+import { initializePubSubHandlers } from './functions/pubsub/initializePubSubHandlers'
+import { logger } from './utils/logging/logger'
+import { WebSocketServer } from './websocket-server'
 
 const CORS_WHITELIST = [
   'http://localhost:5173',
@@ -37,6 +40,10 @@ app.get('/', (_req, res) => {
   res.send('Nothing to see here')
 })
 
+if (process.env.MODE === Environment.LOCAL) {
+  initializePubSubHandlers()
+}
+
 const startServer = async () => {
   const httpServer = createServer(app)
   const apolloServer = createApolloServer(httpServer)
@@ -55,7 +62,19 @@ const startServer = async () => {
     })
   )
 
-  httpServer.listen(PORT)
-}
+  if (process.env.MODE === Environment.LOCAL) {
+    const webSocketServer = WebSocketServer.getInstance();
+    await webSocketServer.initialize();
+  }
 
-startServer()
+  httpServer.listen(PORT, () => {
+    logger.info(`HTTP server running on port ${PORT}`);
+    if (process.env.MODE === Environment.LOCAL) {
+      logger.info(`WebSocket server running on port ${process.env.WS_PORT || '8080'}`);
+    }
+  });
+};
+
+startServer().catch((error) => {
+  logger.error('Failed to start server:', error);
+});

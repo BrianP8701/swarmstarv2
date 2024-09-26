@@ -5,6 +5,7 @@ import { SecretService, Environment } from '../../services/SecretService'
 import { container } from '../../utils/di/container'
 import { PubSubTopic } from './PubSubTopic'
 import { PubSubHandler } from './PubSubHandler'
+import { UserMessageHandler } from './handler/UserMessageHandler'
 
 function getHandlerForTopic(topic: PubSubTopic): PubSubHandler<PubSubTopic> | null {
   switch (topic) {
@@ -14,6 +15,8 @@ function getHandlerForTopic(topic: PubSubTopic): PubSubHandler<PubSubTopic> | nu
       return container.get(OperationHandler)
     case PubSubTopic.WebSocketHandler:
       return container.get(WebSocketHandler)
+    case PubSubTopic.UserMessageHandler:
+      return container.get(UserMessageHandler)
     default:
       return null
   }

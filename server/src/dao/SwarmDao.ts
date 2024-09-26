@@ -11,6 +11,13 @@ export class SwarmDao {
     })
   }
 
+  async update(swarmId: string, swarmUpdateInput: Prisma.SwarmUpdateInput) {
+    return this.prisma.swarm.update({
+      where: { id: swarmId },
+      data: swarmUpdateInput,
+    })
+  }
+
   async getBasic(swarmId: string): Promise<Swarm> {
     return this.prisma.swarm.findUniqueOrThrow({
       where: { id: swarmId },
@@ -55,13 +62,6 @@ export class SwarmDao {
     return this.prisma.swarm.findUniqueOrThrow({
       where: { id: swarmId },
       include: { actionMetadataNodes: true },
-    })
-  }
-
-  async update(swarmId: string, swarmUpdateInput: Prisma.SwarmUpdateInput) {
-    return this.prisma.swarm.update({
-      where: { id: swarmId },
-      data: swarmUpdateInput,
     })
   }
 

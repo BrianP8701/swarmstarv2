@@ -7,7 +7,7 @@ import { AlertPayload } from '../payload/AlertPayload'
 import { logger } from '../../../utils/logging/logger'
 import { AlertType } from '../payload/AlertPayload'
 import assert from 'assert'
-import { TwilioService } from '../../../services/external/TwilioService'
+import { TwilioService } from '../../../services/TwilioService'
 import { PubSubTopic } from '../PubSubTopic'
 
 @injectable()

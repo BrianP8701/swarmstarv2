@@ -6,10 +6,10 @@ import assert from 'assert';
 const pubsub = new PubSub();
 
 export const Subscription: SubscriptionResolvers = {
-  messageReceived: {
+  messageSent: {
     subscribe: async (_, __, { req }: ResolverContext) => {
       assert(req.user, 'User not found');
-      const asyncIterator = pubsub.asyncIterator(`MESSAGE_RECEIVED_${req.user.id}`);
+      const asyncIterator = pubsub.asyncIterator(`MESSAGE_SENT_${req.user.id}`);
       return {
         [Symbol.asyncIterator]() {
           return asyncIterator;

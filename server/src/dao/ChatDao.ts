@@ -55,13 +55,13 @@ export class ChatDao {
         id: chatId,
       },
       select: {
-        Swarm: {
+        swarm: {
           select: {
             userId: true,
           },
         },
       },
     })
-    return userIdOnChat.Swarm.userId
+    return userIdOnChat.swarm.userId
   }
 }

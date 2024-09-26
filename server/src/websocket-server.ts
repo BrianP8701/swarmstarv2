@@ -9,17 +9,41 @@ import { container } from './utils/di/container';
 import { checkAuthenticated } from './utils/auth/auth';
 import { AuthenticatedRequest } from './utils/auth/AuthRequest';
 import { Response } from 'express';
+import { useServer } from 'graphql-ws/lib/use/ws';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { resolvers } from './graphql/resolvers';
+import { typeDefs } from './graphql/typeDefs';
 
 @injectable()
 export class WebSocketServer {
-  private wss: WSServer;
+  private static instance: WebSocketServer | null = null;
+  private wss: WSServer | null = null;
+  private server: http.Server | null = null;
   private userConnections: Map<string, WebSocket> = new Map();
   private secretService: SecretService;
 
-  constructor() {
+  public constructor() {
     this.secretService = container.get(SecretService);
-    const server = http.createServer();
-    this.wss = new WSServer({ server });
+  }
+
+  public static getInstance(): WebSocketServer {
+    if (!WebSocketServer.instance) {
+      WebSocketServer.instance = new WebSocketServer();
+    }
+    return WebSocketServer.instance;
+  }
+
+  public async initialize() {
+    if (this.wss) {
+      logger.warn('WebSocket server is already initialized');
+      return;
+    }
+
+    this.server = http.createServer();
+    this.wss = new WSServer({
+      server: this.server,
+      path: '/graphql',
+    });
 
     this.wss.on('connection', this.handleConnection.bind(this));
 
@@ -28,10 +52,59 @@ export class WebSocketServer {
       this.setupPubSub();
     }
 
-    const WS_PORT = process.env.WS_PORT || 8080;
-    server.listen(WS_PORT, () => {
-      logger.info(`WebSocket server is running on port ${WS_PORT}`);
-    });
+    const schema = makeExecutableSchema({ typeDefs, resolvers });
+    
+    useServer(
+      {
+        schema,
+        context: async (ctx) => {
+          const token = (ctx.connectionParams as { Authorization?: string })?.Authorization?.split(' ')[1];
+          if (!token) {
+            throw new Error('Authentication failed: No token provided');
+          }
+          const userId = await this.verifyToken(token);
+          if (!userId) {
+            throw new Error('Authentication failed: Invalid token');
+          }
+          return { userId };
+        },
+      },
+      this.wss
+    );
+
+    await this.startServer();
+  }
+
+  private async startServer(retryCount: number = 0) {
+    const maxRetries = 5;
+    const WS_PORT = parseInt(process.env.WS_PORT || '8080', 10) + retryCount;
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        this.server!.listen(WS_PORT)
+          .once('listening', () => {
+            logger.info(`WebSocket server is running on port ${WS_PORT}`);
+            resolve();
+          })
+          .once('error', (err: NodeJS.ErrnoException) => {
+            if (err.code === 'EADDRINUSE') {
+              logger.warn(`Port ${WS_PORT} is in use`);
+              reject(err);
+            } else {
+              logger.error('Failed to start WebSocket server:', err);
+              reject(err);
+            }
+          });
+      });
+    } catch (error) {
+      if (retryCount < maxRetries) {
+        logger.info(`Retrying with port ${WS_PORT + 1}`);
+        await this.startServer(retryCount + 1);
+      } else {
+        logger.error(`Failed to start WebSocket server after ${maxRetries} attempts`);
+        throw error;
+      }
+    }
   }
 
   private setupPubSub() {
@@ -44,10 +117,15 @@ export class WebSocketServer {
   }
 
   private async handleConnection(ws: WebSocket, req: http.IncomingMessage) {
-    const token = new URLSearchParams(req.url?.split('?')[1]).get('token');
-    if (token) {
-      const userId = await this.verifyToken(token);
-      if (userId) {
+    const urlParams = new URLSearchParams(req.url?.split('?')[1]);
+    const token = urlParams.get('token');
+    const userId = urlParams.get('userId');
+    logger.info(`User ${userId} connected`);
+    logger.info(`Token: ${token}`);
+
+    if (token && userId) {
+      const isValidToken = await this.verifyToken(token);
+      if (isValidToken) {
         this.userConnections.set(userId, ws);
         logger.info(`User ${userId} connected`);
 
@@ -59,18 +137,24 @@ export class WebSocketServer {
         ws.close(1008, 'Invalid token');
       }
     } else {
-      ws.close(1008, 'Token not provided');
+      ws.close(1008, 'Token or userId not provided');
     }
   }
 
   private async verifyToken(token: string): Promise<string | null> {
-    const req = { headers: { authorization: `Bearer ${token}` } } as AuthenticatedRequest;
-    const res = {} as http.ServerResponse;
-    const next = () => {};
+    try {
+      const req = { 
+        headers: { authorization: `Bearer ${token}` }
+      } as AuthenticatedRequest;
+      const res = {} as Response;
+      const next = () => {};
 
-    await checkAuthenticated(req, res as Response, next);
-
-    return req.user ? req.user.id : null;
+      await checkAuthenticated(req, res, next);
+      return req.auth?.userId || null;
+    } catch (error) {
+      logger.error('Token verification failed:', error);
+      return null;
+    }
   }
 
   private handlePubSubMessage(message: { data: Buffer; ack: () => void }) {
@@ -93,6 +177,3 @@ export class WebSocketServer {
     return this.userConnections.get(userId) || null;
   }
 }
-
-// Initialize the WebSocket server
-new WebSocketServer();

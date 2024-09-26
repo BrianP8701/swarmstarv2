@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { AbstractInstructor } from './AbstractInstructor';
 import { InstructorMessage, InstructorMessageRoleEnum } from '../../services/InstructorService';
+import { injectable } from 'inversify';
 
 const IsContextSufficientInstructorSchema = z.object({
   isContextSufficient: z.boolean().describe("Do we have enough information to do what we need to do?"),
@@ -11,6 +12,7 @@ type IsContextSufficientInstructorInput = {
   context?: string;
 };
 
+@injectable()
 export class IsContextSufficientInstructor extends AbstractInstructor<
   typeof IsContextSufficientInstructorSchema,
   IsContextSufficientInstructorInput

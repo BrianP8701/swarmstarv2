@@ -1,7 +1,8 @@
 version: '3.9'
 services:
-  postgres:
+  postgres_swarmstar:
     image: postgres:16-alpine
+    container_name: postgres_swarmstar
     ports:
       - "5434:5432"
     volumes:
@@ -10,7 +11,13 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: swarmstarv2
+    networks:
+      - swarmstar_network
 
 volumes:
   swarmstarv2:
     driver: local
+
+networks:
+  swarmstar_network:
+    driver: bridge

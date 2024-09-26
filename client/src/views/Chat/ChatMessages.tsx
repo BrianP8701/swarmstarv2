@@ -1,5 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { MessageFragment, MessageRoleEnum, useFetchChatLazyQuery } from "@/graphql/generated/graphql";
+import { useEffect, useRef } from "react";
+import {
+  MessageRoleEnum,
+  NewMessageDocument,
+  useFetchChatQuery,
+  NewMessageSubscription,
+  FetchChatQuery,
+} from "@/graphql/generated/graphql";
 
 interface UserMessageProps {
   content: string;
@@ -32,28 +38,56 @@ interface ChatMessagesProps {
   isDialogMode?: boolean;
 }
 
-export function ChatMessages({selectedChatId, isDialogMode }: ChatMessagesProps) {
+export function ChatMessages({ selectedChatId, isDialogMode }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const [messages, setMessages] = useState<MessageFragment[]>([])
-  const [fetchChat, { data: chatData }] = useFetchChatLazyQuery()
+
+  const { data, subscribeToMore } = useFetchChatQuery({
+    variables: { chatId: selectedChatId ?? '' },
+    skip: !selectedChatId,
+  });
 
   useEffect(() => {
     if (selectedChatId) {
-      fetchChat({ variables: { id: selectedChatId } })
-    }
-  }, [selectedChatId, fetchChat]);
+      const subscribeToNewMessages = subscribeToMore<NewMessageSubscription>({
+        document: NewMessageDocument,
+        variables: { chatId: selectedChatId ?? '' },
+        updateQuery: (prev: FetchChatQuery, { subscriptionData }) => {
+          if (!subscriptionData.data?.messageSent) return prev;
+          const newMessage = subscriptionData.data.messageSent;
 
-  useEffect(() => {
-    if (chatData?.fetchChat) {
-      setMessages(chatData.fetchChat.data?.messages ?? [])
+          return {
+            ...prev,
+            fetchChat: prev.fetchChat
+              ? {
+                  ...prev.fetchChat,
+                  data: prev.fetchChat.data
+                    ? {
+                        ...prev.fetchChat.data,
+                        messages: [
+                          ...(prev.fetchChat.data.messages?.filter(Boolean) || []),
+                          newMessage,
+                        ].filter((message): message is NonNullable<typeof message> => 
+                          message !== null && message !== undefined
+                        ),
+                      }
+                    : null,
+                }
+              : null,
+          };
+        },
+      });
+
+      return () => subscribeToNewMessages();
     }
-  }, [chatData])
+  }, [selectedChatId, subscribeToMore]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+  }, [data?.fetchChat?.data?.messages])
 
   const heightClass = isDialogMode ? "h-[calc(100vh-163px)]" : "h-[calc(100vh-200px)]"
+
+  const messages = data?.fetchChat?.data?.messages || [];
 
   return (
     <div className={`flex flex-col justify-start overflow-y-auto mt-10 gap-4 ${heightClass}`}>

@@ -25,7 +25,7 @@ export class MemoryDao extends AbstractNodeDao<MemoryNode, MemoryNode> {
     return node?.parent || null;
   }
 
-  public async createMemory(userId: string, title: string): Promise<Memory> {
+  public async create(userId: string, title: string): Promise<Memory> {
     const memory = await this.prisma.memory.create({
       data: {
         title,

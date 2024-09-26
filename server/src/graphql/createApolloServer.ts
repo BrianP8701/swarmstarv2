@@ -8,6 +8,8 @@ import { Container } from 'inversify';
 import { AuthenticatedRequest } from '../utils/auth/AuthRequest';
 import { resolvers } from './resolvers';
 import { typeDefs } from './typeDefs';
+import { checkAuthenticated } from '../utils/auth/auth';
+import { Response } from 'express'; // Add this import
 
 export interface ResolverContext {
   req: AuthenticatedRequest;
@@ -25,8 +27,23 @@ export const createApolloServer = (httpServer: Server): ApolloServer => {
     path: '/graphql',
   });
 
-  useServer({ schema }, wsServer);
+  useServer({
+    schema,
+    context: async (ctx) => {
+      const token = (ctx.connectionParams as { Authorization?: string })?.Authorization?.split(' ')[1];
+      if (!token) {
+        throw new Error('Authentication failed: No token provided');
+      }
+      const req = { 
+        headers: { authorization: `Bearer ${token}` }
+      } as AuthenticatedRequest;
+      const res = {} as Response; // This should now use the correct type
+      const next = () => {};
 
+      await checkAuthenticated(req, res, next);
+      return { userId: req.auth?.userId };
+    },
+  }, wsServer);
 
   return server;
 };

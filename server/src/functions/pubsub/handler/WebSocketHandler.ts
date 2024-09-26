@@ -1,7 +1,6 @@
 import { injectable, inject } from 'inversify';
 import { PubSubTopic } from '../PubSubTopic';
 import { WebSocketPayload, WebSocketMessageType } from '../payload/WebSocketPayload';
-import { WebSocketServer } from '../../../websocket-server';
 import { NonCloudFunctionHandler } from '../NonCloudFunctionHandler';
 import { WebSocketService } from '../../../services/WebsocketService';
 import { PubSub } from 'graphql-subscriptions';
@@ -13,7 +12,6 @@ const pubsub = new PubSub();
 @injectable()
 export class WebSocketHandler extends NonCloudFunctionHandler<PubSubTopic.WebSocketHandler> {
   constructor(
-    @inject(WebSocketServer) private webSocketServer: WebSocketServer,
     @inject(WebSocketService) private webSocketService: WebSocketService,
     @inject(ChatDao) private chatDao: ChatDao
   ) {
@@ -31,8 +29,10 @@ export class WebSocketHandler extends NonCloudFunctionHandler<PubSubTopic.WebSoc
         if (connection) {
           const chat = await this.chatDao.getWithMessages(payload.body.chatId);
           const formattedChat = formatDbChatWithMessagesToGqlChat(chat);
-          await this.webSocketServer.sendMessageToUser(payload.userId, formattedChat);
-          await pubsub.publish(`MESSAGE_RECEIVED_${payload.userId}`, { messageReceived: formattedChat });
+          // Replace this line
+          // await this.webSocketServer.sendMessageToUser(payload.userId, formattedChat);
+          await this.webSocketService.sendMessageToUser(payload.userId, formattedChat);
+          await pubsub.publish(`MESSAGE_SENT_${payload.userId}`, { messageSent: formattedChat });
         }
         break;
     }

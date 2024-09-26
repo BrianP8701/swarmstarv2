@@ -5,14 +5,14 @@ import { container } from '../../../utils/di/container'
 import { CloudEventPayload, CloudEventSubscriberFunction } from '../CloudEventSubscriber'
 import { PubSubTopic } from '../PubSubTopic'
 import { UserMessagePayload } from '../payload/UserMessagePayload'
-import { ChatService } from '../../../services/ChatService'
+// import { ChatService } from '../../../services/ChatService'
 import { WebSocketMessageType } from '../payload/WebSocketPayload'
 import { ChatDao } from '../../../dao/ChatDao'
 
 @injectable()
 export class UserMessageHandler extends CloudEventSubscriberFunction<PubSubTopic.UserMessageHandler> {
   constructor(
-    @inject(ChatService) private chatService: ChatService,
+    // @inject(ChatService) private chatService: ChatService,
     @inject(ChatDao) private chatDao: ChatDao
   ) {
     super()
@@ -25,7 +25,8 @@ export class UserMessageHandler extends CloudEventSubscriberFunction<PubSubTopic
   public handle = async (_payload: UserMessagePayload) => {
     const chatId = _payload.chatId
     const userId = await this.chatDao.getUserIdFromChatId(chatId)
-    const response = await this.chatService.generateResponse(chatId)
+    // const response = await this.chatService.generateResponse(chatId)
+    const response = 'Hello'
     await this.pubSubMediator.publishEvent(PubSubTopic.WebSocketHandler, {
       userId, 
       type: WebSocketMessageType.CHAT_MESSAGE,

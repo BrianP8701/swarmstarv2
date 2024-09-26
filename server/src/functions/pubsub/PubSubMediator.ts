@@ -21,7 +21,15 @@ export class PubSubMediator {
   ): Promise<string | void> {
     if (this.secretService.getEnvVars().MODE === Environment.LOCAL) {
       logger.info('Publishing event locally', { topicKey, payload })
-      await this.localPubSubEmulator.publishEvent(topicKey, payload)
+
+      // Call syncronously
+      // await this.localPubSubEmulator.publishEvent(topicKey, payload)
+
+      // Call the local handler asynchronously without awaiting
+      this.localPubSubEmulator.publishEvent(topicKey, payload).catch(error => {
+        logger.error('Error in local event handler', { error, topicKey, payload })
+      })
+      
       return
     } else {
       return this.publisherService.publishEvent(topicKey, payload, attributes)
