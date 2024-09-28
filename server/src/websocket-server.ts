@@ -45,6 +45,18 @@ const startServer = async () => {
 
   const {serverCleanup } = createApolloWsServer(httpServer, container)
 
+  apolloServer.addPlugin({
+    async serverWillStart() {
+      return {
+        async drainServer() {
+          await serverCleanup.dispose()
+        },
+      }
+    },
+  })
+
+  await apolloServer.start()
+
   app.use(
     '/graphql',
     cors<cors.CorsRequest>({ origin: CORS_WHITELIST, credentials: true }),
@@ -57,18 +69,6 @@ const startServer = async () => {
       },
     })
   )
-
-  apolloServer.addPlugin({
-    async serverWillStart() {
-      return {
-        async drainServer() {
-          await serverCleanup.dispose()
-        },
-      }
-    },
-  })
-
-  await apolloServer.start()
 
   httpServer.listen(PORT, () => {
     logger.info(`Server is now running on http://localhost:${PORT}/graphql`)
