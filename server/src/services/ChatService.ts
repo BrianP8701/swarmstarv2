@@ -15,7 +15,8 @@ export class ChatService {
   ) { }
 
   public async sendMessage(chatId: string, message: string, role: MessageRoleEnum): Promise<Chat & { messages: Message[] }> {
-    const chat = await this.chatDao.sendMessage(chatId, message, role)
+    await this.chatDao.sendMessage(chatId, message, role)
+    const chat = await this.chatDao.getWithMessages(chatId)
     await this.pubSubMediator.publishEvent(PubSubTopic.UserMessageHandler, {
       chatId,
     })

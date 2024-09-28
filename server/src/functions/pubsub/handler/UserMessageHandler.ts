@@ -8,6 +8,7 @@ import { UserMessagePayload } from '../payload/UserMessagePayload'
 // import { ChatService } from '../../../services/ChatService'
 import { WebSocketMessageType } from '../payload/WebSocketPayload'
 import { ChatDao } from '../../../dao/ChatDao'
+import { MessageRoleEnum } from '@prisma/client'
 
 @injectable()
 export class UserMessageHandler extends CloudEventSubscriberFunction<PubSubTopic.UserMessageHandler> {
@@ -26,13 +27,13 @@ export class UserMessageHandler extends CloudEventSubscriberFunction<PubSubTopic
     const chatId = _payload.chatId
     const userId = await this.chatDao.getUserIdFromChatId(chatId)
     // const response = await this.chatService.generateResponse(chatId)
-    const response = 'Hello'
+    const response = 'yb better'
+    const message = await this.chatDao.sendMessage(chatId, response, MessageRoleEnum.ASSISTANT)
     await this.pubSubMediator.publishEvent(PubSubTopic.WebSocketHandler, {
       userId, 
-      type: WebSocketMessageType.CHAT_MESSAGE,
+      type: WebSocketMessageType.NEW_MESSAGE,
       body: {
-        chatId,
-        message: response,
+        messageId: message.id
       },
     })
   }

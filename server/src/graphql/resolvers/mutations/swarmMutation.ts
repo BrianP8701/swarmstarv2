@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { ResolverContext } from '../../createApolloServer'
+import { ResolverContext } from '../../createApolloGqlServer'
 import { SwarmMutationResolvers } from '../../generated/graphql'
 import { SwarmService } from '../../../services/SwarmService'
 

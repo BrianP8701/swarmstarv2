@@ -7,13 +7,11 @@ import { createServer } from 'http'
 import { expressMiddleware } from '@apollo/server/express4'
 import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node'
 import { container } from './utils/di/container'
-import { ResolverContext, createApolloServer } from './graphql/createApolloServer'
+import { ResolverContext, createApolloGqlServer } from './graphql/createApolloGqlServer'
 import { checkAuthenticated } from './utils/auth/auth'
 import { TraceContext } from './utils/logging/TraceContext'
-import { Environment } from './services/SecretService'
+import { createApolloWsServer } from './graphql/createApolloWsServer'
 import { initializePubSubHandlers } from './functions/pubsub/initializePubSubHandlers'
-import { logger } from './utils/logging/logger'
-import { WebSocketServer } from './websocket-server'
 
 const CORS_WHITELIST = [
   'http://localhost:5173',
@@ -29,6 +27,7 @@ const app = express()
 const clerkAuth = ClerkExpressWithAuth()
 
 const PORT = process.env.PORT || 5001
+const IS_LOCAL = process.env.NODE_ENV !== 'production'
 
 // Middleware
 app.use(express.json())
@@ -40,13 +39,25 @@ app.get('/', (_req, res) => {
   res.send('Nothing to see here')
 })
 
-if (process.env.MODE === Environment.LOCAL) {
-  initializePubSubHandlers()
-}
-
 const startServer = async () => {
   const httpServer = createServer(app)
-  const apolloServer = createApolloServer(httpServer)
+  const apolloServer = createApolloGqlServer(httpServer)
+
+  if (IS_LOCAL) {
+    initializePubSubHandlers()
+    const { serverCleanup } = createApolloWsServer(httpServer, container)
+
+    apolloServer.addPlugin({
+      async serverWillStart() {
+        return {
+          async drainServer() {
+            await serverCleanup.dispose()
+          },
+        }
+      },
+    })
+  }
+
   await apolloServer.start()
 
   app.use(
@@ -62,19 +73,12 @@ const startServer = async () => {
     })
   )
 
-  if (process.env.MODE === Environment.LOCAL) {
-    const webSocketServer = WebSocketServer.getInstance();
-    await webSocketServer.initialize();
-  }
-
   httpServer.listen(PORT, () => {
-    logger.info(`HTTP server running on port ${PORT}`);
-    if (process.env.MODE === Environment.LOCAL) {
-      logger.info(`WebSocket server running on port ${process.env.WS_PORT || '8080'}`);
+    console.log(`Server is now running on http://localhost:${PORT}/graphql`)
+    if (IS_LOCAL) {
+      console.log(`WebSocket server is also running on ws://localhost:${PORT}/graphql`)
     }
-  });
-};
+  })
+}
 
-startServer().catch((error) => {
-  logger.error('Failed to start server:', error);
-});
+startServer()

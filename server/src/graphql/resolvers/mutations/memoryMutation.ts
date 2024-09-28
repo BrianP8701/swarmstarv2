@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { ResolverContext } from '../../createApolloServer'
+import { ResolverContext } from '../../createApolloGqlServer'
 import { MemoryMutationResolvers } from '../../generated/graphql'
 import { MemoryDao } from '../../../dao/nodes/MemoryDao'
 

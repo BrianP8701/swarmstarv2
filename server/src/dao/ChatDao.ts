@@ -30,23 +30,22 @@ export class ChatDao {
     })
   }
 
-  async sendMessage(chatId: string, message: string, role: MessageRoleEnum): Promise<Chat & { messages: Message[] }> {
-    return this.prisma.chat.update({
+  async getMessage(messageId: string): Promise<Message> {
+    return this.prisma.message.findUniqueOrThrow({
       where: {
-        id: chatId,
-      },
-      data: {
-        messages: {
-          create: {
-            content: message,
-            role,
-          },
-        },
-      },
-      include: {
-        messages: true,
+        id: messageId,
       },
     })
+  }
+
+  async sendMessage(chatId: string, message: string, role: MessageRoleEnum): Promise<Message> {
+    return this.prisma.message.create({
+      data: {
+        content: message,
+        role,
+        chatId,
+      },
+    });
   }
 
   async getUserIdFromChatId(chatId: string): Promise<string> {

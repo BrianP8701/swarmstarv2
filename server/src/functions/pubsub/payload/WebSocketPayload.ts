@@ -5,12 +5,11 @@ export type WebSocketPayload = {
 }
 
 export enum WebSocketMessageType {
-  CHAT_MESSAGE = 'CHAT_MESSAGE',
+  NEW_MESSAGE = 'NEW_MESSAGE',
 }
 
-export type WebSocketPayloadBody = ChatMessagePayload
+export type WebSocketPayloadBody = NewMessagePayload
 
-export type ChatMessagePayload = {
-  chatId: string
-  message: string
+export type NewMessagePayload = {
+  messageId: string
 }

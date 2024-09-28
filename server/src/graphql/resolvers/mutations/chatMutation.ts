@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { ResolverContext } from '../../createApolloServer';
+import { ResolverContext } from '../../createApolloGqlServer';
 import { ChatMutationResolvers } from '../../generated/graphql';
 import { formatDbChatWithMessagesToGqlChat } from '../../formatters/chatFormatters';
 import { ChatService } from '../../../services/ChatService';

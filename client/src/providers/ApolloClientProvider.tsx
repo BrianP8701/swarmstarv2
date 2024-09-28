@@ -5,7 +5,6 @@ import { setContext } from '@apollo/client/link/context'
 import { getMainDefinition } from '@apollo/client/utilities'
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
-
 import { useAuth } from '@clerk/clerk-react'
 
 interface Props {
@@ -14,7 +13,21 @@ interface Props {
 
 export const ApolloClientProvider = ({ children, url }: PropsWithChildren<Props>) => {
   const { getToken, isSignedIn } = useAuth()
+
   const httpLink = useMemo(() => createHttpLink({ uri: url, credentials: 'include' }), [url])
+
+  const wsLink = new GraphQLWsLink(createClient({
+    url: url.replace(/^http/, 'ws'),
+    connectionParams: async () => {
+      if (isSignedIn) {
+        const token = await getToken()
+        return {
+          Authorization: `Bearer ${token}`,
+        }
+      }
+      return {}
+    }
+  }))
 
   const getConnectionContext = useCallback(async () => {
     if (isSignedIn) {
@@ -41,19 +54,6 @@ export const ApolloClientProvider = ({ children, url }: PropsWithChildren<Props>
     }
   })
 
-  const wsLink = new GraphQLWsLink(createClient({
-    url: url.replace(/^http/, 'ws'),
-    connectionParams: async () => {
-      if (isSignedIn) {
-        const token = await getToken()
-        return {
-          Authorization: `Bearer ${token}`,
-        }
-      }
-      return {}
-    },
-  }))
-
   const splitLink = split(
     ({ query }) => {
       const definition = getMainDefinition(query)
@@ -68,13 +68,7 @@ export const ApolloClientProvider = ({ children, url }: PropsWithChildren<Props>
 
   const client = new ApolloClient({
     link: from([authLink, errorLink, splitLink]),
-    cache: new InMemoryCache({
-      typePolicies: {
-        StripeQuery: { keyFields: [] },
-        NoticeQuery: { keyFields: [] },
-        User: { keyFields: [] },
-      },
-    }),
+    cache: new InMemoryCache(),
     connectToDevTools: true,
   })
 

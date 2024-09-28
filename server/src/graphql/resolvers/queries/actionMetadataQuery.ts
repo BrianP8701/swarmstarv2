@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { ResolverContext } from '../../createApolloServer'
+import { ResolverContext } from '../../createApolloGqlServer'
 import { ActionMetadataQueryResolvers } from '../../generated/graphql'
 import { GlobalContextDao } from '../../../dao/nodes/GlobalContextDao'
 import { ActionMetadataNodeDao } from '../../../dao/nodes/ActionMetadataDao'

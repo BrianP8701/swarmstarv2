@@ -6,7 +6,7 @@
   "scripts": {
     "cli": "ts-node src/cli/index.ts",
     "generate-action-metadata": "ts-node src/cli/generateActionMetadata.ts",
-    "start:dev": "nodemon src/server.ts",
+    "start:dev": "nodemon src/graphql-server.ts",
     "start:dev:ws": "nodemon src/websocket-server.ts",
     "build": "tsc --project ./ && yarn copy-schemas",
     "copy-schemas": "npx cpx -v \"src/**/*.gql\" dist && cp package.json dist/package.json && cp yarn.lock dist/yarn.lock && mkdir -p dist/prisma && cp -r prisma/schema.prisma dist/prisma/schema.prisma",
