@@ -1,7 +1,8 @@
 import { z } from 'zod';
-import { InstructorConversation, InstructorService } from '../../services/external/InstructorService';
-import { inject } from 'inversify';
+import { InstructorMessage, InstructorService } from '../../services/InstructorService';
+import { inject, injectable } from 'inversify';
 
+@injectable()
 export abstract class AbstractInstructor<ZodSchema extends z.AnyZodObject, TInstructorInput> {
   abstract ZodSchema: ZodSchema;
 
@@ -9,7 +10,7 @@ export abstract class AbstractInstructor<ZodSchema extends z.AnyZodObject, TInst
     @inject(InstructorService) private instructorService: InstructorService
   ) { }
 
-  protected abstract writeInstructions(args: TInstructorInput): InstructorConversation;
+  protected abstract writeInstructions(args: TInstructorInput): InstructorMessage[];
 
   protected parseOutput?(output: z.infer<ZodSchema>): z.infer<ZodSchema>;
 

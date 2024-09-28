@@ -3,6 +3,7 @@ schema: "../server/src/graphql/schema.gql"
 documents:
   - "src/graphql/queries.gql"
   - "src/graphql/fragments.gql"
+  - "src/graphql/subscriptions.gql"
 generates:
   src/graphql/generated/graphql.ts:
     plugins:

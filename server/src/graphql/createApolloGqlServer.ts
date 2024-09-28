@@ -12,7 +12,7 @@ export interface ResolverContext {
   container: Container;
 }
 
-export const createApolloServer = (httpServer: Server): ApolloServer => {
+export const createApolloGqlServer = (httpServer: Server): ApolloServer => {
   const schema = makeExecutableSchema({ typeDefs, resolvers });
   const server = new ApolloServer({
     schema,

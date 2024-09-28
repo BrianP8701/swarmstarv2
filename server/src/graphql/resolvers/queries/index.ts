@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { UserDao } from '../../../dao/UserDao'
-import { ResolverContext } from '../../createApolloServer'
+import { ResolverContext } from '../../createApolloGqlServer'
 import { formatUserTypeEnum } from '../../formatters/userFormatters'
 import { RootQueryResolvers } from '../../generated/graphql'
 
@@ -8,14 +8,14 @@ export const RootQuery: RootQueryResolvers = {
   actionMetadata: async () => {
     return {}
   },
-  fetchSwarm: async (_parent, { id }) => {
-    return { id }
+  fetchSwarm: async (_parent, { swarmId }) => {
+    return { id: swarmId }
   },
-  fetchMemory: async (_parent, { id }) => {
-    return { id }
+  fetchMemory: async (_parent, { memoryId }) => {
+    return { id: memoryId }
   },
-  fetchChat: async (_parent, { id }) => {
-    return { id }
+  fetchChat: async (_parent, { chatId }) => {
+    return { id: chatId }
   },
   fetchUser: async (_parent, _args, { req, container }: ResolverContext) => {
     const userDao = container.get(UserDao)

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { AbstractInstructor } from './AbstractInstructor';
-import { InstructorConversation } from '../../services/external/InstructorService';
-import { InstructorMessageRoleEnum } from '../../services/external/InstructorService';
+import { InstructorMessage, InstructorMessageRoleEnum } from '../../services/InstructorService';
 
 const RouterInstructorSchema = z.object({
   bestOption: z.number().nullable().describe("The index of the best option. None if there is no viable option."),
@@ -20,7 +19,7 @@ export class RouterInstructor extends AbstractInstructor<
 > {
   ZodSchema = RouterInstructorSchema;
 
-  protected writeInstructions({ options, content, systemMessage }: RouterInstructorInput): InstructorConversation {
+  protected writeInstructions({ options, content, systemMessage }: RouterInstructorInput): InstructorMessage[] {
     const formattedOptions = this.formatOptions(options, content);
     return [
       {

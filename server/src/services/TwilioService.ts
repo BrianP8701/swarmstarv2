@@ -1,7 +1,7 @@
 import { Twilio } from 'twilio';
 import { inject, injectable } from 'inversify';
-import { logger } from '../../utils/logging/logger';
-import { SecretService } from '../SecretService';
+import { SecretService } from './SecretService';
+import { logger } from '../utils/logging/logger';
 
 @injectable()
 export class TwilioService {

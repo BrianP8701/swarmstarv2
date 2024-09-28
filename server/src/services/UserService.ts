@@ -1,7 +1,5 @@
 import { inject, injectable } from 'inversify'
-
 import { PrismaClient, User } from '@prisma/client'
-
 import { ClerkSessionClaims } from '../utils/auth/AuthRequest'
 
 @injectable()

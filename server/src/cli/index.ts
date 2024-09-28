@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { logger } from '../utils/logging/logger'
 
-const script = async () => { }
+const script = async () => {}
 
 script()
   .then(() => {

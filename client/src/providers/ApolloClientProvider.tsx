@@ -1,13 +1,10 @@
 import { PropsWithChildren, useCallback, useMemo } from 'react'
-
-import { ApolloClient, ApolloProvider, createHttpLink, from, InMemoryCache } from '@apollo/client'
+import { ApolloClient, ApolloProvider, createHttpLink, from, InMemoryCache, split } from '@apollo/client'
 import { onError } from '@apollo/client/link/error'
 import { setContext } from '@apollo/client/link/context'
-import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
-import { createClient } from 'graphql-ws';
-import { split } from '@apollo/client';
-import { getMainDefinition } from '@apollo/client/utilities';
-
+import { getMainDefinition } from '@apollo/client/utilities'
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
+import { createClient } from 'graphql-ws'
 import { useAuth } from '@clerk/clerk-react'
 
 interface Props {
@@ -16,12 +13,25 @@ interface Props {
 
 export const ApolloClientProvider = ({ children, url }: PropsWithChildren<Props>) => {
   const { getToken, isSignedIn } = useAuth()
+
   const httpLink = useMemo(() => createHttpLink({ uri: url, credentials: 'include' }), [url])
+
+  const wsLink = new GraphQLWsLink(createClient({
+    url: url.replace(/^http/, 'ws'),
+    connectionParams: async () => {
+      if (isSignedIn) {
+        const token = await getToken()
+        return {
+          Authorization: `Bearer ${token}`,
+        }
+      }
+      return {}
+    }
+  }))
 
   const getConnectionContext = useCallback(async () => {
     if (isSignedIn) {
       try {
-        // Fetch a new token for each request
         const token = await getToken()
         return {
           headers: {
@@ -44,45 +54,21 @@ export const ApolloClientProvider = ({ children, url }: PropsWithChildren<Props>
     }
   })
 
-  const wsLink = new GraphQLWsLink(createClient({
-    url: url.replace('http', 'ws'),
-    connectionParams: async () => {
-      if (isSignedIn) {
-        const token = await getToken();
-        return { Authorization: `Bearer ${token}` };
-      }
-      return {};
-    },
-    retryAttempts: 5,
-    retryWait: (retries) => new Promise((resolve) => setTimeout(resolve, retries * 1000)),
-    shouldRetry: (error: unknown) => {
-      const err = error as { message: string };
-      return !err.message.includes('Unauthorized') && !err.message.includes('Invalid token');
-    },
-  }));
-
   const splitLink = split(
     ({ query }) => {
-      const definition = getMainDefinition(query);
+      const definition = getMainDefinition(query)
       return (
         definition.kind === 'OperationDefinition' &&
         definition.operation === 'subscription'
-      );
+      )
     },
     wsLink,
     httpLink,
-  );
+  )
 
   const client = new ApolloClient({
     link: from([authLink, errorLink, splitLink]),
-    uri: url,
-    cache: new InMemoryCache({
-      typePolicies: {
-        StripeQuery: { keyFields: [] },
-        NoticeQuery: { keyFields: [] },
-        User: { keyFields: [] },
-      },
-    }),
+    cache: new InMemoryCache(),
     connectToDevTools: true,
   })
 

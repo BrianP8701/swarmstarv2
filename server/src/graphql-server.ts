@@ -4,13 +4,15 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
 import { createServer } from 'http'
-
 import { expressMiddleware } from '@apollo/server/express4'
 import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node'
 import { container } from './utils/di/container'
-import { ResolverContext, createApolloServer } from './graphql/createApolloServer'
+import { ResolverContext, createApolloGqlServer } from './graphql/createApolloGqlServer'
 import { checkAuthenticated } from './utils/auth/auth'
 import { TraceContext } from './utils/logging/TraceContext'
+import { createApolloWsServer } from './graphql/createApolloWsServer'
+import { initializePubSubHandlers } from './functions/pubsub/initializePubSubHandlers'
+import { logger } from './utils/logging/logger'
 
 const CORS_WHITELIST = [
   'http://localhost:5173',
@@ -26,6 +28,7 @@ const app = express()
 const clerkAuth = ClerkExpressWithAuth()
 
 const PORT = process.env.PORT || 5001
+const IS_LOCAL = process.env.NODE_ENV !== 'production'
 
 // Middleware
 app.use(express.json())
@@ -39,7 +42,23 @@ app.get('/', (_req, res) => {
 
 const startServer = async () => {
   const httpServer = createServer(app)
-  const apolloServer = createApolloServer(httpServer)
+  const apolloServer = createApolloGqlServer(httpServer)
+
+  if (IS_LOCAL) {
+    initializePubSubHandlers()
+    const { serverCleanup } = createApolloWsServer(httpServer, container)
+
+    apolloServer.addPlugin({
+      async serverWillStart() {
+        return {
+          async drainServer() {
+            await serverCleanup.dispose()
+          },
+        }
+      },
+    })
+  }
+
   await apolloServer.start()
 
   app.use(
@@ -55,7 +74,12 @@ const startServer = async () => {
     })
   )
 
-  httpServer.listen(PORT)
+  httpServer.listen(PORT, () => {
+    logger.info(`Server is now running on http://localhost:${PORT}/graphql`)
+    if (IS_LOCAL) {
+      logger.info(`WebSocket server is also running on ws://localhost:${PORT}/graphql`)
+    }
+  })
 }
 
 startServer()

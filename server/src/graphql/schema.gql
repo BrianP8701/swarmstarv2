@@ -108,9 +108,9 @@ type Message {
 # \___________________________________________________________/
 
 type RootQuery {
-  fetchSwarm(id: ID!): Swarm
-  fetchMemory(id: ID!): Memory
-  fetchChat(id: ID!): Chat
+  fetchSwarm(swarmId: ID!): Swarm
+  fetchMemory(memoryId: ID!): Memory
+  fetchChat(chatId: ID!): Chat
   fetchUser: User
   actionMetadata: ActionMetadataQuery
 }
@@ -175,7 +175,28 @@ type ChatMutation {
 # |                                                           |
 # \___________________________________________________________/
 
+# ___________________________________________________________
+
+#  ___________________________________________________________
+# /                                                           \
+# |                                                           |
+# |                   SUBSCRIPTION SECTION STARTS             |
+# |                                                           |
+# \___________________________________________________________/
+
+type Subscription {
+  messageSent(chatId: ID!): Message
+}
+
+#  ___________________________________________________________
+# /                                                           \
+# |                                                           |
+# |                   SUBSCRIPTION SECTION ENDS               |
+# |                                                           |
+# \___________________________________________________________/
+
 schema {
   query: RootQuery
   mutation: RootMutation
+  subscription: Subscription
 }

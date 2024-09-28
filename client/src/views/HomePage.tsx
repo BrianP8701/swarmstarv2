@@ -31,7 +31,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (selectedSwarmId) {
-      fetchSwarm({ variables: { id: selectedSwarmId } });
+      fetchSwarm({ variables: { swarmId: selectedSwarmId } });
     }
   }, [selectedSwarmId, fetchSwarm]);
 

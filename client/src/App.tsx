@@ -8,7 +8,6 @@ import { ApolloClientProvider } from "./providers/ApolloClientProvider";
 import MainLayout from "@/components/layouts/MainLayout";
 import AuthWrapper from "./components/custom/AuthWrapper";
 
-
 const App = () => {
   return (
     <BrowserRouter>
@@ -32,6 +31,7 @@ const Providers = (props: PropsWithChildren<NonNullable<unknown>>) => {
         <ApolloClientProvider url={import.meta.env.VITE_GRAPHQL_URL}>
           <TooltipProvider>
             <MainLayout>
+              {/* Remove the WebSocketHandler component from here */}
               {props.children}
             </MainLayout>
           </TooltipProvider>

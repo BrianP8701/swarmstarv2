@@ -1,76 +1,77 @@
-import 'reflect-metadata';
-import { WebSocketServer as WSServer, WebSocket } from 'ws';
-import { PubSub } from '@google-cloud/pubsub';
-import http from 'http';
-import { injectable } from 'inversify';
-import { logger } from './utils/logging/logger';
-import { SecretService, Environment } from './services/SecretService';
-import { container } from './utils/di/container';
+import 'reflect-metadata'
 
-@injectable()
-export class WebSocketServer {
-  private wss: WSServer;
-  private userConnections: Map<string, WebSocket> = new Map();
-  private secretService: SecretService
+import cors from 'cors'
+import dotenv from 'dotenv'
+import express from 'express'
+import { createServer } from 'http'
 
-  constructor() {
-    this.secretService = container.get(SecretService)
-    const server = http.createServer();
-    this.wss = new WSServer({ server });
+import { expressMiddleware } from '@apollo/server/express4'
+import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node'
+import { container } from './utils/di/container'
+import { ResolverContext, createApolloGqlServer } from './graphql/createApolloGqlServer'
+import { checkAuthenticated } from './utils/auth/auth'
+import { TraceContext } from './utils/logging/TraceContext'
+import { createApolloWsServer } from './graphql/createApolloWsServer'
+import { logger } from './utils/logging/logger'
 
-    this.wss.on('connection', this.handleConnection.bind(this));
+const CORS_WHITELIST = [
+  'http://localhost:5173',
+  'https://studio.apollographql.com',
+  'https://client-7xir3z4nfa-uc.a.run.app',
+  'https://client-911903497338.us-central1.run.app',
+  'https://swarmstar.ai',
+]
 
-    const envVars = this.secretService.getEnvVars();
-    if (envVars.MODE !== Environment.LOCAL) {
-      this.setupPubSub();
-    }
+dotenv.config()
+const app = express()
 
-    const WS_PORT = process.env.WS_PORT || 8080;
-    server.listen(WS_PORT, () => {
-      logger.info(`WebSocket server is running on port ${WS_PORT}`);
-    });
-  }
+const clerkAuth = ClerkExpressWithAuth()
 
-  private setupPubSub() {
-    const pubsub = new PubSub();
-    const subscriptionName = 'websocket-messages';
-    pubsub.subscription(subscriptionName).on('error', (error) => {
-      logger.error(`Error with PubSub subscription '${subscriptionName}':`, error);
-    });
-    pubsub.subscription(subscriptionName).on('message', this.handlePubSubMessage.bind(this));
-  }
+const PORT = process.env.PORT || 5001
 
-  private handleConnection(ws: WebSocket, req: http.IncomingMessage) {
-    const userId = req.url?.split('=')[1];
-    if (userId) {
-      this.userConnections.set(userId, ws);
-      logger.info(`User ${userId} connected`);
+// Middleware
+app.use(express.json())
+app.use(clerkAuth, checkAuthenticated)
+app.use(TraceContext.expressMiddleware())
 
-      ws.on('close', () => {
-        this.userConnections.delete(userId);
-        logger.info(`User ${userId} disconnected`);
-      });
-    } else {
-      ws.close(1008, 'User ID not provided');
-    }
-  }
+// Paths setup
+app.get('/', (_req, res) => {
+  res.send('Nothing to see here')
+})
 
-  private handlePubSubMessage(message: { data: Buffer; ack: () => void }) {
-    const { userId, data } = JSON.parse(message.data.toString());
-    this.sendMessageToUser(userId, data);
-    message.ack();
-  }
+const startServer = async () => {
+  const httpServer = createServer(app)
+  const apolloServer = createApolloGqlServer(httpServer)
+  await apolloServer.start()
 
-  public sendMessageToUser(userId: string, data: unknown) {
-    const userWs = this.userConnections.get(userId);
-    if (userWs && userWs.readyState === WebSocket.OPEN) {
-      userWs.send(JSON.stringify(data));
-      logger.info(`Message sent to user ${userId}`);
-    } else {
-      logger.info(`User ${userId} not connected or connection not open`);
-    }
-  }
+  const {serverCleanup } = createApolloWsServer(httpServer, container)
+
+  app.use(
+    '/graphql',
+    cors<cors.CorsRequest>({ origin: CORS_WHITELIST, credentials: true }),
+    expressMiddleware(apolloServer, {
+      context: async ({ req }): Promise<ResolverContext> => {
+        return {
+          req,
+          container,
+        }
+      },
+    })
+  )
+
+  apolloServer.addPlugin({
+    async serverWillStart() {
+      return {
+        async drainServer() {
+          await serverCleanup.dispose()
+        },
+      }
+    },
+  })
+
+  httpServer.listen(PORT, () => {
+    logger.info(`Server is now running on http://localhost:${PORT}/graphql`)
+  })
 }
 
-// Initialize the WebSocket server
-new WebSocketServer();
+startServer()

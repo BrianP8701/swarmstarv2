@@ -81,11 +81,11 @@ model Chat {
 
   messages Message[]
 
-  actionNodeId String?     @db.Uuid
-  actionNode   ActionNode? @relation(fields: [actionNodeId], references: [id])
+  actionNodeId String     @db.Uuid
+  actionNode   ActionNode @relation(fields: [actionNodeId], references: [id])
 
-  Swarm   Swarm?  @relation(fields: [swarmId], references: [id])
-  swarmId String? @db.Uuid
+  swarm   Swarm  @relation(fields: [swarmId], references: [id])
+  swarmId String @db.Uuid
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

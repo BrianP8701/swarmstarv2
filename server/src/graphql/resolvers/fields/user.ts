@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { UserResolvers } from '../../generated/graphql'
-import { ResolverContext } from '../../createApolloServer'
+import { ResolverContext } from '../../createApolloGqlServer'
 import { UserDao } from '../../../dao/UserDao'
 import { container } from '../../../utils/di/container'
 import { formatUserTypeEnum } from '../../formatters/userFormatters'

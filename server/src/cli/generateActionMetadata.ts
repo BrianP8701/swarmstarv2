@@ -1,15 +1,16 @@
 import 'reflect-metadata';
 import fs from 'fs/promises';
 import path from 'path';
-import { ActionEnum, ActionMetadataNode, MessageRoleEnum, Prisma } from '@prisma/client';
+import { ActionEnum, ActionMetadataNode, Prisma } from '@prisma/client';
 import { container } from '../utils/di/container';
 import { ActionMetadataNodeDao } from '../dao/nodes/ActionMetadataDao';
 import { AbstractAction } from '../swarmstar/actions/AbstractAction';
 import { AbstractRouter } from '../swarmstar/actions/routers/AbstractRouter';
 import { GlobalContextDao } from '../dao/nodes/GlobalContextDao';
-import { SwarmDao } from '../dao/SwarmDao';
 import { logger } from '../utils/logging/logger';
 import { SecretService } from '../services/SecretService';
+import { SwarmService } from '../services/SwarmService';
+import { MemoryDao } from '../dao/nodes/MemoryDao';
 
 const abstractActionClassStrings = ["AbstractAction", "AbstractRouter"]
 
@@ -119,24 +120,17 @@ export async function generateActionMetadataTree(userId: string): Promise<void> 
     throw new Error('ACTION_FOLDER_PATH environment variable is not set');
   }
   const globalContextDao = container.get(GlobalContextDao);
-  const swarmDao = container.get(SwarmDao);
+  const swarmDao = container.get(SwarmService);
+  const memoryDao = container.get(MemoryDao);
   const defaultSwarmGoal = 'Achieve AGI';
 
-  // Create the default swarm first
-  const swarm = await swarmDao.create({
+  const memory = await memoryDao.create(userId, 'Default Memory');
+  const swarm = await swarmDao.createSwarm(userId, {
     title: 'Default Swarm',
     goal: defaultSwarmGoal,
-    user: { connect: { id: userId } },
-    memory: { create: { title: 'Default Memory', user: { connect: { id: userId } } } },
-    chats: { 
-      create: [{ 
-        title: 'Default Chat', 
-        messages: { 
-          create: [{ content: defaultSwarmGoal, role: MessageRoleEnum.USER }] 
-        } 
-      }]
-    },
-   });
+    memoryId: memory.id,
+  });
+  // Create the default swarm first
 
   logger.info(`Created default swarm with ID: ${swarm.id}`);
 
