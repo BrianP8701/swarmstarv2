@@ -12,6 +12,7 @@ import { checkAuthenticated } from './utils/auth/auth'
 import { TraceContext } from './utils/logging/TraceContext'
 import { createApolloWsServer } from './graphql/createApolloWsServer'
 import { initializePubSubHandlers } from './functions/pubsub/initializePubSubHandlers'
+import { logger } from './utils/logging/logger'
 
 const CORS_WHITELIST = [
   'http://localhost:5173',
@@ -74,9 +75,9 @@ const startServer = async () => {
   )
 
   httpServer.listen(PORT, () => {
-    console.log(`Server is now running on http://localhost:${PORT}/graphql`)
+    logger.info(`Server is now running on http://localhost:${PORT}/graphql`)
     if (IS_LOCAL) {
-      console.log(`WebSocket server is also running on ws://localhost:${PORT}/graphql`)
+      logger.info(`WebSocket server is also running on ws://localhost:${PORT}/graphql`)
     }
   })
 }

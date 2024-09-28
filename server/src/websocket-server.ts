@@ -12,6 +12,7 @@ import { ResolverContext, createApolloGqlServer } from './graphql/createApolloGq
 import { checkAuthenticated } from './utils/auth/auth'
 import { TraceContext } from './utils/logging/TraceContext'
 import { createApolloWsServer } from './graphql/createApolloWsServer'
+import { logger } from './utils/logging/logger'
 
 const CORS_WHITELIST = [
   'http://localhost:5173',
@@ -69,7 +70,7 @@ const startServer = async () => {
   })
 
   httpServer.listen(PORT, () => {
-    console.log(`Server is now running on http://localhost:${PORT}/graphql`)
+    logger.info(`Server is now running on http://localhost:${PORT}/graphql`)
   })
 }
 

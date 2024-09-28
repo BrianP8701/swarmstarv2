@@ -19,10 +19,11 @@ export class WebSocketHandler extends NonCloudFunctionHandler<PubSubTopic.WebSoc
   }
 
   public async handleEvent(payload: WebSocketPayload): Promise<void> {
+    let message;
     switch (payload.type) {
       case WebSocketMessageType.NEW_MESSAGE:
         logger.info(`Sending message to user ${payload.userId}`);
-        const message = await this.chatDao.getMessage(payload.body.messageId);
+        message = await this.chatDao.getMessage(payload.body.messageId);
         await pubsub.publish(`${WebsocketTopic.NEW_MESSAGE}_${payload.userId}_${message.chatId}`, { messageSent: message });
         break;
     }
