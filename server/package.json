@@ -17,7 +17,7 @@
     "knip": "knip",
     "db:seed": "ts-node src/cli/databaseSeed.ts",
     "db:reset-and-seed": "ts-node src/cli/resetAndSeed.ts",
-    "start:prod": "node dist/server.js",
+    "start:prod": "node dist/graphql-server.js",
     "start:prod:ws": "node dist/websocket-server.js",
     "pre": "yarn lint && yarn build",
     "post-build": "cd dist && yarn install && yarn prisma generate",

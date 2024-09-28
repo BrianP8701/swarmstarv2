@@ -42,7 +42,6 @@ app.get('/', (_req, res) => {
 const startServer = async () => {
   const httpServer = createServer(app)
   const apolloServer = createApolloGqlServer(httpServer)
-  await apolloServer.start()
 
   const {serverCleanup } = createApolloWsServer(httpServer, container)
 
@@ -68,6 +67,8 @@ const startServer = async () => {
       }
     },
   })
+
+  await apolloServer.start()
 
   httpServer.listen(PORT, () => {
     logger.info(`Server is now running on http://localhost:${PORT}/graphql`)
