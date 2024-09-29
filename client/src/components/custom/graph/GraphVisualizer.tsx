@@ -1,23 +1,29 @@
 import React, { useMemo, useRef, useEffect, useState } from 'react';
 import Graph from 'react-vis-network-graph';
 
-export type TreeNode = {
+export type Node = {
     id: string
     title?: string | null
-    parentId?: string | null
 }
 
-interface TreeVisualizerProps {
-    nodes: TreeNode[];
+export type Edge = {
+    startNodeId: string
+    endNodeId: string
 }
 
-export const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes }) => {
+interface GraphVisualizerProps {
+    nodes: Node[];
+    edges: Edge[];
+}
+
+export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ nodes, edges }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [key, setKey] = useState(0);
 
     const graphData = useMemo(() => {
         const uniqueNodes = new Map<string, { id: string; label: string }>();
-        const edges: { from: string; to: string }[] = [];
+        const uniqueEdges = new Set<string>();
+        const graphEdges: { from: string; to: string }[] = [];
         const duplicates: string[] = [];
 
         nodes.forEach(node => {
@@ -30,11 +36,15 @@ export const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes }) => {
                 id: node.id,
                 label: node.title || 'Untitled Node',
             });
+        });
 
-            if (node.parentId && uniqueNodes.has(node.parentId)) {
-                edges.push({
-                    from: node.parentId,
-                    to: node.id,
+        edges.forEach(edge => {
+            const edgeKey = `${edge.startNodeId}-${edge.endNodeId}`;
+            if (!uniqueEdges.has(edgeKey) && uniqueNodes.has(edge.startNodeId) && uniqueNodes.has(edge.endNodeId)) {
+                uniqueEdges.add(edgeKey);
+                graphEdges.push({
+                    from: edge.startNodeId,
+                    to: edge.endNodeId,
                 });
             }
         });
@@ -45,23 +55,41 @@ export const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes }) => {
 
         return {
             nodes: Array.from(uniqueNodes.values()),
-            edges: edges,
+            edges: graphEdges,
         };
-    }, [nodes]);
+    }, [nodes, edges]);
 
     const options = {
         layout: {
             hierarchical: {
-                enabled: true,
+                enabled: false,
                 direction: 'UD',
-                sortMethod: 'directed',
-            },
+                sortMethod: 'hubsize',
+                nodeSpacing: 200,
+                treeSpacing: 200,
+                blockShifting: true,
+                edgeMinimization: true,
+                parentCentralization: true,
+                levelSeparation: 150,
+            }
         },
         nodes: {
-            shape: 'circle',
+            shape: 'dot',
+            size: 10,
+        },
+        edges: {
+            smooth: {
+                type: 'continuous',
+            },
         },
         physics: {
-            enabled: false,
+            enabled: true,
+            stabilization: false,
+            barnesHut: {
+                gravitationalConstant: -80000,
+                springConstant: 0.001,
+                springLength: 200,
+            },
         },
     };
 

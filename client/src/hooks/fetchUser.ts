@@ -4,7 +4,7 @@ export function useFetchUser() {
   const { data, loading, error } = useFetchUserQuery();
   
   return {
-    user: data?.fetchUser,
+    user: data?.user,
     loading,
     error
   };

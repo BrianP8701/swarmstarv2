@@ -1,10 +1,10 @@
 import { ChatInput } from "./ChatInput";
 import { Loader2Icon } from "lucide-react";
-import { SwarmWithDataFragment } from "@/graphql/generated/graphql";
+import { SwarmFragment } from "@/graphql/generated/graphql";
 import { ChatMessages } from "./ChatMessages";
 
 interface ChatContentProps {
-    swarm: SwarmWithDataFragment | undefined;
+    swarm: SwarmFragment | undefined;
     isDialogMode?: boolean;
     selectedChatId: string | null;
     sendMessageLoading: boolean;

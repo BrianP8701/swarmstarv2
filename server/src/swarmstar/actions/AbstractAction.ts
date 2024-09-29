@@ -1,54 +1,52 @@
-import { ActionNode, ActionEnum, PlanContext, RouteActionContext, SearchContext } from '@prisma/client';
-import { ActionDao, ActionNodeWithContext } from '../../dao/nodes/ActionDao';
+import { AgentNode, ActionEnum, PlanContext, RouteActionContext, SearchContext } from '@prisma/client';
+import { AgentNodeDao } from '../../dao/nodes/AgentNodeDao';
 import { IsContextSufficientInstructor } from '../instructors/IsContextSufficientInstructor';
 import { AskQuestionsInstructor } from '../instructors/AskQuestionsInstructor';
 import { OperationDao } from '../../dao/OperationDao';
 import { container } from '../../utils/di/container';
 
-export type ActionContext = PlanContext | RouteActionContext | SearchContext;
+export type AgentContext = PlanContext | RouteActionContext | SearchContext;
 
-export abstract class AbstractAction<T extends ActionContext> {
+export abstract class AbstractAction<T extends AgentContext> {
   static readonly description: string;
   static readonly actionEnum: ActionEnum;
 
   abstract readonly description: string;
   abstract readonly actionEnum: ActionEnum;
 
-  protected actionNode: ActionNodeWithContext;
-  protected actionDao: ActionDao;
+  protected agentNode: AgentNode;
+  protected agentNodeDao: AgentNodeDao;
   protected isContextSufficientInstructor: IsContextSufficientInstructor;
   protected askQuestionsInstructor: AskQuestionsInstructor;
   protected operationDao: OperationDao;
-  protected context: T;
 
   constructor(
-    actionNode: ActionNodeWithContext
+    agentNode: AgentNode
   ) {
-    this.actionDao = container.get(ActionDao);
+    this.agentNodeDao = container.get(AgentNodeDao);
     this.isContextSufficientInstructor = container.get(IsContextSufficientInstructor);
     this.askQuestionsInstructor = container.get(AskQuestionsInstructor);
     this.operationDao = container.get(OperationDao);
-    this.actionNode = actionNode;
-    this.context = this.getContext();
+    this.agentNode = agentNode;
   }
 
-  protected abstract getContext(): T;
+  protected abstract getContext(): Promise<T>;
 
   abstract run(): Promise<void>;
 
-  async submitReport(actionNode: ActionNode, report: string): Promise<ActionNode> {
-    if (actionNode.report !== null) {
+  async submitReport(agentNode: AgentNode, report: string): Promise<AgentNode> {
+    if (agentNode.report !== null) {
       throw new Error(
-        `Node ${actionNode.id} already has a report: ${actionNode.report}. Cannot update with ${report}.`
+        `Node ${agentNode.id} already has a report: ${agentNode.report}. Cannot update with ${report}.`
       );
     }
-    return await this.actionDao.update(actionNode.id, { report });
+    return await this.agentNodeDao.update(agentNode.id, { report });
   }
 
   async isContextSufficient(content: string): Promise<boolean> {
     const isContextSufficient = await this.isContextSufficientInstructor.run(
       { content, context: this.getMostRecentContextString() ?? undefined },
-      this.actionNode.id
+      this.agentNode.id
     );
     return isContextSufficient.isContextSufficient;
   }
@@ -56,11 +54,11 @@ export abstract class AbstractAction<T extends ActionContext> {
   async askQuestions(content: string): Promise<void> {
     const questions = await this.askQuestionsInstructor.run(
       { content, context: this.getMostRecentContextString() ?? undefined },
-      this.actionNode.id
+      this.agentNode.id
     );
 
     const questionsString = questions.questions.map(q => `\t- ${q}`).join('\n');
-    await this.actionDao.create({
+    await this.agentNodeDao.create({
       actionEnum: ActionEnum.SEARCH,
       goal: `Find answers to the following questions:\n${questionsString}`,
       searchContext: {
@@ -68,18 +66,18 @@ export abstract class AbstractAction<T extends ActionContext> {
           questions: questions.questions
         }
       },
-      swarm: { connect: { id: this.actionNode.swarmId } }
+      agentGraph: { connect: { id: this.agentNode.agentGraphId } }
     });
   }
 
   getMostRecentContextString(): string | undefined {
-    const contextHistory = this.actionNode.stringContextHistory as string[];
+    const contextHistory = this.agentNode.stringContextHistory as string[];
     return contextHistory.length > 0 ? contextHistory[contextHistory.length - 1] : undefined;
   }
 
   protected assertContext<T>(context: T | null | undefined, contextName: string): asserts context is T {
     if (!context) {
-      throw new Error(`${contextName} is missing for action ${this.actionNode.id} of type ${this.actionNode.actionEnum}`);
+      throw new Error(`${contextName} is missing for action ${this.agentNode.id} of type ${this.agentNode.actionEnum}`);
     }
   }
 }

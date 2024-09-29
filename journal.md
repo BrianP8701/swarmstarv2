@@ -1,9 +1,14 @@
 # September 28th 2024
+## Planning
 Okay since my last journal entry, I've made a few changes to the codebase. We now use typescript end to end, have cloud infra, ci/cd and other shit. In terms of implementing the actual system, no progress has been made. Now we have the infra and dev experience out of the way we can begin getting started. Let's make a roadmap:
-- [ ] Allow users to arrange the UIs DialogPreview components however they like
 - [ ] Convert nodes to use mappings to support graphs
 - [ ] Make two modes for displaying nodes: Basic and Card
-- [ ] 
+- [ ] Improve graph ui
+- [ ] Allow users to arrange the UIs DialogPreview components however they like
+- [ ] begin iterating on action/memory/tool nodes
+
+## Bidirectional Communication with User
+At the moment the systems communication begins with the user sending the initial message. But from there on out, only the system initiates communication with the user. The system doesen't have a way for the user to initiate communication, create new chats with the system during runtime. This is needed if the user wants to update the plan, share new context or ask questions mid runtime. Allowing the user to ask questions or add context is simple enough (not really), but updating the action tree mid exection? That wont be straight forward. I almost imagine, the user initiating communication will spawn new action trees, and in this action tree there will be the choice to be like, hey the plan has changed. in that scenario, the primary action tree needs to be paused (supported feature) and the we can run some sort of update process over the primary action tree.
 
 # July 21th 2024
 Well. This is awkward. We have to revert back to the original design of seemingly excessive blocking operations. This is because it allows easy exit and reentry points. Without seemingly excessive blocking operations we have, well less operations. I also thought it would allow the action code to become more concise. But question wrappers need to return it's operations directly back to the source. This basically means we want functions that directly return Operations. This brings back the question of how do we pass args between these functions. 

@@ -3,10 +3,10 @@ import { PanelRightOpen, PanelRightClose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChatContent } from "./ChatContent";
 import ChatSidebar from "@/views/Chat/ChatSidebar";
-import { SwarmWithDataFragment, useSendMessageMutation } from "@/graphql/generated/graphql";
+import { SwarmFragment, useSendMessageMutation } from "@/graphql/generated/graphql";
 
 export interface ChatProps {
-  swarm: SwarmWithDataFragment | undefined;
+  swarm: SwarmFragment | undefined;
   isDialogMode?: boolean;
   selectedChatId: string | null;
   setSelectedChatId: (value: string | null) => void;
@@ -17,7 +17,7 @@ export default function Chat({ swarm, isDialogMode, selectedChatId, setSelectedC
   const [sendMessage, { loading }] = useSendMessageMutation()
 
 
-  const chats = swarm?.data?.chats?.map((chat) => ({ value: chat.id, label: chat.title ?? chat.id })) ?? [];
+  const chats = swarm?.chats?.map((chat) => ({ value: chat.id, label: chat.title ?? chat.id })) ?? [];
 
   const onSendMessage = async (message: string) => {
     if (!selectedChatId) return;

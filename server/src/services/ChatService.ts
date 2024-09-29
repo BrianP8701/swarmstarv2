@@ -28,7 +28,7 @@ export class ChatService {
     const response = await this.chainOfThoughtInstructor.run({
       conversation: formatDbChatToInstructorChat(chat.messages),
     })
-    await this.chatDao.sendMessage(chatId, response.response, MessageRoleEnum.SWARMSTAR)
+    await this.chatDao.sendMessage(chatId, response.response, MessageRoleEnum.ASSISTANT)
     return response.response
   }
 }

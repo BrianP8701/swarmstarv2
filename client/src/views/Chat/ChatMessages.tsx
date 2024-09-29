@@ -57,21 +57,16 @@ export function ChatMessages({ selectedChatId, isDialogMode }: ChatMessagesProps
 
           return {
             ...prev,
-            fetchChat: prev.fetchChat
+            chat: prev.chat
               ? {
-                  ...prev.fetchChat,
-                  data: prev.fetchChat.data
-                    ? {
-                        ...prev.fetchChat.data,
-                        messages: [
-                          ...(prev.fetchChat.data.messages?.filter(Boolean) || []),
-                          newMessage,
-                        ].filter((message): message is NonNullable<typeof message> => 
-                          message !== null && message !== undefined
-                        ),
-                      }
-                    : null,
-                }
+                ...prev.chat,
+                messages: [
+                  ...(prev.chat.messages?.filter(Boolean) || []),
+                  newMessage,
+                ].filter((message): message is NonNullable<typeof message> =>
+                  message !== null && message !== undefined
+                ),
+              }
               : null,
           };
         },
@@ -83,11 +78,11 @@ export function ChatMessages({ selectedChatId, isDialogMode }: ChatMessagesProps
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [data?.fetchChat?.data?.messages])
+  }, [data?.chat?.messages])
 
   const heightClass = isDialogMode ? "h-[calc(100vh-163px)]" : "h-[calc(100vh-200px)]"
 
-  const messages = data?.fetchChat?.data?.messages || [];
+  const messages = data?.chat?.messages || [];
 
   return (
     <div className={`flex flex-col justify-start overflow-y-auto mt-10 gap-4 ${heightClass}`}>

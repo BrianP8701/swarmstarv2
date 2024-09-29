@@ -1,24 +1,44 @@
 import { Chat, Message, MessageRoleEnum, Prisma, PrismaClient } from '@prisma/client'
 import { inject, injectable } from 'inversify'
+import { AbstractDao } from './AbstractDao'
 
 @injectable()
-export class ChatDao {
-  constructor(@inject(PrismaClient) private prisma: PrismaClient) { }
+export class ChatDao extends AbstractDao<Chat, Prisma.ChatCreateInput, Prisma.ChatUpdateInput, Prisma.ChatInclude> {
+  constructor(@inject(PrismaClient) prisma: PrismaClient) {
+    super(prisma);
+  }
 
-  async create(chatCreateInput: Prisma.ChatCreateInput) {
+  // CRUD methods
+  async get(id: string): Promise<Chat> {
+    return this.prisma.chat.findUniqueOrThrow({
+      where: { id },
+    })
+  }
+
+  async exists(id: string): Promise<boolean> {
+    const chat = await this.prisma.chat.findUnique({ where: { id } });
+    return chat !== null;
+  }
+
+  async create(chatCreateInput: Prisma.ChatCreateInput, includeClauses?: Prisma.ChatInclude): Promise<Chat> {
     return this.prisma.chat.create({
       data: chatCreateInput,
+      include: includeClauses
     })
   }
 
-  async get(chatId: string): Promise<Chat> {
-    return this.prisma.chat.findUniqueOrThrow({
-      where: {
-        id: chatId,
-      },
+  async update(id: string, updateInput: Prisma.ChatUpdateInput): Promise<Chat> {
+    return this.prisma.chat.update({
+      where: { id },
+      data: updateInput,
     })
   }
 
+  async delete(id: string): Promise<void> {
+    await this.prisma.chat.delete({ where: { id } });
+  }
+
+  // Additional methods
   async getWithMessages(chatId: string): Promise<Chat & { messages: Message[] }> {
     return this.prisma.chat.findUniqueOrThrow({
       where: {

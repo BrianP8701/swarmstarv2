@@ -1,66 +1,90 @@
 fragment User on User {
   id
-  type
   swarms {
-    ...Swarm
+    ...SwarmPreview
   }
-  memories {
-    ...Memory
+  informationGraphs {
+    ...InformationGraphPreview
   }
 }
 
-fragment Swarm on Swarm {
+fragment SwarmPreview on Swarm {
   id
   title
   goal
 }
 
-fragment SwarmData on SwarmData {
-  id
-  memoryNodes {
-    ...MemoryNode
-  }
+fragment Swarm on Swarm {
+  ...SwarmPreview
   chats {
-    ...Chat
+    ...ChatPreview
   }
-  actionNodes {
-    ...ActionNode
+  agentGraph {
+    ...AgentGraph
   }
-  actionMetadataNodes {
-    ...ActionMetadataNode
-  }
-}
-
-fragment SwarmWithData on Swarm {
-  ...Swarm
-  data {
-    ...SwarmData
+  informationGraph {
+    ...InformationGraph
   }
 }
 
-fragment Memory on Memory {
+fragment InformationGraphPreview on InformationGraph {
   id
   title
-  memoryNodes {
-    ...MemoryNode
+}
+
+fragment InformationGraph on InformationGraph {
+  ...InformationGraphPreview
+  nodes {
+    ...InformationNode
   }
+  edges {
+    ...InformationNodeEdge
+  }
+}
+
+fragment InformationNode on InformationNode {
+  id
+  title
+}
+
+fragment InformationNodeEdge on InformationNodeEdge {
+  id
+  startNodeId
+  endNodeId
+}
+
+fragment AgentGraph on AgentGraph {
+  id
+  nodes {
+    ...AgentNode
+  }
+  edges {
+    ...AgentNodeEdge
+  }
+}
+
+fragment AgentNode on AgentNode {
+  id
+  title
+}
+
+fragment AgentNodeEdge on AgentNodeEdge {
+  id
+  type
+  startNodeId
+  endNodeId
+}
+
+fragment ChatPreview on Chat {
+  id
+  title
+  status
 }
 
 fragment Chat on Chat {
-  id
-  title
-}
-
-fragment ChatData on ChatData {
+  ...ChatPreview
   messages {
     ...Message
-  }
-}
-
-fragment ChatWithData on Chat {
-  ...Chat
-  data {
-    ...ChatData
   }
 }
 
@@ -73,18 +97,42 @@ fragment Message on Message {
 fragment ActionNode on ActionNode {
   id
   title
-  parentId
-}
-
-fragment MemoryNode on MemoryNode {
-  id
-  title
-  parentId
-}
-
-fragment ActionMetadataNode on ActionMetadataNode {
-  id
-  title
-  parentId
   description
+}
+
+fragment ToolGraph on ToolGraph {
+  id
+  nodes {
+    ...ToolNode
+  }
+  edges {
+    ...ToolNodeEdge
+  }
+}
+
+fragment ToolNode on ToolNode {
+  id
+  title
+}
+
+fragment ToolNodeEdge on ToolNodeEdge {
+  id
+  startNodeId
+  endNodeId
+}
+
+fragment ActionGraph on ActionGraph {
+  id
+  nodes {
+    ...ActionNode
+  }
+  edges {
+    ...ActionNodeEdge
+  }
+}
+
+fragment ActionNodeEdge on ActionNodeEdge {
+  id
+  startNodeId
+  endNodeId
 }

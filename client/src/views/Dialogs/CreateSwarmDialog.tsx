@@ -14,7 +14,7 @@ import { CreateSwarmRequest, useCreateSwarmMutation } from "@/graphql/generated/
 const initialCreateSwarmRequest: CreateSwarmRequest = {
   title: '',
   goal: '',
-  memoryId: ''
+  informationGraphId: ''
 }
 
 export function CreateSwarmDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
@@ -27,7 +27,7 @@ export function CreateSwarmDialog({ open, onOpenChange }: { open: boolean, onOpe
     setIsCreateMemoryDialogOpen(true)
   }
 
-  const memories = user?.memories ?? []
+  const informationGraphs = user?.informationGraphs ?? []
 
   const handleCreateSwarm = async () => {
     try {
@@ -39,7 +39,7 @@ export function CreateSwarmDialog({ open, onOpenChange }: { open: boolean, onOpe
     }
   };
 
-  const isSpawnButtonDisabled = !createSwarmRequest.memoryId || !createSwarmRequest.title || !createSwarmRequest.goal
+  const isSpawnButtonDisabled = !createSwarmRequest.informationGraphId || !createSwarmRequest.title || !createSwarmRequest.goal
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -57,15 +57,15 @@ export function CreateSwarmDialog({ open, onOpenChange }: { open: boolean, onOpe
               className="hover:bg-muted/50 text-sm h-9"
               create={openCreateMemoryDialog}
               createMessage="Create"
-              options={memories.map(memory => ({ value: memory.id, label: memory.title ?? 'Untitled Memory' })) ?? []}
+              options={informationGraphs.map(informationGraph => ({ value: informationGraph.id, label: informationGraph.title ?? 'Untitled Information Graph' })) ?? []}
               onSelect={
                 (value) => {
-                  setCreateSwarmRequest({ ...createSwarmRequest, memoryId: value });
+                  setCreateSwarmRequest({ ...createSwarmRequest, informationGraphId: value });
                 }
               }
-              placeholder="Memory"
-              selectedValue={createSwarmRequest.memoryId}
-              emptyMessage="No memories found"
+              placeholder="Information Graph"
+              selectedValue={createSwarmRequest.informationGraphId}
+              emptyMessage="No information graphs found"
             />
           </div>
           <Textarea

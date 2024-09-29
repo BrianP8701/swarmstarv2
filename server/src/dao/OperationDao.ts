@@ -1,61 +1,42 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import { Operation, Prisma, PrismaClient } from '@prisma/client'
 import { inject, injectable } from 'inversify'
+import { AbstractDao } from './AbstractDao'
 
 @injectable()
-export class OperationDao {
-  constructor(@inject(PrismaClient) private prisma: PrismaClient) {}
+export class OperationDao extends AbstractDao<Operation, Prisma.OperationCreateInput, Prisma.OperationUpdateInput, Prisma.OperationInclude> {
+  constructor(@inject(PrismaClient) prisma: PrismaClient) {
+    super(prisma);
+  }
 
-  // FunctionCallOperation methods
-  async createFunctionCallOperation(createInput: Prisma.FunctionCallOperationCreateInput) {
-    return this.prisma.functionCallOperation.create({
-      data: createInput
+  // CRUD methods
+  async get(id: string): Promise<Operation> {
+    return this.prisma.operation.findUniqueOrThrow({
+      where: { id },
     })
   }
 
-  async updateFunctionCallOperation(id: string, updateInput: Prisma.FunctionCallOperationUpdateInput) {
-    return this.prisma.functionCallOperation.update({
+  async exists(id: string): Promise<boolean> {
+    const operation = await this.prisma.operation.findUnique({ where: { id } });
+    return operation !== null;
+  }
+
+  async create(createInput: Prisma.OperationCreateInput, includeClauses?: Prisma.OperationInclude): Promise<Operation> {
+    return this.prisma.operation.create({
+      data: createInput,
+      include: includeClauses
+    })
+  }
+
+  async update(id: string, updateInput: Prisma.OperationUpdateInput): Promise<Operation> {
+    return this.prisma.operation.update({
       where: { id },
       data: updateInput,
     })
   }
 
-  async getFunctionCallOperation(id: string) {
-    return this.prisma.functionCallOperation.findUnique({
-      where: { id },
-    })
+  async delete(id: string): Promise<void> {
+    await this.prisma.operation.delete({ where: { id } });
   }
 
-  // TerminationOperation methods
-  async createTerminationOperation(createInput: Prisma.TerminationOperationCreateInput) {
-    return this.prisma.terminationOperation.create({
-      data: createInput
-    })
-  }
-
-  async updateTerminationOperation(id: string, updateInput: Prisma.TerminationOperationUpdateInput) {
-    return this.prisma.terminationOperation.update({
-      where: { id },
-      data: updateInput,
-    })
-  }
-
-  async getTerminationOperation(id: string) {
-    return this.prisma.terminationOperation.findUnique({
-      where: { id },
-    })
-  }
-
-  // BlockingOperation methods
-  async createBlockingOperation(createInput: Prisma.BlockingOperationCreateInput) {
-    return this.prisma.blockingOperation.create({
-      data: createInput
-    });
-  }
-
-  async updateBlockingOperation(id: string, updateInput: Prisma.BlockingOperationUpdateInput) {
-    return this.prisma.blockingOperation.update({
-      where: { id },
-      data: updateInput,
-    })
-  }
+  // Additional methods can be added here if needed
 }

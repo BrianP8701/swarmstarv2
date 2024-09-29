@@ -1,30 +1,52 @@
-import { Memory, Prisma, PrismaClient, Swarm, User } from '@prisma/client'
+import { Prisma, PrismaClient, Swarm, User, InformationGraph } from '@prisma/client'
 import { inject, injectable } from 'inversify'
+import { AbstractDao } from './AbstractDao'
 
 @injectable()
-export class UserDao {
-  constructor(@inject(PrismaClient) private prisma: PrismaClient) { }
+export class UserDao extends AbstractDao<User, Prisma.UserCreateInput, Prisma.UserUpdateInput, Prisma.UserInclude> {
+  constructor(@inject(PrismaClient) prisma: PrismaClient) {
+    super(prisma);
+  }
 
-  async get(id: string) {
+  // CRUD methods
+  async get(id: string): Promise<User> {
     return this.prisma.user.findUniqueOrThrow({
       where: { id },
     })
   }
 
-  async getWithData(id: string): Promise<User & { swarms: Swarm[], memories: Memory[] }> {
-    return this.prisma.user.findUniqueOrThrow({
-      where: { id },
-      include: { swarms: true, memories: true },
-    })
+  async exists(id: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    return user !== null;
   }
 
-  async create(userCreateInput: Prisma.UserCreateInput) {
+  async create(userCreateInput: Prisma.UserCreateInput, includeClauses?: Prisma.UserInclude): Promise<User> {
     return this.prisma.user.create({
       data: userCreateInput,
+      include: includeClauses
     })
   }
 
-  async getSwarms(id: string): Promise<Swarm []> {
+  async update(id: string, updateInput: Prisma.UserUpdateInput): Promise<User> {
+    return this.prisma.user.update({
+      where: { id },
+      data: updateInput,
+    })
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.user.delete({ where: { id } });
+  }
+
+  // Additional methods
+  async getWithData(id: string): Promise<User & { swarms: Swarm[], informationGraphs: InformationGraph[] }> {
+    return this.prisma.user.findUniqueOrThrow({
+      where: { id },
+      include: { swarms: true, informationGraphs: true },
+    })
+  }
+
+  async getSwarms(id: string): Promise<Swarm[]> {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { id },
       select: { swarms: true },
@@ -32,11 +54,11 @@ export class UserDao {
     return user.swarms;
   }
 
-  async getMemories(id: string): Promise<Memory[]> {
+  async getInformationGraphs(id: string): Promise<InformationGraph[]> {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { id },
-      select: { memories: true },
+      select: { informationGraphs: true },
     });
-    return user.memories;
+    return user.informationGraphs
   }
 }

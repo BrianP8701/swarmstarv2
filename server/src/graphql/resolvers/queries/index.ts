@@ -1,31 +1,27 @@
 import assert from 'assert'
-import { UserDao } from '../../../dao/UserDao'
 import { ResolverContext } from '../../createApolloGqlServer'
-import { formatUserTypeEnum } from '../../formatters/userFormatters'
 import { RootQueryResolvers } from '../../generated/graphql'
+import { GlobalContextDao } from '../../../dao/GlobalContextDao'
 
 export const RootQuery: RootQueryResolvers = {
-  actionMetadata: async () => {
-    return {}
-  },
-  fetchSwarm: async (_parent, { swarmId }) => {
-    return { id: swarmId }
-  },
-  fetchMemory: async (_parent, { memoryId }) => {
-    return { id: memoryId }
-  },
-  fetchChat: async (_parent, { chatId }) => {
-    return { id: chatId }
-  },
-  fetchUser: async (_parent, _args, { req, container }: ResolverContext) => {
-    const userDao = container.get(UserDao)
+  user: async (_parent, _args, { req }: ResolverContext) => {
     assert(req.user, 'User is not logged in')
-    const user = await userDao.getWithData(req.user.id)
-    return {
-      id: user.id,
-      type: formatUserTypeEnum(user.type),
-      swarms: user.swarms,
-      memories: user.memories,
-    }
+    return { id: req.user.id }
   },
+  actionGraph: async (_parent, _args, { container }: ResolverContext) => {
+    const globalContextDao = container.get(GlobalContextDao)
+    const globalContext = await globalContextDao.get()
+    return { id: globalContext.actionGraphId }
+  },
+  toolGraph: async (_parent, _args, { container }: ResolverContext) => {
+    const globalContextDao = container.get(GlobalContextDao)
+    const globalContext = await globalContextDao.get()
+    return { id: globalContext.toolGraphId }
+  },
+  swarm: async (_parent, { id }: { id: string }) => {
+    return { id }
+  },
+  chat: async (_parent, { id }: { id: string }) => {
+    return { id }
+  }
 }

@@ -1,14 +1,15 @@
 import { injectable, inject } from 'inversify';
 import { AbstractRouter, RouterStatusEnum } from './AbstractRouter';
-import { ActionEnum, ActionMetadataNode, RouteActionContext } from '@prisma/client';
-import { ActionMetadataNodeDao } from '../../../dao/nodes/ActionMetadataDao';
-import { ActionNodeWithContext } from '../../../dao/nodes/ActionDao';
+import { ActionEnum, ActionNode, RouteActionContext } from '@prisma/client';
+import { ActionNodeDao } from '../../../dao/nodes/ActionNodeDao';
+import { AgentNodeWithContext } from '../../../dao/nodes/AgentNodeDao';
 import { container } from '../../../utils/di/container';
+import { GlobalContextDao } from '../../../dao/GlobalContextDao';
 
 @injectable()
 export class ActionRouter extends AbstractRouter<
-  ActionMetadataNode,
-  ActionMetadataNodeDao,
+  ActionNode,
+  ActionNodeDao,
   RouteActionContext
 > {
   static readonly description = "Find the most appropriate action based on the current context and goal.";
@@ -21,34 +22,40 @@ export class ActionRouter extends AbstractRouter<
     return "You are an AI assistant helping to navigate through a tree of actions. Choose the most appropriate action based on the current context and goal.";
   }
 
-  constructor(@inject('ActionNode') actionNode: ActionNodeWithContext) {
-    super(actionNode);
-  }
-
-  protected getNodeDao(): ActionMetadataNodeDao {
-    return container.get(ActionMetadataNodeDao);
-  }
-
-  protected getContext(): RouteActionContext {
-    return this.actionNode.routeActionContext;
-  }
-
-  async getStartNode(): Promise<ActionMetadataNode> {
-    if (this.context.startNodeId) {
-      return await this.nodeDao.get(this.context.startNodeId);
+  protected async getContext(): Promise<RouteActionContext> {
+    const agentWithContext = await this.agentNodeDao.getWithContext(this.agentNode.id);
+    const routeActionContext = agentWithContext.routeActionContext;
+    if (!routeActionContext) {
+      throw new Error("Route action context not found");
     }
-    return await this.nodeDao.get(this.actionNode.swarmId);
+    return routeActionContext;
   }
 
-  async handleNoChildren(node: ActionMetadataNode): Promise<[RouterStatusEnum, ActionMetadataNode]> {
+  constructor(
+    @inject('AgentNode') agentNode: AgentNodeWithContext,
+    @inject(GlobalContextDao) private globalContextDao: GlobalContextDao
+  ) {
+    super(agentNode);
+  }
+
+  protected getNodeDao(): ActionNodeDao {
+    return container.get(ActionNodeDao);
+  }
+
+  async getStartNode(): Promise<ActionNode> {
+    const globalContext = await this.globalContextDao.get();
+    return await this.nodeDao.get(globalContext.rootActionNodeId);
+  }
+
+  async handleNoChildren(node: ActionNode): Promise<[RouterStatusEnum, ActionNode]> {
     return [RouterStatusEnum.SUCCESS, node];
   }
 
-  async handleSuccess(node: ActionMetadataNode): Promise<void> {
-    await this.actionDao.create({
+  async handleSuccess(node: ActionNode): Promise<void> {
+    await this.agentNodeDao.create({
       actionEnum: node.actionEnum,
-      goal: this.context.content,
-      swarm: { connect: { id: this.actionNode.swarmId } }
+      goal: (await this.getContext()).content,
+      agentGraph: { connect: { id: this.agentNode.agentGraphId } }
     });
   }
 

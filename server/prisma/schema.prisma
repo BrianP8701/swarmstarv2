@@ -22,38 +22,37 @@ datasource db {
 // \___________________________________________________________/
 
 model GlobalContext {
-  id             String @id @default(uuid()) @db.Uuid
-  defaultSwarmId String @db.Uuid
+  id               String @id @default(uuid()) @db.Uuid
+  rootActionNodeId String @db.Uuid
+  rootToolNodeId   String @db.Uuid
+  toolGraphId      String @db.Uuid
+  actionGraphId    String @db.Uuid
 }
 
 model User {
-  id        String       @id @default(uuid()) @db.Uuid
-  clerkId   String       @unique
-  stripeId  String?
-  type      UserTypeEnum @default(USER)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  swarms    Swarm[]
-  memories  Memory[]
+  id                String             @id @default(uuid()) @db.Uuid
+  clerkId           String             @unique
+  stripeId          String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  swarms            Swarm[]
+  informationGraphs InformationGraph[]
 
   @@index([clerkId])
 }
 
 model Swarm {
-  id     String          @id @default(uuid()) @db.Uuid
-  goal   String
-  title  String
-  status SwarmStatusEnum @default(WAITING_FOR_USER_INPUT)
+  id    String @id @default(uuid()) @db.Uuid
+  title String
+  goal  String
 
-  actionNodes         ActionNode[]         @relation("SwarmToActionNodes")
-  actionMetadataNodes ActionMetadataNode[] @relation("SwarmToActionMetadataNodes")
-  toolMetadataNodes   ToolMetadataNode[]   @relation("SwarmToToolMetadataNodes")
+  agentGraphId String?     @unique @db.Uuid
+  agentGraph   AgentGraph? @relation("SwarmToAgentGraph")
 
-  memoryId String @db.Uuid
-  memory   Memory @relation(fields: [memoryId], references: [id])
+  informationGraphId String           @db.Uuid
+  informationGraph   InformationGraph @relation("SwarmToInformationGraph", fields: [informationGraphId], references: [id])
 
-  chats Chat[]
-
+  chats  Chat[]
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id])
 
@@ -61,31 +60,67 @@ model Swarm {
   updatedAt DateTime @updatedAt
 }
 
-model Memory {
+model AgentGraph {
+  id String @id @default(uuid()) @db.Uuid
+
+  nodes AgentNode[]     @relation("AgentGraphToAgentNodes")
+  edges AgentNodeEdge[] @relation("AgentGraphToAgentNodeEdges")
+
+  swarm   Swarm  @relation("SwarmToAgentGraph", fields: [swarmId], references: [id])
+  swarmId String @unique @db.Uuid
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InformationGraph {
   id    String @id @default(uuid()) @db.Uuid
   title String
 
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id])
 
-  swarms      Swarm[]
-  memoryNodes MemoryNode[] @relation("MemoryToMemoryNodes")
+  swarms Swarm[] @relation("SwarmToInformationGraph")
+
+  nodes InformationNode[]     @relation("InformationGraphToInformationNodes")
+  edges InformationNodeEdge[] @relation("InformationGraphToInformationNodeEdges")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ActionGraph {
+  id String @id @default(uuid()) @db.Uuid
+
+  nodes ActionNode[]     @relation("ActionGraphToActionNodes")
+  edges ActionNodeEdge[] @relation("ActionGraphToActionNodeEdges")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ToolGraph {
+  id String @id @default(uuid()) @db.Uuid
+
+  nodes ToolNode[]     @relation("ToolGraphToToolNodes")
+  edges ToolNodeEdge[] @relation("ToolGraphToToolNodeEdges")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Chat {
-  id     String @id @default(uuid()) @db.Uuid
+  id     String         @id @default(uuid()) @db.Uuid
   title  String
+  status ChatStatusEnum @default(ACTIVE)
+
+  swarmId String @db.Uuid
+  swarm   Swarm  @relation(fields: [swarmId], references: [id])
 
   messages Message[]
 
-  actionNodeId String     @db.Uuid
-  actionNode   ActionNode @relation(fields: [actionNodeId], references: [id])
-
-  swarm   Swarm  @relation(fields: [swarmId], references: [id])
-  swarmId String @db.Uuid
+  agentNodeId String    @db.Uuid
+  agentNode   AgentNode @relation(fields: [agentNodeId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -102,60 +137,38 @@ model Message {
   updatedAt DateTime @updatedAt
 }
 
-model FunctionCallOperation {
-  id             String              @id @default(uuid()) @db.Uuid
-  functionToCall String
-  actionNodeId   String              @db.Uuid
-  actionNode     ActionNode          @relation("ActionNodeToFunctionCallOperations", fields: [actionNodeId], references: [id], onDelete: Cascade)
-  status         OperationStatusEnum @default(QUEUED)
+model Operation {
+  id     String              @id @default(uuid()) @db.Uuid
+  status OperationStatusEnum @default(QUEUED)
+  type   OperationTypeEnum
+
+  agentNodeId String    @db.Uuid
+  agentNode   AgentNode @relation("AgentNodeToOperations", fields: [agentNodeId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model TerminationOperation {
-  id           String              @id @default(uuid()) @db.Uuid
-  terminatorId String
-  actionNodeId String              @db.Uuid
-  actionNode   ActionNode          @relation("ActionNodeToTerminationOperations", fields: [actionNodeId], references: [id], onDelete: Cascade)
-  status       OperationStatusEnum @default(QUEUED)
+model AgentNode {
+  id                   String   @id @default(uuid()) @db.Uuid
+  goal                 String
+  report               String?
+  stringContextHistory String[] @default([])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+  status         AgentStatusEnum @default(ACTIVE)
+  killPolicyEnum KillPolicyEnum  @default(SIMPLE)
+  actionEnum     ActionEnum
 
-model BlockingOperation {
-  id                    String                @id @default(uuid()) @db.Uuid
-  nextFunctionToCall    String
-  args                  Json?
-  blockingOperationEnum BlockingOperationEnum
-  actionNodeId          String                @db.Uuid
-  actionNode            ActionNode            @relation("ActionNodeToBlockingOperations", fields: [actionNodeId], references: [id], onDelete: Cascade)
-  status                OperationStatusEnum   @default(QUEUED)
+  outgoingEdges AgentNodeEdge[] @relation("AgentNodeEdgeStart")
+  incomingEdges AgentNodeEdge[] @relation("AgentNodeEdgeEnd")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+  operations Operation[] @relation("AgentNodeToOperations")
 
-model ActionNode {
-  id                     String                  @id @default(uuid()) @db.Uuid
-  goal                   String
-  status                 ActionStatusEnum        @default(ACTIVE)
-  terminationPolicyEnum  TerminationPolicyEnum   @default(SIMPLE)
-  report                 String?
-  stringContextHistory   String[]                @default([])
-  actionEnum             ActionEnum
-  parentId               String?                 @default(uuid()) @db.Uuid
-  parent                 ActionNode?             @relation("ActionNodeToActionNode", fields: [parentId], references: [id])
-  children               ActionNode[]            @relation("ActionNodeToActionNode")
-  functionCallOperations FunctionCallOperation[] @relation("ActionNodeToFunctionCallOperations")
-  terminationOperations  TerminationOperation[]  @relation("ActionNodeToTerminationOperations")
-  blockingOperations     BlockingOperation[]     @relation("ActionNodeToBlockingOperations")
-  chats                  Chat[]
-  logs                   String[]                @default([])
+  chats Chat[]
+  logs  String[] @default([])
 
-  swarmId String @db.Uuid
-  swarm   Swarm  @relation("SwarmToActionNodes", fields: [swarmId], references: [id], onDelete: Cascade)
+  agentGraphId String     @db.Uuid
+  agentGraph   AgentGraph @relation("AgentGraphToAgentNodes", fields: [agentGraphId], references: [id], onDelete: Cascade)
 
   planContext        PlanContext?
   routeActionContext RouteActionContext?
@@ -165,81 +178,147 @@ model ActionNode {
   updatedAt DateTime @updatedAt
 }
 
-model MemoryNode {
-  id          String         @id @default(uuid()) @db.Uuid
-  title       String
-  description String
-  memoryType  MemoryTypeEnum
-  parentId    String?        @db.Uuid
-  parent      MemoryNode?    @relation("MemoryNodeToMemoryNode", fields: [parentId], references: [id])
-  children    MemoryNode[]   @relation("MemoryNodeToMemoryNode")
+model InformationNode {
+  id              String              @id @default(uuid()) @db.Uuid
+  title           String
+  description     String
+  informationType InformationTypeEnum
 
-  memoryId String @db.Uuid
-  memory   Memory @relation("MemoryToMemoryNodes", fields: [memoryId], references: [id], onDelete: Cascade)
+  outgoingEdges InformationNodeEdge[] @relation("InformationNodeEdgeStart")
+  incomingEdges InformationNodeEdge[] @relation("InformationNodeEdgeEnd")
+
+  informationGraphId String           @db.Uuid
+  informationGraph   InformationGraph @relation("InformationGraphToInformationNodes", fields: [informationGraphId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model ToolMetadataNode {
+model ToolNode {
   id          String       @id @default(uuid()) @db.Uuid
   description String
   toolType    ToolTypeEnum
 
-  parentId String?            @db.Uuid
-  parent   ToolMetadataNode?  @relation("ToolMetadataNodeToToolMetadataNode", fields: [parentId], references: [id])
-  children ToolMetadataNode[] @relation("ToolMetadataNodeToToolMetadataNode")
+  outgoingEdges ToolNodeEdge[] @relation("ToolNodeEdgeStart")
+  incomingEdges ToolNodeEdge[] @relation("ToolNodeEdgeEnd")
 
-  swarmId String @db.Uuid
-  swarm   Swarm  @relation("SwarmToToolMetadataNodes", fields: [swarmId], references: [id], onDelete: Cascade)
+  toolGraphId String    @db.Uuid
+  toolGraph   ToolGraph @relation("ToolGraphToToolNodes", fields: [toolGraphId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model ActionMetadataNode {
+model ActionNode {
   id          String     @id @default(uuid()) @db.Uuid
   description String
   actionEnum  ActionEnum
 
-  parentId String?              @db.Uuid
-  parent   ActionMetadataNode?  @relation("ActionMetadataNodeToActionMetadataNode", fields: [parentId], references: [id])
-  children ActionMetadataNode[] @relation("ActionMetadataNodeToActionMetadataNode")
+  outgoingEdges ActionNodeEdge[] @relation("ActionNodeEdgeStart")
+  incomingEdges ActionNodeEdge[] @relation("ActionNodeEdgeEnd")
 
-  swarmId String @db.Uuid
-  swarm   Swarm  @relation("SwarmToActionMetadataNodes", fields: [swarmId], references: [id], onDelete: Cascade)
+  actionGraphId String      @db.Uuid
+  actionGraph   ActionGraph @relation("ActionGraphToActionNodes", fields: [actionGraphId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model PlanContext {
-  id                             String     @id @default(uuid()) @db.Uuid
-  terminationHandlerFunctionName String?
-  attempts                       Int
-  planAttempts                   String[]   @default([])
-  planReviewFeedbackHistory      String[]   @default([])
-  actionNode                     ActionNode @relation(fields: [actionNodeId], references: [id])
-  actionNodeId                   String     @unique @db.Uuid
+  id                        String    @id @default(uuid()) @db.Uuid
+  killFunctionName          String?
+  attempts                  Int
+  planAttempts              String[]  @default([])
+  planReviewFeedbackHistory String[]  @default([])
+  agentNode                 AgentNode @relation(fields: [agentNodeId], references: [id])
+  agentNodeId               String    @unique @db.Uuid
 }
 
 model RouteActionContext {
-  id                             String     @id @default(uuid()) @db.Uuid
-  terminationHandlerFunctionName String?
-  content                        String
-  startNodeId                    String?
-  currentNodeId                  String?
-  markedNodeIds                  String[]   @default([])
-  actionNode                     ActionNode @relation(fields: [actionNodeId], references: [id])
-  actionNodeId                   String     @unique @db.Uuid
+  id               String    @id @default(uuid()) @db.Uuid
+  killFunctionName String?
+  content          String
+  startNodeId      String?
+  currentNodeId    String?
+  markedNodeIds    String[]  @default([])
+  agentNode        AgentNode @relation(fields: [agentNodeId], references: [id])
+  agentNodeId      String    @unique @db.Uuid
 }
 
 model SearchContext {
-  id                             String     @id @default(uuid()) @db.Uuid
-  terminationHandlerFunctionName String?
-  questions                      String[]
-  actionNode                     ActionNode @relation(fields: [actionNodeId], references: [id])
-  actionNodeId                   String     @unique @db.Uuid
+  id                      String    @id @default(uuid()) @db.Uuid
+  killHandlerFunctionName String?
+  questions               String[]
+  agentNode               AgentNode @relation(fields: [agentNodeId], references: [id])
+  agentNodeId             String    @unique @db.Uuid
+}
+
+model AgentNodeEdge {
+  id          String                @id @default(uuid()) @db.Uuid
+  startNodeId String                @db.Uuid
+  endNodeId   String                @db.Uuid
+  type        AgentNodeEdgeTypeEnum
+
+  agentGraphId String     @db.Uuid
+  agentGraph   AgentGraph @relation("AgentGraphToAgentNodeEdges", fields: [agentGraphId], references: [id], onDelete: Cascade)
+
+  startNode AgentNode @relation("AgentNodeEdgeStart", fields: [startNodeId], references: [id])
+  endNode   AgentNode @relation("AgentNodeEdgeEnd", fields: [endNodeId], references: [id])
+
+  @@unique([startNodeId, endNodeId])
+  @@index([startNodeId])
+  @@index([endNodeId])
+}
+
+model InformationNodeEdge {
+  id String @id @default(uuid()) @db.Uuid
+
+  startNodeId String @db.Uuid
+  endNodeId   String @db.Uuid
+
+  informationGraphId String           @db.Uuid
+  informationGraph   InformationGraph @relation("InformationGraphToInformationNodeEdges", fields: [informationGraphId], references: [id], onDelete: Cascade)
+
+  startNode InformationNode @relation("InformationNodeEdgeStart", fields: [startNodeId], references: [id])
+  endNode   InformationNode @relation("InformationNodeEdgeEnd", fields: [endNodeId], references: [id])
+
+  @@unique([startNodeId, endNodeId])
+  @@index([startNodeId])
+  @@index([endNodeId])
+}
+
+model ToolNodeEdge {
+  id String @id @default(uuid()) @db.Uuid
+
+  startNodeId String @db.Uuid
+  endNodeId   String @db.Uuid
+
+  startNode ToolNode @relation("ToolNodeEdgeStart", fields: [startNodeId], references: [id])
+  endNode   ToolNode @relation("ToolNodeEdgeEnd", fields: [endNodeId], references: [id])
+
+  toolGraphId String    @db.Uuid
+  toolGraph   ToolGraph @relation("ToolGraphToToolNodeEdges", fields: [toolGraphId], references: [id], onDelete: Cascade)
+
+  @@unique([startNodeId, endNodeId])
+  @@index([startNodeId])
+  @@index([endNodeId])
+}
+
+model ActionNodeEdge {
+  id String @id @default(uuid()) @db.Uuid
+
+  startNodeId String @db.Uuid
+  endNodeId   String @db.Uuid
+
+  actionGraphId String      @db.Uuid
+  actionGraph   ActionGraph @relation("ActionGraphToActionNodeEdges", fields: [actionGraphId], references: [id], onDelete: Cascade)
+
+  startNode ActionNode @relation("ActionNodeEdgeStart", fields: [startNodeId], references: [id])
+  endNode   ActionNode @relation("ActionNodeEdgeEnd", fields: [endNodeId], references: [id])
+
+  @@unique([startNodeId, endNodeId])
+  @@index([startNodeId])
+  @@index([endNodeId])
 }
 
 //  ___________________________________________________________
@@ -258,11 +337,6 @@ model SearchContext {
 // |                                                           |
 // \___________________________________________________________/
 
-enum UserTypeEnum {
-  ADMIN
-  USER
-}
-
 enum OperationStatusEnum {
   QUEUED
   RUNNING
@@ -270,11 +344,17 @@ enum OperationStatusEnum {
   FAILED
 }
 
+enum OperationTypeEnum {
+  SPAWN
+  RUN
+  RETURN
+  KILL
+}
+
 enum MessageRoleEnum {
   USER
   SYSTEM
   ASSISTANT
-  SWARMSTAR
 }
 
 enum ActionEnum {
@@ -286,60 +366,41 @@ enum ActionEnum {
   REVIEW_GOAL_PROGRESS
 }
 
-enum ActionStatusEnum {
+enum AgentStatusEnum {
   ACTIVE
   WAITING_FOR_USER_INPUT
-  TERMINATED
+  DEAD
   PAUSED
   ERROR
 }
 
-enum TerminationPolicyEnum {
+enum KillPolicyEnum {
   SIMPLE
   CONFIRM_DIRECTIVE_COMPLETION
-  CUSTOM_TERMINATION_HANDLER
-}
-
-enum BlockingOperationEnum {
-  SEND_USER_MESSAGE
-  INSTRUCTOR_CALL
-  CHATGPT_CALL
-}
-
-enum DatabaseTableEnum {
-  ACTION_NODES
-  SWARMSTAR_SPACE
-  SWARMSTAR_EVENTS
-  ACTION_METADATA_NODES
-  MEMORY_METADATA_NODES
-  TOOL_METADATA_NODES
-  SPAWN_OPERATIONS
-  TERMINATION_OPERATIONS
-  BLOCKING_OPERATIONS
-  FUNCTION_CALL_OPERATIONS
-  MESSAGES
-  USERS
-}
-
-enum SwarmStatusEnum {
-  SPAWNING
-  ACTIVE
-  WAITING_FOR_USER_INPUT
-  COMPLETED
-  PAUSED
-  ERROR
+  CUSTOM_KILL_HANDLER
 }
 
 enum ToolTypeEnum {
   GITHUB_CLONE
 }
 
-enum MemoryTypeEnum {
+enum InformationTypeEnum {
   FOLDER
   GITHUB_REPOSITORY_LINK
   PYTHON_FILE
   TYPESCRIPT_FILE
   STRING
+}
+
+enum AgentNodeEdgeTypeEnum {
+  SPAWN
+  KILL
+  RETURN
+}
+
+enum ChatStatusEnum {
+  ACTIVE
+  COMPLETED
 }
 
 //  ___________________________________________________________

@@ -2,7 +2,7 @@ import Instructor from '@instructor-ai/instructor'
 import { inject, injectable } from 'inversify'
 import OpenAI from 'openai'
 import { z } from 'zod'
-import { ActionDao } from '../dao/nodes/ActionDao'
+import { AgentNodeDao } from '../dao/nodes/AgentNodeDao'
 
 export type GPT_MODEL = 'gpt-3.5-turbo' | 'gpt-4-1106-preview' | 'gpt-4-turbo-preview' | 'gpt-4o' | 'gpt-4o-mini'
 
@@ -33,7 +33,7 @@ export type InstructorRequest = {
 export class InstructorService {
   constructor(
     @inject(OpenAI) private openAI: OpenAI,
-    @inject(ActionDao) private actionDao: ActionDao
+    @inject(AgentNodeDao) private agentNodeDao: AgentNodeDao
   ) { }
 
   public async run<T extends z.AnyZodObject>(request: InstructorRequest): Promise<z.infer<T>> {
@@ -66,7 +66,7 @@ export class InstructorService {
     }
 
     if (request.action_id) {
-      await this.actionDao.log(request.action_id, [...request.messages.map(message => message.content), JSON.stringify(result)])
+      await this.agentNodeDao.log(request.action_id, [...request.messages.map(message => message.content), JSON.stringify(result)])
     }
     return result
   }

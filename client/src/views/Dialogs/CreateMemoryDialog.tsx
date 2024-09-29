@@ -2,32 +2,32 @@ import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CreateMemoryRequest, useCreateMemoryMutation } from "../../graphql/generated/graphql";
+import { CreateInformationGraphRequest, useCreateInformationGraphMutation } from "../../graphql/generated/graphql";
 
 interface CreateMemoryDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }
 
-const initialCreateMemoryRequest: CreateMemoryRequest = {
+const initialCreateInformationGraphRequest: CreateInformationGraphRequest = {
     title: '',
 }
 
 export function CreateMemoryDialog({ open, onOpenChange }: CreateMemoryDialogProps) {
-    const [createMemoryRequest, setCreateMemoryRequest] = useState<CreateMemoryRequest>(initialCreateMemoryRequest)
-    const [createMemory] = useCreateMemoryMutation();
+    const [createInformationGraphRequest, setCreateInformationGraphRequest] = useState<CreateInformationGraphRequest>(initialCreateInformationGraphRequest)
+    const [createInformationGraph] = useCreateInformationGraphMutation();
 
-    const handleCreateMemory = async () => {
+    const handleCreateInformationGraph = async () => {
         try {
-            await createMemory({ variables: { input: createMemoryRequest } });
+            await createInformationGraph({ variables: { input: createInformationGraphRequest } });
             onOpenChange(false);
-            setCreateMemoryRequest(initialCreateMemoryRequest);
+            setCreateInformationGraphRequest(initialCreateInformationGraphRequest);
         } catch (error) {
-            console.error("Error creating memory:", error);
+            console.error("Error creating information graph:", error);
         }
     };
 
-    const isCreateButtonDisabled = !createMemoryRequest.title
+    const isCreateButtonDisabled = !createInformationGraphRequest.title
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -35,16 +35,16 @@ export function CreateMemoryDialog({ open, onOpenChange }: CreateMemoryDialogPro
                 <div className="grid gap-4 py-4 px-20 mt-2">
                     <Input
                         placeholder="Title"
-                        value={createMemoryRequest.title}
-                        onChange={(e) => setCreateMemoryRequest({ ...createMemoryRequest, title: e.target.value })}
+                        value={createInformationGraphRequest.title}
+                        onChange={(e) => setCreateInformationGraphRequest({ ...createInformationGraphRequest, title: e.target.value })}
                     />
                 </div>
                 <div className="flex justify-end">
                     <Button 
-                        onClick={handleCreateMemory}
+                        onClick={handleCreateInformationGraph}
                         disabled={isCreateButtonDisabled}
                     >
-                        Create Memory
+                        Create Information Graph
                     </Button>
                 </div>
             </DialogContent>

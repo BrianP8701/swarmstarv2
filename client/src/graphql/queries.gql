@@ -1,18 +1,24 @@
 query FetchUser {
-  fetchUser {
+  user {
     ...User
   }
 }
 
 query FetchSwarm($swarmId: ID!) {
-  fetchSwarm(swarmId: $swarmId) {
-    ...SwarmWithData
+  swarm(id: $swarmId) {
+    ...Swarm
   }
 }
 
 query FetchChat($chatId: ID!) {
-  fetchChat(chatId: $chatId) {
-    ...ChatWithData
+  chat(id: $chatId) {
+    ...Chat
+  }
+}
+
+query FetchActionGraph {
+  actionGraph {
+    ...ActionGraph
   }
 }
 
@@ -24,9 +30,9 @@ mutation CreateSwarm($input: CreateSwarmRequest!) {
   }
 }
 
-mutation CreateMemory($input: CreateMemoryRequest!) {
-  memoryMutation {
-    createMemory(input: $input) {
+mutation CreateInformationGraph($input: CreateInformationGraphRequest!) {
+  informationGraphMutation {
+    createInformationGraph(input: $input) {
       ...User
     }
   }
@@ -35,7 +41,13 @@ mutation CreateMemory($input: CreateMemoryRequest!) {
 mutation SendMessage($input: SendMessageRequest!) {
   chatMutation {
     sendMessage(input: $input) {
-      ...ChatWithData
+      ...Chat
     }
+  }
+}
+
+subscription MessageSent($chatId: ID!) {
+  messageSent(chatId: $chatId) {
+    ...Message
   }
 }

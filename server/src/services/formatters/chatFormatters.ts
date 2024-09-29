@@ -20,8 +20,6 @@ export const formatDbMessageRoleToInstructorMessageRole = (role: MessageRoleEnum
       return InstructorMessageRoleEnum.ASSISTANT
     case MessageRoleEnum.SYSTEM:
       return InstructorMessageRoleEnum.SYSTEM
-    case MessageRoleEnum.SWARMSTAR:
-      return InstructorMessageRoleEnum.ASSISTANT
     default:
       throw new Error(`Unsupported message role: ${role}`)
   }

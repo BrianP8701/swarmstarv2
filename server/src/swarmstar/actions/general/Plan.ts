@@ -2,7 +2,7 @@ import { ActionEnum, PlanContext } from '@prisma/client'
 import { AbstractAction } from '../AbstractAction'
 import { PlanInstructor } from '../../instructors/PlanInstructor'
 import { ReviewPlanInstructor } from '../../instructors/ReviewPlanInstructor'
-import { ActionNodeWithContext } from '../../../dao/nodes/ActionDao'
+import { AgentNodeWithContext } from '../../../dao/nodes/AgentNodeDao'
 import { container } from '../../../utils/di/container'
 
 const MAX_PLAN_ATTEMPTS = 3
@@ -17,58 +17,59 @@ export class PlanAction extends AbstractAction<PlanContext> {
   protected planInstructor: PlanInstructor
   protected reviewPlanInstructor: ReviewPlanInstructor
 
-  constructor(actionNode: ActionNodeWithContext) {
-    super(actionNode)
+  constructor(agentNode: AgentNodeWithContext) {
+    super(agentNode)
     this.planInstructor = container.get(PlanInstructor)
     this.reviewPlanInstructor = container.get(ReviewPlanInstructor)
   }
 
   async run(): Promise<void> {
-    const isContextSufficient = await this.isContextSufficient(this.actionNode.goal)
+    const isContextSufficient = await this.isContextSufficient(this.agentNode.goal)
     if (!isContextSufficient) {
-      await this.askQuestions(this.actionNode.goal)
+      await this.askQuestions(this.agentNode.goal)
       return
     }
     await this.generatePlan()
   }
 
   private async generatePlan(): Promise<void> {
-    this.context.attempts++
+    const context = await this.getContext()
+    context.attempts++
     const plan = await this.planInstructor.run(
       {
-        goal: this.actionNode.goal,
+        goal: this.agentNode.goal,
         context: this.getMostRecentContextString(),
-        review: this.getContext().planReviewFeedbackHistory[this.getContext().planReviewFeedbackHistory.length - 1],
-        lastPlanAttempt: this.getContext().planAttempts[this.getContext().planAttempts.length - 1],
+        review: context.planReviewFeedbackHistory[context.planReviewFeedbackHistory.length - 1],
+        lastPlanAttempt: context.planAttempts[context.planAttempts.length - 1],
       },
-      this.actionNode.id
+      this.agentNode.id
     )
 
     const reviewPlan = await this.reviewPlanInstructor.run(
       {
-        goal: this.actionNode.goal,
+        goal: this.agentNode.goal,
         steps: plan.steps,
         context: this.getMostRecentContextString(),
       },
-      this.actionNode.id
+      this.agentNode.id
     )
 
     if (reviewPlan.confirmation) {
       await this.spawnNextAction(plan.steps[0])
     } else {
-      if (this.context.attempts < MAX_PLAN_ATTEMPTS) {
-        this.context.planReviewFeedbackHistory.push(reviewPlan.feedback)
-        this.context.planAttempts.push(plan.steps.join('\n'))
+      if (context.attempts < MAX_PLAN_ATTEMPTS) {
+        context.planReviewFeedbackHistory.push(reviewPlan.feedback)
+        context.planAttempts.push(plan.steps.join('\n'))
         await this.updateContext()
         await this.generatePlan()
       } else {
-        throw new Error(`Plan exceeded max attempts on action node ${this.actionNode.id}`)
+        throw new Error(`Plan exceeded max attempts on action node ${this.agentNode.id}`)
       }
     }
   }
 
   private async spawnNextAction(goal: string): Promise<void> {
-    await this.actionDao.create({
+    await this.agentNodeDao.create({
       actionEnum: ActionEnum.ROUTE_ACTION,
       goal,
       routeActionContext: {
@@ -76,21 +77,26 @@ export class PlanAction extends AbstractAction<PlanContext> {
           content: goal,
         }
       },
-      swarm: { connect: { id: this.actionNode.swarmId } }
+      agentGraph: { connect: { id: this.agentNode.agentGraphId } }
     });
   }
 
-  protected getContext(): PlanContext {
-    return this.actionNode.planContext
+  protected async getContext(): Promise<PlanContext> {
+    const agentNodeWithContext = await this.agentNodeDao.getWithContext(this.agentNode.id)
+    if (!agentNodeWithContext?.planContext) {
+      throw new Error(`Agent node with id ${this.agentNode.id} not found`)
+    }
+    return agentNodeWithContext.planContext
   }
 
   private async updateContext(): Promise<void> {
-    await this.actionDao.update(this.actionNode.id, {
+    const context = await this.getContext()
+    await this.agentNodeDao.update(this.agentNode.id, {
       planContext: {
         update: {
-          attempts: this.getContext().attempts,
-          planAttempts: this.getContext().planAttempts,
-          planReviewFeedbackHistory: this.getContext().planReviewFeedbackHistory,
+          attempts: context.attempts,
+          planAttempts: context.planAttempts,
+          planReviewFeedbackHistory: context.planReviewFeedbackHistory,
         }
       }
     })

@@ -10,18 +10,22 @@ import {
 } from "@/components/ui/resizable"
 import {
   useFetchSwarmLazyQuery,
-  SwarmWithDataFragment
+  SwarmFragment,
+  useFetchActionGraphLazyQuery,
+  ActionGraphFragment
 } from "../graphql/generated/graphql";
-import { TreeVisualizer } from "../components/custom/tree/TreeVisualizer";
+import { GraphVisualizer } from "../components/custom/graph/GraphVisualizer";
 import { useFetchUser } from "../hooks/fetchUser";
 import { Loader2Icon } from "lucide-react";
 
 export default function HomePage() {
   const { user, loading } = useFetchUser();
-  const [fetchSwarm, { data: swarmData }] = useFetchSwarmLazyQuery();
+  const [fetchSwarm, { data: fetchSwarmQuery }] = useFetchSwarmLazyQuery();
+  const [fetchActionGraph, { data: fetchActionGraphQuery }] = useFetchActionGraphLazyQuery();
 
   const [selectedSwarmId, setSelectedSwarmId] = useState<string | undefined>(undefined);
-  const [swarm, setSwarm] = useState<SwarmWithDataFragment | undefined>(undefined);
+  const [swarm, setSwarm] = useState<SwarmFragment | undefined>(undefined);
+  const [actionGraph, setActionGraph] = useState<ActionGraphFragment | undefined>(undefined);
   const [isCreateSwarmDialogOpen, setIsCreateSwarmDialogOpen] = useState(false);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
 
@@ -36,13 +40,22 @@ export default function HomePage() {
   }, [selectedSwarmId, fetchSwarm]);
 
   useEffect(() => {
-    if (swarmData?.fetchSwarm) {
-      setSwarm({
-        ...swarmData.fetchSwarm,
-        data: swarmData.fetchSwarm.data ?? undefined
-      });
+    if (selectedSwarmId) {
+      fetchActionGraph();
     }
-  }, [swarmData]);
+  }, [selectedSwarmId, fetchActionGraph]);
+
+  useEffect(() => {
+    if (fetchSwarmQuery?.swarm) {
+      setSwarm(fetchSwarmQuery.swarm);
+    }
+  }, [fetchSwarmQuery]);
+
+  useEffect(() => {
+    if (fetchActionGraphQuery?.actionGraph) {
+      setActionGraph(fetchActionGraphQuery.actionGraph);
+    }
+  }, [fetchActionGraphQuery]);
 
   useEffect(() => {
     if (user && user.swarms && user.swarms.length > 0 && !selectedSwarmId) {
@@ -51,8 +64,8 @@ export default function HomePage() {
   }, [user, selectedSwarmId]);
 
   useEffect(() => {
-    if (swarm && swarm.data?.chats && swarm.data.chats.length > 0 && !selectedChatId) {
-      setSelectedChatId(swarm.data.chats[0].id);
+    if (swarm && swarm.chats && swarm.chats.length > 0 && !selectedChatId) {
+      setSelectedChatId(swarm.chats[0].id);
     }
   }, [swarm, selectedChatId]);
 
@@ -65,7 +78,6 @@ export default function HomePage() {
   }
 
   const swarms = user?.swarms ?? [];
-  const actionMetadataNodes = swarm?.data?.actionMetadataNodes ?? [];
 
   return (
     <div className="flex flex-col h-full">
@@ -117,12 +129,18 @@ export default function HomePage() {
                   <DialogPreview
                     previewComponent={
                       <div className="w-full h-full">
-                        <TreeVisualizer nodes={actionMetadataNodes} />
+                        <GraphVisualizer 
+                          nodes={actionGraph?.nodes ?? []} 
+                          edges={(actionGraph?.edges ?? [])}
+                        />
                       </div>
                     }
                     dialogContent={
                       <div className="w-full h-full">
-                        <TreeVisualizer nodes={actionMetadataNodes} />
+                        <GraphVisualizer 
+                          nodes={actionGraph?.nodes ?? []}
+                          edges={(actionGraph?.edges ?? [])}
+                        />
                       </div>
                     }
                   />

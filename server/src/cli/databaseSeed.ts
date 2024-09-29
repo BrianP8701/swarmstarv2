@@ -19,10 +19,9 @@ export async function seed() {
   const user = await userDao.create({
     clerkId: userId,
   });
-
-  await generateActionMetadataTree(user.id);
-
   logger.info(`Created seed user with ID: ${user.id}`);
+
+  await generateActionMetadataTree();
 }
 
 // Add this for CLI execution

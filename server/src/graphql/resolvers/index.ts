@@ -1,16 +1,18 @@
-import { RootQuery } from './queries';
-import { ActionMetadataQuery } from './queries/actionMetadataQuery';
+import { RootMutation } from './mutations';
+import { Subscription } from './subscriptions';
+
+import { InformationGraph } from './fields/graphs/informationGraph';
+import { ToolGraph } from './fields/graphs/toolGraph';
+import { AgentGraph } from './fields/graphs/agentGraph';
+import { ActionGraph } from './fields/graphs/actionGraph';
+
 import { Swarm } from './fields/swarm';
 import { User } from './fields/user';
-import { RootMutation } from './mutations';
-import { MemoryMutation } from './mutations/memoryMutation';
 import { SwarmMutation } from './mutations/swarmMutation';
-import { Memory } from './fields/memory';
-import { SwarmData } from './fields/swarmData';
 import { ChatMutation } from './mutations/chatMutation';
-import { ChatData } from './fields/chatData';
 import { Chat } from './fields/chat';
-import { Subscription } from './subscriptions';
+import { InformationGraphMutation } from './mutations/informationGraphMutation';
+import { RootQuery } from './queries';
 
 export const resolvers = {
   // Root
@@ -18,19 +20,17 @@ export const resolvers = {
   RootMutation,
   Subscription,
 
-  // Queries
-  ActionMetadataQuery,
-
   // Field Resolvers
   Swarm,
-  Memory,
-  SwarmData,
   User,
   Chat,
-  ChatData,
+  InformationGraph,
+  ToolGraph,
+  AgentGraph,
+  ActionGraph,
 
   // Mutations
   SwarmMutation,
-  MemoryMutation,
   ChatMutation,
+  InformationGraphMutation
 };

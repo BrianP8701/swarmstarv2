@@ -1,15 +1,9 @@
 #  ___________________________________________________________
 # /                                                           \
 # |                                                           |
-# |                     TYPE SECTION STARTS                   |
+# |                     ENUM SECTION STARTS                   |
 # |                                                           |
 # \___________________________________________________________/
-
-
-enum UserTypeEnum {
-  USER
-  ADMIN
-}
 
 enum ActionEnum {
   FOLDER
@@ -24,65 +18,143 @@ enum MessageRoleEnum {
   USER
   SYSTEM
   ASSISTANT
-  SWARMSTAR
 }
+
+enum AgentNodeEdgeTypeEnum {
+  SPAWN
+  KILL
+  RETURN
+}
+
+enum ChatStatusEnum {
+  ACTIVE
+  COMPLETED
+}
+
+#  ___________________________________________________________
+# /                                                           \
+# |                                                           |
+# |                     ENUM SECTION ENDS                     |
+# |                                                           |
+# \___________________________________________________________/
+
+# ___________________________________________________________
+
+#  ___________________________________________________________
+# /                                                           \
+# |                                                           |
+# |                     TYPE SECTION STARTS                   |
+# |                                                           |
+# \___________________________________________________________/
+
 
 type User {
   id: ID!
-  type: UserTypeEnum
   swarms: [Swarm!]
-  memories: [Memory!]
+  informationGraphs: [InformationGraph!]
 }
 
 type Swarm {
   id: ID!
   title: String
   goal: String
-  data: SwarmData
-}
-
-type SwarmData {
-  id: ID!
   chats: [Chat!]
-  actionNodes: [ActionNode!]
-  memoryNodes: [MemoryNode!]
-  actionMetadataNodes: [ActionMetadataNode!]
+  agentGraph: AgentGraph
+  informationGraph: InformationGraph
 }
 
-type Memory {
+"""
+Information Graph
+"""
+type InformationGraph {
   id: ID!
   title: String
-  memoryNodes: [MemoryNode!]
+  nodes: [InformationNode!]
+  edges: [InformationNodeEdge!]
 }
 
-type Chat {
+type InformationNode {
   id: ID!
   title: String
-  data: ChatData
 }
 
-type ChatData {
+type InformationNodeEdge {
   id: ID!
-  messages: [Message!]
+  startNodeId: ID!
+  endNodeId: ID!
+}
+
+"""
+Agent Graph
+"""
+type AgentGraph {
+  id: ID!
+  nodes: [AgentNode!]
+  edges: [AgentNodeEdge!]
+}
+
+type AgentNode {
+  id: ID!
+  title: String
+}
+
+type AgentNodeEdge {
+  id: ID!
+  type: AgentNodeEdgeTypeEnum
+  startNodeId: ID!
+  endNodeId: ID!
+}
+
+"""
+Action Graph
+"""
+type ActionGraph {
+  id: ID!
+  nodes: [ActionNode!]
+  edges: [ActionNodeEdge!]
 }
 
 type ActionNode {
   id: ID!
   title: String
-  parentId: ID
-}
-
-type MemoryNode {
-  id: ID!
-  title: String
-  parentId: ID
-}
-
-type ActionMetadataNode {
-  id: ID!
-  title: String
-  parentId: ID
   description: String
+}
+
+type ActionNodeEdge {
+  id: ID!
+  startNodeId: ID!
+  endNodeId: ID!
+}
+
+"""
+Tool Graph
+"""
+type ToolGraph {
+  id: ID!
+  nodes: [ToolNode!]
+  edges: [ToolNodeEdge!]
+}
+
+type ToolNode {
+  id: ID!
+  title: String
+}
+
+type ToolNodeEdge {
+  id: ID!
+  startNodeId: ID!
+  endNodeId: ID!
+}
+
+
+"""
+Chat
+"""
+type Chat {
+  id: ID!
+  title: String
+  messages: [Message!]
+  status: ChatStatusEnum
 }
 
 type Message {
@@ -108,15 +180,11 @@ type Message {
 # \___________________________________________________________/
 
 type RootQuery {
-  fetchSwarm(swarmId: ID!): Swarm
-  fetchMemory(memoryId: ID!): Memory
-  fetchChat(chatId: ID!): Chat
-  fetchUser: User
-  actionMetadata: ActionMetadataQuery
-}
-
-type ActionMetadataQuery {
-  getActionMetadata: [ActionMetadataNode]
+  user: User
+  actionGraph: ActionGraph
+  toolGraph: ToolGraph
+  swarm(id: ID!): Swarm
+  chat(id: ID!): Chat
 }
 
 #  ___________________________________________________________
@@ -137,26 +205,26 @@ type ActionMetadataQuery {
 
 type RootMutation {
   swarmMutation: SwarmMutation
-  memoryMutation: MemoryMutation
+  informationGraphMutation: InformationGraphMutation
   chatMutation: ChatMutation
 }
 
 input CreateSwarmRequest {
   title: String!
   goal: String!
-  memoryId: ID!
+  informationGraphId: ID!
 }
 
 type SwarmMutation {
   createSwarm(input: CreateSwarmRequest!): User
 }
 
-input CreateMemoryRequest {
+input CreateInformationGraphRequest {
   title: String!
 }
 
-type MemoryMutation {
-  createMemory(input: CreateMemoryRequest!): User
+type InformationGraphMutation {
+  createInformationGraph(input: CreateInformationGraphRequest!): User
 }
 
 input SendMessageRequest {

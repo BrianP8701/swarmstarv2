@@ -1,9 +1,9 @@
 import { injectable } from 'inversify';
-import { AbstractAction, ActionContext } from '../AbstractAction';
+import { AbstractAction, AgentContext } from '../AbstractAction';
 import { RouterInstructor } from '../../instructors/RouterInstructor';
 import { container } from '../../../utils/di/container';
 import { AbstractNodeDao } from '../../../dao/nodes/AbstractNodeDao';
-import { ActionNodeWithContext } from '../../../dao/nodes/ActionDao';
+import { AgentNodeWithContext } from '../../../dao/nodes/AgentNodeDao';
 
 export enum RouterStatusEnum {
   SEARCHING,
@@ -13,7 +13,7 @@ export enum RouterStatusEnum {
   FAILURE
 }
 
-type RouterContext = ActionContext & {
+type RouterContext = AgentContext & {
   content: string;
   markedNodeIds: string[];
 }
@@ -23,12 +23,12 @@ interface RouterNode {
   id: string;
   description: string;
 }
-
+ 
 @injectable()
 export abstract class AbstractRouter<
   T extends RouterNode,
-  D extends AbstractNodeDao<T, T>,
-  C extends RouterContext
+  D extends AbstractNodeDao<T, unknown, unknown, unknown, unknown, unknown, unknown, unknown>,
+  C extends RouterContext,
 > extends AbstractAction<C> {
   protected routerInstructor: RouterInstructor;
   protected nodeDao: D;
@@ -37,8 +37,8 @@ export abstract class AbstractRouter<
     throw new Error('systemPrompt must be implemented in derived class');
   }
 
-  constructor(actionNode: ActionNodeWithContext) {
-    super(actionNode);
+  constructor(agentNode: AgentNodeWithContext) {
+    super(agentNode);
     this.routerInstructor = container.get(RouterInstructor);
     this.nodeDao = this.getNodeDao();
   }
@@ -76,7 +76,7 @@ export abstract class AbstractRouter<
   }
 
   private async search(node: T): Promise<[RouterStatusEnum, T]> {
-    const children = await this.nodeDao.getChildren(node.id);
+    const children = await this.nodeDao.getOutgoingNodes(node.id);
     if (children.length === 0) {
       return [RouterStatusEnum.NO_CHILDREN, node];
     }
@@ -86,53 +86,58 @@ export abstract class AbstractRouter<
     return this.multipleChildrenSearch(node, children);
   }
 
-  private singleChildSearch(child: T): [RouterStatusEnum, T] {
-    this.context.markedNodeIds.push(child.id);
+  private async singleChildSearch(child: T): Promise<[RouterStatusEnum, T]> {
+    const context = await this.getContext();
+    context.markedNodeIds.push(child.id);
     return [RouterStatusEnum.SEARCHING, child];
   }
 
   private async multipleChildrenSearch(node: T, children: T[]): Promise<[RouterStatusEnum, T]> {
-    const viableChildren = this.removeUnviableNodes(children);
+    const viableChildren = await this.removeUnviableNodes(children);
     if (viableChildren.length === 0) {
       return [RouterStatusEnum.NO_VIABLE_OPTIONS, node];
     }
 
+    const context = await this.getContext();
     const routerResponse = await this.routerInstructor.run(
       {
         options: viableChildren.map(child => child.description),
-        content: this.context.content,
+        content: context.content,
         systemMessage: (this.constructor as unknown as typeof AbstractRouter<T, D, C>).systemPrompt,
       },
-      this.actionNode.id
+      this.agentNode.id
     );
 
     if (routerResponse.bestOption !== null) {
-      this.markUnviableNodes(children, routerResponse.unviableOptions);
+      await this.markUnviableNodes(children, routerResponse.unviableOptions);
       const selectedNode = viableChildren[routerResponse.bestOption];
-      this.context.markedNodeIds.push(selectedNode.id);
+      context.markedNodeIds.push(selectedNode.id);
       return [RouterStatusEnum.SEARCHING, selectedNode];
     }
 
-    this.markUnviableNodes(children, children.map((_, index) => index));
+    await this.markUnviableNodes(children, children.map((_, index) => index));
     return [RouterStatusEnum.NO_VIABLE_OPTIONS, node];
   }
 
-  private markUnviableNodes(children: T[], unviableOptions: number[]): void {
-    this.context.markedNodeIds.push(...unviableOptions.map(index => children[index].id));
+  private async markUnviableNodes(children: T[], unviableOptions: number[]): Promise<void> {
+    const context = await this.getContext();
+    context.markedNodeIds.push(...unviableOptions.map(index => children[index].id));
   }
 
-  private removeUnviableNodes(children: T[]): T[] {
-    return children.filter(child => !this.context.markedNodeIds.includes(child.id));
+  private async removeUnviableNodes(children: T[]): Promise<T[]> {
+    const context = await this.getContext();
+    return children.filter(child => !context.markedNodeIds.includes(child.id));
   }
 
   private async backtrack(node: T): Promise<[RouterStatusEnum, T]> {
     while (true) {
-      const parentNode = await this.nodeDao.getParent(node.id);
-      if (parentNode) {
-        node = parentNode as T; // Type assertion needed here
-        this.context.markedNodeIds.push(node.id);
-        const children = await this.nodeDao.getChildren(node.id);
-        const filteredChildren = this.removeUnviableNodes(children);
+      const parentNodes = await this.nodeDao.getIncomingNodes(node.id)
+      if (parentNodes.length > 0) {
+        node = parentNodes[0] as T; // Type assertion needed here
+        const context = await this.getContext();
+        context.markedNodeIds.push(node.id);
+        const children = await this.nodeDao.getOutgoingNodes(node.id);
+        const filteredChildren = await this.removeUnviableNodes(children);
         if (filteredChildren.length > 0) {
           return [RouterStatusEnum.SEARCHING, node];
         }
