@@ -1,16 +1,24 @@
-import React, { useState } from 'react';
-import { Button, ButtonProps } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import React, { useState } from 'react'
+import { Button, ButtonProps } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 interface TooltipDialogButtonProps extends ButtonProps {
-  tooltipText: string;
-  ariaLabel: string;
-  dialogContent: React.ReactNode;
+  tooltipText: string
+  ariaLabel: string
+  dialogContent: React.ReactNode
 }
 
-export default function TooltipDialogButton({ children, className, variant = "ghost", size = "icon", ariaLabel, tooltipText, dialogContent }: TooltipDialogButtonProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+export default function TooltipDialogButton({
+  children,
+  className,
+  variant = 'ghost',
+  size = 'icon',
+  ariaLabel,
+  tooltipText,
+  dialogContent,
+}: TooltipDialogButtonProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   return (
     <TooltipProvider>
@@ -26,15 +34,13 @@ export default function TooltipDialogButton({ children, className, variant = "gh
             {children}
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="right" sideOffset={5}>
+        <TooltipContent side='right' sideOffset={5}>
           {tooltipText}
         </TooltipContent>
       </Tooltip>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          {dialogContent}
-        </DialogContent>
+        <DialogContent>{dialogContent}</DialogContent>
       </Dialog>
     </TooltipProvider>
-  );
+  )
 }

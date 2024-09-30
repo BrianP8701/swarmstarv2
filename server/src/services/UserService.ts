@@ -11,7 +11,7 @@ export class UserService {
     const user = await this.prismaClient.user.upsert({
       where: { clerkId: sessionClaim.sub },
       create: {
-        clerkId: sessionClaim.sub
+        clerkId: sessionClaim.sub,
       },
       update: {},
     })

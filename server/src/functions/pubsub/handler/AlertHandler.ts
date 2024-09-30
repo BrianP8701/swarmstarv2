@@ -12,9 +12,7 @@ import { PubSubTopic } from '../PubSubTopic'
 
 @injectable()
 export class AlertHandler extends CloudEventSubscriberFunction<PubSubTopic.AlertHandler> {
-  constructor(
-    @inject(TwilioService) private twilioService: TwilioService
-  ) {
+  constructor(@inject(TwilioService) private twilioService: TwilioService) {
     super()
   }
 

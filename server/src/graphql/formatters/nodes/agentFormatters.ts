@@ -1,12 +1,5 @@
-import { 
-  AgentEdge,
-  AgentEdgeTypeEnum
-} from "@prisma/client"
-import { 
-  AgentEdge as GqlAgentEdge,
-  AgentEdgeTypeEnum as GqlAgentEdgeTypeEnum
-} from "../../generated/graphql"
-
+import { AgentEdge, AgentEdgeTypeEnum } from '@prisma/client'
+import { AgentEdge as GqlAgentEdge, AgentEdgeTypeEnum as GqlAgentEdgeTypeEnum } from '../../generated/graphql'
 
 export const formatAgentEdgeToGqlAgentEdge = (edge: AgentEdge): GqlAgentEdge => {
   return {

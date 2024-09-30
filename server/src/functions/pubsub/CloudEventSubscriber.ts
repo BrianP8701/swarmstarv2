@@ -48,7 +48,7 @@ export abstract class CloudEventSubscriberFunction<T extends PubSubTopic> implem
   public abstract handle(payload: TopicPayload[T]): Promise<void>
   protected static eventHandler: CloudEventFunction<CloudEventPayload>
 
-  public abstract getTopic(): T;
+  public abstract getTopic(): T
 
   public registerLocalHandler(): void {
     if (this.secretService.getEnvVars().MODE === Environment.LOCAL) {

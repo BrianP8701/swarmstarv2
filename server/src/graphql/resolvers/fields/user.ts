@@ -15,7 +15,7 @@ export const User: UserResolvers = {
     assert(req.user?.id, 'User is not authenticated')
     const userDao = container.get(UserDao)
     const user = await userDao.getWithData(req.user.id)
-    return user.informationGraphs.map((informationGraph) => ({
+    return user.informationGraphs.map(informationGraph => ({
       id: informationGraph.id,
     }))
   },

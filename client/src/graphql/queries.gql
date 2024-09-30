@@ -5,13 +5,13 @@ query FetchUser {
 }
 
 query FetchSwarm($swarmId: ID!) {
-  swarm(id: $swarmId) {
+  swarm(swarmId: $swarmId) {
     ...Swarm
   }
 }
 
 query FetchChat($chatId: ID!) {
-  chat(id: $chatId) {
+  chat(chatId: $chatId) {
     ...Chat
   }
 }

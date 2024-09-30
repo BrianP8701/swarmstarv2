@@ -34,7 +34,7 @@ export class InstructorService {
   constructor(
     @inject(OpenAI) private openAI: OpenAI,
     @inject(AgentNodeDao) private agentNodeDao: AgentNodeDao
-  ) { }
+  ) {}
 
   public async run<T extends z.AnyZodObject>(request: InstructorRequest): Promise<z.infer<T>> {
     const timeoutPromise = new Promise<'timeout'>(resolve => {
@@ -54,7 +54,7 @@ export class InstructorService {
       temperature: request.temperature ?? 0,
       response_model: {
         schema: request.response_model.schema,
-        name: request.response_model.name
+        name: request.response_model.name,
       },
       max_retries: request.max_retries ?? 3,
     })
@@ -66,7 +66,10 @@ export class InstructorService {
     }
 
     if (request.action_id) {
-      await this.agentNodeDao.log(request.action_id, [...request.messages.map(message => message.content), JSON.stringify(result)])
+      await this.agentNodeDao.log(request.action_id, [
+        ...request.messages.map(message => message.content),
+        JSON.stringify(result),
+      ])
     }
     return result
   }

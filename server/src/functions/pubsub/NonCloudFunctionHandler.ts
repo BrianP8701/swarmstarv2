@@ -15,7 +15,7 @@ export abstract class NonCloudFunctionHandler<T extends PubSubTopic> implements 
     this.pubSubMediator = container.get(PubSubMediator)
   }
 
-  public abstract getTopic(): T;
+  public abstract getTopic(): T
 
   public async handle(payload: TopicPayload[T]): Promise<void> {
     const extractedPayload = this.extractPayload(payload)
@@ -27,7 +27,7 @@ export abstract class NonCloudFunctionHandler<T extends PubSubTopic> implements 
     return payload
   }
 
-  protected abstract handleEvent(payload: TopicPayload[T]): Promise<void>;
+  protected abstract handleEvent(payload: TopicPayload[T]): Promise<void>
 
   public registerLocalHandler(): void {
     if (this.secretService.getEnvVars().MODE === Environment.LOCAL) {

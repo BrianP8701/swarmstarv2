@@ -12,7 +12,7 @@ export class InformationGraphDao extends AbstractGraphDao<
   Prisma.InformationGraphInclude
 > {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
-    super(prisma);
+    super(prisma)
   }
 
   async get(id: string): Promise<InformationGraph> {
@@ -22,14 +22,17 @@ export class InformationGraphDao extends AbstractGraphDao<
   }
 
   async exists(id: string): Promise<boolean> {
-    const graph = await this.prisma.informationGraph.findUnique({ where: { id } });
-    return graph !== null;
+    const graph = await this.prisma.informationGraph.findUnique({ where: { id } })
+    return graph !== null
   }
 
-  async create(createInput: Prisma.InformationGraphCreateInput, include?: Prisma.InformationGraphInclude): Promise<InformationGraph> {
+  async create(
+    createInput: Prisma.InformationGraphCreateInput,
+    include?: Prisma.InformationGraphInclude
+  ): Promise<InformationGraph> {
     return this.prisma.informationGraph.create({
       data: createInput,
-      include: include
+      include: include,
     })
   }
 
@@ -41,26 +44,26 @@ export class InformationGraphDao extends AbstractGraphDao<
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.informationGraph.delete({ where: { id } });
+    await this.prisma.informationGraph.delete({ where: { id } })
   }
 
-  async getGraph(id: string): Promise<{ nodes: InformationNode[], edges: InformationEdge[] }> {
+  async getGraph(id: string): Promise<{ nodes: InformationNode[]; edges: InformationEdge[] }> {
     const graph = await this.prisma.informationGraph.findUnique({
       where: { id },
       include: {
         nodes: true,
         edges: true,
       },
-    });
+    })
 
     if (!graph) {
-      throw new Error(`InformationGraph with id ${id} not found`);
+      throw new Error(`InformationGraph with id ${id} not found`)
     }
 
     return {
       nodes: graph.nodes,
       edges: graph.edges,
-    };
+    }
   }
 
   // Additional methods specific to InformationGraph if needed
@@ -71,10 +74,10 @@ export class InformationGraphDao extends AbstractGraphDao<
   }
 
   async getNodes(id: string): Promise<InformationNode[]> {
-    return this.prisma.informationNode.findMany({ where: { informationGraphId: id } });
+    return this.prisma.informationNode.findMany({ where: { informationGraphId: id } })
   }
 
   async getEdges(id: string): Promise<InformationEdge[]> {
-    return this.prisma.informationEdge.findMany({ where: { informationGraphId: id } });
+    return this.prisma.informationEdge.findMany({ where: { informationGraphId: id } })
   }
 }

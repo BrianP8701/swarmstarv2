@@ -1,12 +1,12 @@
-import { Outlet } from 'react-router-dom';
-import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/clerk-react';
-import { TooltipProvider } from "@radix-ui/react-tooltip";
+import { Outlet } from 'react-router-dom'
+import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/clerk-react'
+import { TooltipProvider } from '@radix-ui/react-tooltip'
 
 const AuthWrapper = () => {
   return (
     <>
-    <SignedIn>
-      <TooltipProvider>
+      <SignedIn>
+        <TooltipProvider>
           <Outlet />
         </TooltipProvider>
       </SignedIn>
@@ -17,4 +17,4 @@ const AuthWrapper = () => {
   )
 }
 
-export default AuthWrapper;
+export default AuthWrapper

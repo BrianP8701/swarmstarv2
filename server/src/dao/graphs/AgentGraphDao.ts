@@ -12,7 +12,7 @@ export class AgentGraphDao extends AbstractGraphDao<
   Prisma.AgentGraphInclude
 > {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
-    super(prisma);
+    super(prisma)
   }
 
   async get(id: string): Promise<AgentGraph> {
@@ -22,14 +22,14 @@ export class AgentGraphDao extends AbstractGraphDao<
   }
 
   async exists(id: string): Promise<boolean> {
-    const graph = await this.prisma.agentGraph.findUnique({ where: { id } });
-    return graph !== null;
+    const graph = await this.prisma.agentGraph.findUnique({ where: { id } })
+    return graph !== null
   }
 
   async create(createInput: Prisma.AgentGraphCreateInput, include?: Prisma.AgentGraphInclude): Promise<AgentGraph> {
     return this.prisma.agentGraph.create({
       data: createInput,
-      include: include
+      include: include,
     })
   }
 
@@ -41,33 +41,33 @@ export class AgentGraphDao extends AbstractGraphDao<
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.agentGraph.delete({ where: { id } });
+    await this.prisma.agentGraph.delete({ where: { id } })
   }
 
-  async getGraph(id: string): Promise<{ nodes: AgentNode[], edges: AgentEdge[] }> {
+  async getGraph(id: string): Promise<{ nodes: AgentNode[]; edges: AgentEdge[] }> {
     const graph = await this.prisma.agentGraph.findUnique({
       where: { id },
       include: {
         nodes: true,
         edges: true,
       },
-    });
+    })
 
     if (!graph) {
-      throw new Error(`AgentGraph with id ${id} not found`);
+      throw new Error(`AgentGraph with id ${id} not found`)
     }
 
     return {
       nodes: graph.nodes,
       edges: graph.edges,
-    };
+    }
   }
 
   async getNodes(id: string): Promise<AgentNode[]> {
-    return this.prisma.agentNode.findMany({ where: { agentGraphId: id } });
+    return this.prisma.agentNode.findMany({ where: { agentGraphId: id } })
   }
 
   async getEdges(id: string): Promise<AgentEdge[]> {
-    return this.prisma.agentEdge.findMany({ where: { agentGraphId: id } });
+    return this.prisma.agentEdge.findMany({ where: { agentGraphId: id } })
   }
 }

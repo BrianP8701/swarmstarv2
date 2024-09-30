@@ -1,10 +1,10 @@
-import { Chat, ChatStatusEnum, Message, MessageRoleEnum } from "@prisma/client"
-import { 
-  Chat as GqlChat, 
-  ChatStatusEnum as GqlChatStatusEnum, 
-  Message as GqlChatMessage, 
-  MessageRoleEnum as GqlMessageRoleEnum 
-} from "../generated/graphql"
+import { Chat, ChatStatusEnum, Message, MessageRoleEnum } from '@prisma/client'
+import {
+  Chat as GqlChat,
+  ChatStatusEnum as GqlChatStatusEnum,
+  Message as GqlChatMessage,
+  MessageRoleEnum as GqlMessageRoleEnum,
+} from '../generated/graphql'
 
 export const formatDbChatToGqlChat = (chat: Chat & { messages?: Message[] }): GqlChat => {
   return {

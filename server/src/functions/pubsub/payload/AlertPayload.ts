@@ -1,9 +1,8 @@
 export enum AlertType {
-  NewUser
+  NewUser,
 }
 
-export type AlertBody =
-  | SlackBodyForNewUser
+export type AlertBody = SlackBodyForNewUser
 
 export type SlackBodyForNewUser = {
   type: AlertType.NewUser

@@ -11,10 +11,10 @@ export const InformationGraphMutation: InformationGraphMutationResolvers = {
       title: input.title,
       user: {
         connect: {
-          id: req.user.id
-        }
+          id: req.user.id,
+        },
       },
     })
     return informationGraph
-  }
+  },
 }

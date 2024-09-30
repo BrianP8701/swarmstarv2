@@ -3,26 +3,31 @@ import { inject, injectable } from 'inversify'
 import { AbstractDao } from './AbstractDao'
 
 @injectable()
-export class SwarmDao extends AbstractDao<Swarm, Prisma.SwarmCreateInput, Prisma.SwarmUpdateInput, Prisma.SwarmInclude> {
+export class SwarmDao extends AbstractDao<
+  Swarm,
+  Prisma.SwarmCreateInput,
+  Prisma.SwarmUpdateInput,
+  Prisma.SwarmInclude
+> {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
-    super(prisma);
+    super(prisma)
   }
 
   async get(id: string): Promise<Swarm> {
     return this.prisma.swarm.findUniqueOrThrow({
       where: { id },
-    });
+    })
   }
 
   async exists(id: string): Promise<boolean> {
-    const swarm = await this.prisma.swarm.findUnique({ where: { id } });
-    return swarm !== null;
+    const swarm = await this.prisma.swarm.findUnique({ where: { id } })
+    return swarm !== null
   }
 
   async create(swarmCreateInput: Prisma.SwarmCreateInput, includeClauses?: Prisma.SwarmInclude): Promise<Swarm> {
     return this.prisma.swarm.create({
       data: swarmCreateInput,
-      include: includeClauses
+      include: includeClauses,
     })
   }
 

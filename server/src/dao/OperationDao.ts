@@ -3,9 +3,14 @@ import { inject, injectable } from 'inversify'
 import { AbstractDao } from './AbstractDao'
 
 @injectable()
-export class OperationDao extends AbstractDao<Operation, Prisma.OperationCreateInput, Prisma.OperationUpdateInput, Prisma.OperationInclude> {
+export class OperationDao extends AbstractDao<
+  Operation,
+  Prisma.OperationCreateInput,
+  Prisma.OperationUpdateInput,
+  Prisma.OperationInclude
+> {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
-    super(prisma);
+    super(prisma)
   }
 
   // CRUD methods
@@ -16,14 +21,14 @@ export class OperationDao extends AbstractDao<Operation, Prisma.OperationCreateI
   }
 
   async exists(id: string): Promise<boolean> {
-    const operation = await this.prisma.operation.findUnique({ where: { id } });
-    return operation !== null;
+    const operation = await this.prisma.operation.findUnique({ where: { id } })
+    return operation !== null
   }
 
   async create(createInput: Prisma.OperationCreateInput, includeClauses?: Prisma.OperationInclude): Promise<Operation> {
     return this.prisma.operation.create({
       data: createInput,
-      include: includeClauses
+      include: includeClauses,
     })
   }
 
@@ -35,7 +40,7 @@ export class OperationDao extends AbstractDao<Operation, Prisma.OperationCreateI
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.operation.delete({ where: { id } });
+    await this.prisma.operation.delete({ where: { id } })
   }
 
   // Additional methods can be added here if needed

@@ -43,7 +43,7 @@ const startServer = async () => {
   const httpServer = createServer(app)
   const apolloServer = createApolloGqlServer(httpServer)
 
-  const {serverCleanup } = createApolloWsServer(httpServer, container)
+  const { serverCleanup } = createApolloWsServer(httpServer, container)
 
   apolloServer.addPlugin({
     async serverWillStart() {

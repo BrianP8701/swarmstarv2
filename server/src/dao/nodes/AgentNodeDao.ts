@@ -3,15 +3,20 @@ import { inject, injectable } from 'inversify'
 import { AbstractNodeDao } from './AbstractNodeDao'
 
 export type AgentNodeWithContext = AgentNode & {
-  planContext: PlanContext | null,
-  routeActionContext: RouteActionContext | null,
+  planContext: PlanContext | null
+  routeActionContext: RouteActionContext | null
   searchContext: SearchContext | null
 }
 
 @injectable()
-export class AgentNodeDao extends AbstractNodeDao<AgentNode, Prisma.AgentNodeCreateInput, Prisma.AgentNodeUpdateInput, Prisma.AgentNodeInclude> {
+export class AgentNodeDao extends AbstractNodeDao<
+  AgentNode,
+  Prisma.AgentNodeCreateInput,
+  Prisma.AgentNodeUpdateInput,
+  Prisma.AgentNodeInclude
+> {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
-    super(prisma);
+    super(prisma)
   }
 
   // CRUD methods
@@ -22,28 +27,28 @@ export class AgentNodeDao extends AbstractNodeDao<AgentNode, Prisma.AgentNodeCre
   }
 
   async exists(id: string): Promise<boolean> {
-    const node = await this.prisma.agentNode.findUnique({ where: { id } });
-    return node !== null;
+    const node = await this.prisma.agentNode.findUnique({ where: { id } })
+    return node !== null
   }
 
   async create(createInput: Prisma.AgentNodeCreateInput, includeClauses?: Prisma.AgentNodeInclude): Promise<AgentNode> {
     return this.prisma.agentNode.create({
       data: createInput,
-      include: includeClauses
-    });
+      include: includeClauses,
+    })
   }
 
   async update(id: string, updateInput: Prisma.AgentNodeUpdateInput): Promise<AgentNode> {
     return this.prisma.agentNode.update({
       where: { id },
       data: updateInput,
-    });
+    })
   }
 
   async delete(id: string): Promise<void> {
     await this.prisma.agentNode.delete({
       where: { id },
-    });
+    })
   }
 
   // Node DAO methods
@@ -51,22 +56,22 @@ export class AgentNodeDao extends AbstractNodeDao<AgentNode, Prisma.AgentNodeCre
     const edges = await this.prisma.agentEdge.findMany({
       where: { startNodeId: nodeId },
       include: { endNode: true },
-    });
-    return edges.map(edge => edge.endNode);
+    })
+    return edges.map(edge => edge.endNode)
   }
 
   async getIncomingNodes(nodeId: string): Promise<AgentNode[]> {
     const edges = await this.prisma.agentEdge.findMany({
       where: { endNodeId: nodeId },
       include: { startNode: true },
-    });
-    return edges.map(edge => edge.startNode);
+    })
+    return edges.map(edge => edge.startNode)
   }
 
   async getAllConnectedNodes(nodeId: string): Promise<AgentNode[]> {
-    const outgoing = await this.getOutgoingNodes(nodeId);
-    const incoming = await this.getIncomingNodes(nodeId);
-    return [...outgoing, ...incoming];
+    const outgoing = await this.getOutgoingNodes(nodeId)
+    const incoming = await this.getIncomingNodes(nodeId)
+    return [...outgoing, ...incoming]
   }
 
   async log(actionId: string, messages: string[]) {
@@ -84,6 +89,6 @@ export class AgentNodeDao extends AbstractNodeDao<AgentNode, Prisma.AgentNodeCre
         routeActionContext: true,
         searchContext: true,
       },
-    });
+    })
   }
 }

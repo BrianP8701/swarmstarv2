@@ -1,19 +1,19 @@
-import * as React from "react";
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from '@/components/ui/command';
-import { PopoverButton } from './PopoverButton';
-import { CheckIcon } from 'lucide-react';
-import { cn } from '@/utils/cn';
+import * as React from 'react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from '@/components/ui/command'
+import { PopoverButton } from './PopoverButton'
+import { CheckIcon } from 'lucide-react'
+import { cn } from '@/utils/cn'
 
 interface SelectWithCreateProps {
-  create: () => void;
-  createMessage: string;
-  options: { value: string; label: string }[];
-  onSelect: (value: string) => void;
-  className?: string;
-  placeholder: string;
-  selectedValue?: string;
-  emptyMessage?: string;
+  create: () => void
+  createMessage: string
+  options: { value: string; label: string }[]
+  onSelect: (value: string) => void
+  className?: string
+  placeholder: string
+  selectedValue?: string
+  emptyMessage?: string
 }
 
 const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
@@ -25,18 +25,18 @@ const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
   selectedValue,
   emptyMessage,
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(false)
 
-  const togglePopover = () => setIsOpen(!isOpen);
+  const togglePopover = () => setIsOpen(!isOpen)
 
   const handleSelect = (value: string) => {
     if (value === 'create') {
-      create();
+      create()
     } else {
-      onSelect(value);
+      onSelect(value)
     }
-    setIsOpen(false);
-  };
+    setIsOpen(false)
+  }
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -49,7 +49,7 @@ const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
       </PopoverTrigger>
       <PopoverContent align='start' className={`p-0 relative`}>
         <Command>
-          <CommandInput placeholder="Search" create={create} />
+          <CommandInput placeholder='Search' create={create} />
           <CommandList>
             <CommandEmpty>{emptyMessage ?? 'No results found'}</CommandEmpty>
             <CommandGroup>
@@ -58,15 +58,10 @@ const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
                   key={option.value}
                   value={option.value}
                   onSelect={() => handleSelect(option.value)}
-                  className={cn(
-                    option.value === selectedValue && 'bg-accent'
-                  )}
+                  className={cn(option.value === selectedValue && 'bg-accent')}
                 >
                   <CheckIcon
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      option.value === selectedValue ? "opacity-100" : "opacity-0"
-                    )}
+                    className={cn('mr-2 h-4 w-4', option.value === selectedValue ? 'opacity-100' : 'opacity-0')}
                   />
                   {option.label}
                 </CommandItem>
@@ -76,7 +71,7 @@ const SelectWithCreate: React.FC<SelectWithCreateProps> = ({
         </Command>
       </PopoverContent>
     </Popover>
-  );
-};
+  )
+}
 
-export default SelectWithCreate;
+export default SelectWithCreate

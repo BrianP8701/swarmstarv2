@@ -1,12 +1,12 @@
-import { PropsWithChildren } from "react";
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-react';
-import { TooltipProvider } from "@/components/ui/tooltip";
-import './App.css';
-import HomePage from './views/HomePage';
-import { ApolloClientProvider } from "./providers/ApolloClientProvider";
-import MainLayout from "@/components/layouts/MainLayout";
-import AuthWrapper from "./components/custom/AuthWrapper";
+import { PropsWithChildren } from 'react'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-react'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import './App.css'
+import HomePage from './views/HomePage'
+import { ApolloClientProvider } from './providers/ApolloClientProvider'
+import MainLayout from '@/components/layouts/MainLayout'
+import AuthWrapper from './components/custom/AuthWrapper'
 
 const App = () => {
   return (
@@ -37,8 +37,8 @@ const Providers = (props: PropsWithChildren<NonNullable<unknown>>) => {
           </TooltipProvider>
         </ApolloClientProvider>
       </ClerkLoaded>
-    </ClerkProvider >
+    </ClerkProvider>
   )
 }
 
-export default App;
+export default App

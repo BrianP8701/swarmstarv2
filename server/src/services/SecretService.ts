@@ -1,9 +1,9 @@
-import { z } from 'zod';
-import { injectable } from 'inversify';
-import { logger } from '../utils/logging/logger';
-import dotenv from 'dotenv';
+import { z } from 'zod'
+import { injectable } from 'inversify'
+import { logger } from '../utils/logging/logger'
+import dotenv from 'dotenv'
 
-dotenv.config();
+dotenv.config()
 
 export enum Environment {
   LOCAL = 'local',
@@ -28,24 +28,24 @@ const envSchema = z.object({
   GLOBAL_CONTEXT_ID: z.string(),
   VITE_CLERK_PUBLISHABLE_KEY: z.string(),
   VITE_GRAPHQL_URL: z.string().url(),
-});
+})
 
-export type EnvConfig = z.infer<typeof envSchema>;
+export type EnvConfig = z.infer<typeof envSchema>
 
 @injectable()
 export class SecretService {
-  private config: EnvConfig;
+  private config: EnvConfig
 
   constructor() {
-    const result = envSchema.safeParse(process.env);
+    const result = envSchema.safeParse(process.env)
     if (!result.success) {
-      logger.error('Invalid environment variables:', result.error.format());
-      throw new Error('Invalid environment configuration');
+      logger.error('Invalid environment variables:', result.error.format())
+      throw new Error('Invalid environment configuration')
     }
-    this.config = result.data;
+    this.config = result.data
   }
 
   public getEnvVars(): EnvConfig {
-    return this.config;
+    return this.config
   }
 }

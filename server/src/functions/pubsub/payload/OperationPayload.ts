@@ -1,7 +1,7 @@
 export enum OperationType {
   FunctionCall,
   Termination,
-  Blocking
+  Blocking,
 }
 
 export interface OperationPayload {

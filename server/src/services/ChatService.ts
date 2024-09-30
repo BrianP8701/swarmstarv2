@@ -12,9 +12,13 @@ export class ChatService {
     @inject(ChatDao) private chatDao: ChatDao,
     @inject(PubSubMediator) private pubSubMediator: PubSubMediator,
     @inject(ChainOfThoughtInstructor) private chainOfThoughtInstructor: ChainOfThoughtInstructor
-  ) { }
+  ) {}
 
-  public async sendMessage(chatId: string, message: string, role: MessageRoleEnum): Promise<Chat & { messages: Message[] }> {
+  public async sendMessage(
+    chatId: string,
+    message: string,
+    role: MessageRoleEnum
+  ): Promise<Chat & { messages: Message[] }> {
     await this.chatDao.sendMessage(chatId, message, role)
     const chat = await this.chatDao.getWithMessages(chatId)
     await this.pubSubMediator.publishEvent(PubSubTopic.UserMessageHandler, {

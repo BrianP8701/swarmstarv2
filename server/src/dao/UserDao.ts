@@ -5,7 +5,7 @@ import { AbstractDao } from './AbstractDao'
 @injectable()
 export class UserDao extends AbstractDao<User, Prisma.UserCreateInput, Prisma.UserUpdateInput, Prisma.UserInclude> {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
-    super(prisma);
+    super(prisma)
   }
 
   // CRUD methods
@@ -16,14 +16,14 @@ export class UserDao extends AbstractDao<User, Prisma.UserCreateInput, Prisma.Us
   }
 
   async exists(id: string): Promise<boolean> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
-    return user !== null;
+    const user = await this.prisma.user.findUnique({ where: { id } })
+    return user !== null
   }
 
   async create(userCreateInput: Prisma.UserCreateInput, includeClauses?: Prisma.UserInclude): Promise<User> {
     return this.prisma.user.create({
       data: userCreateInput,
-      include: includeClauses
+      include: includeClauses,
     })
   }
 
@@ -35,11 +35,11 @@ export class UserDao extends AbstractDao<User, Prisma.UserCreateInput, Prisma.Us
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.user.delete({ where: { id } });
+    await this.prisma.user.delete({ where: { id } })
   }
 
   // Additional methods
-  async getWithData(id: string): Promise<User & { swarms: Swarm[], informationGraphs: InformationGraph[] }> {
+  async getWithData(id: string): Promise<User & { swarms: Swarm[]; informationGraphs: InformationGraph[] }> {
     return this.prisma.user.findUniqueOrThrow({
       where: { id },
       include: { swarms: true, informationGraphs: true },
@@ -50,15 +50,15 @@ export class UserDao extends AbstractDao<User, Prisma.UserCreateInput, Prisma.Us
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { id },
       select: { swarms: true },
-    });
-    return user.swarms;
+    })
+    return user.swarms
   }
 
   async getInformationGraphs(id: string): Promise<InformationGraph[]> {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { id },
       select: { informationGraphs: true },
-    });
+    })
     return user.informationGraphs
   }
 }

@@ -9,5 +9,5 @@ export const SwarmMutation: SwarmMutationResolvers = {
     const swarmService = await container.get(SwarmService)
     const swarm = await swarmService.createSwarm(req.user.id, input)
     return swarm
-  }
+  },
 }

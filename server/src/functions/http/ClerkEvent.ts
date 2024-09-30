@@ -72,12 +72,11 @@ export const ClerkEventHttp: HttpFunction = async (req: Request, res: Response):
         clerkId: event.data.id,
       })
 
-
       await publisherService.publishEvent(PubSubTopic.AlertHandler, {
         eventType: AlertType.NewUser,
         body: {
           type: AlertType.NewUser,
-          userId: user.id
+          userId: user.id,
         },
       })
       logger.info('User created event received', { event, header: req.header, body: req.body })

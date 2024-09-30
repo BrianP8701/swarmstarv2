@@ -16,18 +16,20 @@ export const ApolloClientProvider = ({ children, url }: PropsWithChildren<Props>
 
   const httpLink = useMemo(() => createHttpLink({ uri: url, credentials: 'include' }), [url])
 
-  const wsLink = new GraphQLWsLink(createClient({
-    url: url.replace(/^http/, 'ws'),
-    connectionParams: async () => {
-      if (isSignedIn) {
-        const token = await getToken()
-        return {
-          Authorization: `Bearer ${token}`,
+  const wsLink = new GraphQLWsLink(
+    createClient({
+      url: url.replace(/^http/, 'ws'),
+      connectionParams: async () => {
+        if (isSignedIn) {
+          const token = await getToken()
+          return {
+            Authorization: `Bearer ${token}`,
+          }
         }
-      }
-      return {}
-    }
-  }))
+        return {}
+      },
+    })
+  )
 
   const getConnectionContext = useCallback(async () => {
     if (isSignedIn) {
@@ -57,13 +59,10 @@ export const ApolloClientProvider = ({ children, url }: PropsWithChildren<Props>
   const splitLink = split(
     ({ query }) => {
       const definition = getMainDefinition(query)
-      return (
-        definition.kind === 'OperationDefinition' &&
-        definition.operation === 'subscription'
-      )
+      return definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
     },
     wsLink,
-    httpLink,
+    httpLink
   )
 
   const client = new ApolloClient({

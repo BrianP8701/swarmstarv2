@@ -3,9 +3,7 @@ import { inject, injectable } from 'inversify'
 
 @injectable()
 export class GlobalContextDao {
-  constructor(
-    @inject(PrismaClient) private prisma: PrismaClient
-  ) {}
+  constructor(@inject(PrismaClient) private prisma: PrismaClient) {}
 
   public async get(): Promise<GlobalContext> {
     const globalContext = await this.prisma.globalContext.findFirst()

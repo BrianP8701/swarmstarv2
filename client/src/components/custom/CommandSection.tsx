@@ -1,11 +1,4 @@
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { cn } from '@/utils/cn'
 import { CheckIcon, Loader2Icon, PlusCircleIcon } from 'lucide-react'
 import * as React from 'react'
@@ -83,9 +76,7 @@ export function CommandSection({
                   >
                     <CheckIcon className={cn('h-4 w-4')} />
                   </div>
-                  {isCreateOption && (
-                    <PlusCircleIcon className='w-4 h-4 mr-2 text-muted-foreground' />
-                  )}
+                  {isCreateOption && <PlusCircleIcon className='w-4 h-4 mr-2 text-muted-foreground' />}
                   <span>{option.label}</span>
                 </CommandItem>
               )

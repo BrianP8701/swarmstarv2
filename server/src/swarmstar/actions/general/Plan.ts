@@ -8,11 +8,11 @@ import { container } from '../../../utils/di/container'
 const MAX_PLAN_ATTEMPTS = 3
 
 export class PlanAction extends AbstractAction<PlanContext> {
-  static readonly description = "Plan an action based on the current context and goal.";
-  static readonly actionEnum = ActionEnum.PLAN;
+  static readonly description = 'Plan an action based on the current context and goal.'
+  static readonly actionEnum = ActionEnum.PLAN
 
-  readonly description = PlanAction.description;
-  readonly actionEnum = PlanAction.actionEnum;
+  readonly description = PlanAction.description
+  readonly actionEnum = PlanAction.actionEnum
 
   protected planInstructor: PlanInstructor
   protected reviewPlanInstructor: ReviewPlanInstructor
@@ -75,10 +75,10 @@ export class PlanAction extends AbstractAction<PlanContext> {
       routeActionContext: {
         create: {
           content: goal,
-        }
+        },
       },
-      agentGraph: { connect: { id: this.agentNode.agentGraphId } }
-    });
+      agentGraph: { connect: { id: this.agentNode.agentGraphId } },
+    })
   }
 
   protected async getContext(): Promise<PlanContext> {
@@ -97,8 +97,8 @@ export class PlanAction extends AbstractAction<PlanContext> {
           attempts: context.attempts,
           planAttempts: context.planAttempts,
           planReviewFeedbackHistory: context.planReviewFeedbackHistory,
-        }
-      }
+        },
+      },
     })
   }
 }

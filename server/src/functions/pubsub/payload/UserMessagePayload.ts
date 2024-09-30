@@ -1,3 +1,3 @@
 export interface UserMessagePayload {
-  chatId: string;
+  chatId: string
 }

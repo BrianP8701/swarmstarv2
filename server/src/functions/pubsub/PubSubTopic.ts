@@ -1,7 +1,7 @@
-import { AlertPayload } from "./payload/AlertPayload"
-import { OperationPayload } from "./payload/OperationPayload"
-import { UserMessagePayload } from "./payload/UserMessagePayload"
-import { WebSocketPayload } from "./payload/WebSocketPayload"
+import { AlertPayload } from './payload/AlertPayload'
+import { OperationPayload } from './payload/OperationPayload'
+import { UserMessagePayload } from './payload/UserMessagePayload'
+import { WebSocketPayload } from './payload/WebSocketPayload'
 
 export enum PubSubTopic {
   AlertHandler = 'alert-handler',

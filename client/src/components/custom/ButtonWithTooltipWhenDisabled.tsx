@@ -1,48 +1,48 @@
-import { Button, ButtonProps } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button, ButtonProps } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { cn } from '@/utils/cn'
 
 interface ButtonWithTooltipWhenDisabledProps extends ButtonProps {
-  onClick: () => void;
-  tooltipText: string;
-  ariaLabel: string;
-  disabled: boolean;
+  onClick: () => void
+  tooltipText: string
+  ariaLabel: string
+  disabled: boolean
 }
 
-export default function ButtonWithTooltipWhenDisabled({ 
-  children, 
-  className, 
-  variant = "ghost", 
-  size = "icon", 
-  ariaLabel, 
-  onClick, 
-  tooltipText, 
-  disabled 
+export default function ButtonWithTooltipWhenDisabled({
+  children,
+  className,
+  variant = 'ghost',
+  size = 'icon',
+  ariaLabel,
+  onClick,
+  tooltipText,
+  disabled,
 }: ButtonWithTooltipWhenDisabledProps) {
-  const button = (
-    <Button
-      variant={variant}
-      size={size}
-      className={className}
-      aria-label={ariaLabel}
-      onClick={onClick}
-      disabled={disabled}
-    >
-      {children}
-    </Button>
-  );
-
-  if (!disabled) {
-    return button;
+  const handleClick = () => {
+    if (!disabled) {
+      onClick()
+    }
   }
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        {button}
+        <Button
+          variant={variant}
+          size={size}
+          className={cn(className, disabled && 'cursor-not-allowed')}
+          aria-label={ariaLabel}
+          onClick={handleClick}
+        >
+          {children}
+        </Button>
       </TooltipTrigger>
-      <TooltipContent side="right" sideOffset={5}>
-        {tooltipText}
-      </TooltipContent>
+      {disabled && (
+        <TooltipContent side='right' sideOffset={5}>
+          {tooltipText}
+        </TooltipContent>
+      )}
     </Tooltip>
-  );
+  )
 }

@@ -45,6 +45,7 @@ fragment InformationGraph on InformationGraph {
 fragment InformationNode on InformationNode {
   id
   title
+  type
 }
 
 fragment informationEdge on informationEdge {
@@ -66,6 +67,7 @@ fragment AgentGraph on AgentGraph {
 fragment AgentNode on AgentNode {
   id
   title
+  type
 }
 
 fragment AgentEdge on AgentEdge {
@@ -97,6 +99,7 @@ fragment Message on Message {
 fragment ActionNode on ActionNode {
   id
   title
+  type
   description
 }
 
@@ -113,6 +116,7 @@ fragment ToolGraph on ToolGraph {
 fragment ToolNode on ToolNode {
   id
   title
+  type
 }
 
 fragment ToolEdge on ToolEdge {

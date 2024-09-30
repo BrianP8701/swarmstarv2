@@ -1,5 +1,14 @@
-import { ActionEnum } from "@prisma/client"
-import { ActionEnum as GqlActionEnum } from "../generated/graphql"
+import { ActionEnum, ActionNode } from '@prisma/client'
+import { ActionEnum as GqlActionEnum, ActionNode as GqlActionNode } from '../../generated/graphql'
+
+export const formatActionNode = (node: ActionNode): GqlActionNode => {
+  return {
+    id: node.id,
+    title: formatActionEnum(node.actionEnum),
+    type: formatActionEnum(node.actionEnum),
+    description: node.description,
+  }
+}
 
 export const formatActionEnum = (actionEnum: ActionEnum): GqlActionEnum => {
   switch (actionEnum) {

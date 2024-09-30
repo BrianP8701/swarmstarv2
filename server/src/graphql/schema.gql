@@ -31,6 +31,14 @@ enum ChatStatusEnum {
   COMPLETED
 }
 
+enum WindowContentEnum {
+  INFORMATION_GRAPH
+  ACTION_GRAPH
+  AGENT_GRAPH
+  TOOL_GRAPH
+  CHAT
+}
+
 #  ___________________________________________________________
 # /                                                           \
 # |                                                           |
@@ -52,6 +60,12 @@ type User {
   id: ID!
   swarms: [Swarm!]
   informationGraphs: [InformationGraph!]
+}
+
+type Settings {
+  id: ID!
+  theme: String
+  
 }
 
 type Swarm {
@@ -76,6 +90,7 @@ type InformationGraph {
 type InformationNode {
   id: ID!
   title: String
+  type: String
 }
 
 type informationEdge {
@@ -96,6 +111,7 @@ type AgentGraph {
 type AgentNode {
   id: ID!
   title: String
+  type: String
 }
 
 type AgentEdge {
@@ -118,6 +134,7 @@ type ActionNode {
   id: ID!
   title: String
   description: String
+  type: String
 }
 
 type ActionEdge {
@@ -138,6 +155,7 @@ type ToolGraph {
 type ToolNode {
   id: ID!
   title: String
+  type: String
 }
 
 type ToolEdge {
@@ -183,8 +201,8 @@ type RootQuery {
   user: User
   actionGraph: ActionGraph
   toolGraph: ToolGraph
-  swarm(id: ID!): Swarm
-  chat(id: ID!): Chat
+  swarm(swarmId: ID!): Swarm
+  chat(chatId: ID!): Chat
 }
 
 #  ___________________________________________________________

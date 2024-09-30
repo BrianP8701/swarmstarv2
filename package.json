@@ -15,10 +15,12 @@
         "client:generate": "cd client && yarn generate",
         "server:generate": "cd server && yarn generate",
         "db:reset-and-seed": "cd server && yarn ts-node src/cli/resetAndSeed.ts",
-        "pre": "cd server && yarn pre && cd .. && cd client && yarn pre"
+        "pre": "yarn pretty && cd server && yarn pre && cd .. && cd client && yarn pre",
+        "pretty": "prettier --write \"client/src/**/*.{js,jsx,ts,tsx}\" \"server/src/**/*.{js,ts}\""
     },
     "devDependencies": {
         "concurrently": "^6.0.0",
+        "prettier": "^3.3.3",
         "vite": "^2.0.0"
     }
 }

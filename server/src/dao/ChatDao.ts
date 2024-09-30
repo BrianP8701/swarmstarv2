@@ -5,7 +5,7 @@ import { AbstractDao } from './AbstractDao'
 @injectable()
 export class ChatDao extends AbstractDao<Chat, Prisma.ChatCreateInput, Prisma.ChatUpdateInput, Prisma.ChatInclude> {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
-    super(prisma);
+    super(prisma)
   }
 
   // CRUD methods
@@ -16,14 +16,14 @@ export class ChatDao extends AbstractDao<Chat, Prisma.ChatCreateInput, Prisma.Ch
   }
 
   async exists(id: string): Promise<boolean> {
-    const chat = await this.prisma.chat.findUnique({ where: { id } });
-    return chat !== null;
+    const chat = await this.prisma.chat.findUnique({ where: { id } })
+    return chat !== null
   }
 
   async create(chatCreateInput: Prisma.ChatCreateInput, includeClauses?: Prisma.ChatInclude): Promise<Chat> {
     return this.prisma.chat.create({
       data: chatCreateInput,
-      include: includeClauses
+      include: includeClauses,
     })
   }
 
@@ -35,7 +35,7 @@ export class ChatDao extends AbstractDao<Chat, Prisma.ChatCreateInput, Prisma.Ch
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.chat.delete({ where: { id } });
+    await this.prisma.chat.delete({ where: { id } })
   }
 
   // Additional methods
@@ -65,7 +65,7 @@ export class ChatDao extends AbstractDao<Chat, Prisma.ChatCreateInput, Prisma.Ch
         role,
         chatId,
       },
-    });
+    })
   }
 
   async getUserIdFromChatId(chatId: string): Promise<string> {

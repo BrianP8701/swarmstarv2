@@ -12,7 +12,7 @@ export class ToolGraphDao extends AbstractGraphDao<
   Prisma.ToolGraphInclude
 > {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
-    super(prisma);
+    super(prisma)
   }
 
   async get(id: string): Promise<ToolGraph> {
@@ -22,14 +22,14 @@ export class ToolGraphDao extends AbstractGraphDao<
   }
 
   async exists(id: string): Promise<boolean> {
-    const graph = await this.prisma.toolGraph.findUnique({ where: { id } });
-    return graph !== null;
+    const graph = await this.prisma.toolGraph.findUnique({ where: { id } })
+    return graph !== null
   }
 
   async create(createInput: Prisma.ToolGraphCreateInput, include?: Prisma.ToolGraphInclude): Promise<ToolGraph> {
     return this.prisma.toolGraph.create({
       data: createInput,
-      include: include
+      include: include,
     })
   }
 
@@ -41,33 +41,33 @@ export class ToolGraphDao extends AbstractGraphDao<
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.toolGraph.delete({ where: { id } });
+    await this.prisma.toolGraph.delete({ where: { id } })
   }
 
-  async getGraph(id: string): Promise<{ nodes: ToolNode[], edges: ToolEdge[] }> {
+  async getGraph(id: string): Promise<{ nodes: ToolNode[]; edges: ToolEdge[] }> {
     const graph = await this.prisma.toolGraph.findUnique({
       where: { id },
       include: {
         nodes: true,
         edges: true,
       },
-    });
+    })
 
     if (!graph) {
-      throw new Error(`ToolGraph with id ${id} not found`);
+      throw new Error(`ToolGraph with id ${id} not found`)
     }
 
     return {
       nodes: graph.nodes,
       edges: graph.edges,
-    };
+    }
   }
 
   async getNodes(id: string): Promise<ToolNode[]> {
-    return this.prisma.toolNode.findMany({ where: { toolGraphId: id } });
+    return this.prisma.toolNode.findMany({ where: { toolGraphId: id } })
   }
 
   async getEdges(id: string): Promise<ToolEdge[]> {
-    return this.prisma.toolEdge.findMany({ where: { toolGraphId: id } });
+    return this.prisma.toolEdge.findMany({ where: { toolGraphId: id } })
   }
 }

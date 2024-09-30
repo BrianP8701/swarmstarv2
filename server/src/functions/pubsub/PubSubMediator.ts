@@ -29,7 +29,7 @@ export class PubSubMediator {
       this.localPubSubEmulator.publishEvent(topicKey, payload).catch(error => {
         logger.error('Error in local event handler', { error, topicKey, payload })
       })
-      
+
       return
     } else {
       return this.publisherService.publishEvent(topicKey, payload, attributes)

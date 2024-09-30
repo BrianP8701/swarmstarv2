@@ -1,5 +1,5 @@
-import { Message, MessageRoleEnum } from "@prisma/client";
-import { InstructorMessage, InstructorMessageRoleEnum } from "../InstructorService";
+import { Message, MessageRoleEnum } from '@prisma/client'
+import { InstructorMessage, InstructorMessageRoleEnum } from '../InstructorService'
 
 export const formatDbChatToInstructorChat = (messages: Message[]): InstructorMessage[] => {
   return messages.map(formatDbMessageToInstructorMessage)

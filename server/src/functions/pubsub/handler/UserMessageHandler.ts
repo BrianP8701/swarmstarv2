@@ -30,10 +30,10 @@ export class UserMessageHandler extends CloudEventSubscriberFunction<PubSubTopic
     const response = 'yb better'
     const message = await this.chatDao.sendMessage(chatId, response, MessageRoleEnum.ASSISTANT)
     await this.pubSubMediator.publishEvent(PubSubTopic.WebSocketHandler, {
-      userId, 
+      userId,
       type: WebSocketMessageType.NEW_MESSAGE,
       body: {
-        messageId: message.id
+        messageId: message.id,
       },
     })
   }

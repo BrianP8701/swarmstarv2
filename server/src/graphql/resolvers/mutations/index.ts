@@ -1,4 +1,4 @@
-import { RootMutationResolvers } from "../../generated/graphql";
+import { RootMutationResolvers } from '../../generated/graphql'
 
 export const RootMutation: RootMutationResolvers = {
   informationGraphMutation: async () => {
@@ -9,5 +9,5 @@ export const RootMutation: RootMutationResolvers = {
   },
   chatMutation: async () => {
     return {}
-  }
+  },
 }
