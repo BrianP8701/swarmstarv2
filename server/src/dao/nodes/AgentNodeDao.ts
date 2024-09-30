@@ -1,4 +1,4 @@
-import { AgentNode, AgentNodeEdge, Prisma, PrismaClient, PlanContext, RouteActionContext, SearchContext } from '@prisma/client'
+import { AgentNode, Prisma, PrismaClient, PlanContext, RouteActionContext, SearchContext } from '@prisma/client'
 import { inject, injectable } from 'inversify'
 import { AbstractNodeDao } from './AbstractNodeDao'
 
@@ -9,7 +9,7 @@ export type AgentNodeWithContext = AgentNode & {
 }
 
 @injectable()
-export class AgentNodeDao extends AbstractNodeDao<AgentNode, AgentNodeEdge, Prisma.AgentNodeCreateInput, Prisma.AgentNodeUpdateInput, Prisma.AgentNodeEdgeCreateInput, Prisma.AgentNodeEdgeUpdateInput, Prisma.AgentNodeInclude, Prisma.AgentNodeEdgeInclude> {
+export class AgentNodeDao extends AbstractNodeDao<AgentNode, Prisma.AgentNodeCreateInput, Prisma.AgentNodeUpdateInput, Prisma.AgentNodeInclude> {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
     super(prisma);
   }
@@ -47,12 +47,8 @@ export class AgentNodeDao extends AbstractNodeDao<AgentNode, AgentNodeEdge, Pris
   }
 
   // Node DAO methods
-  async getEdge(id: string): Promise<AgentNodeEdge> {
-    return this.prisma.agentNodeEdge.findUniqueOrThrow({ where: { id } });
-  }
-
   async getOutgoingNodes(nodeId: string): Promise<AgentNode[]> {
-    const edges = await this.prisma.agentNodeEdge.findMany({
+    const edges = await this.prisma.agentEdge.findMany({
       where: { startNodeId: nodeId },
       include: { endNode: true },
     });
@@ -60,69 +56,17 @@ export class AgentNodeDao extends AbstractNodeDao<AgentNode, AgentNodeEdge, Pris
   }
 
   async getIncomingNodes(nodeId: string): Promise<AgentNode[]> {
-    const edges = await this.prisma.agentNodeEdge.findMany({
+    const edges = await this.prisma.agentEdge.findMany({
       where: { endNodeId: nodeId },
       include: { startNode: true },
     });
     return edges.map(edge => edge.startNode);
   }
 
-  async getOutgoingEdges(nodeId: string): Promise<AgentNodeEdge[]> {
-    return this.prisma.agentNodeEdge.findMany({
-      where: { startNodeId: nodeId },
-    });
-  }
-
-  async getIncomingEdges(nodeId: string): Promise<AgentNodeEdge[]> {
-    return this.prisma.agentNodeEdge.findMany({
-      where: { endNodeId: nodeId },
-    });
-  }
-
   async getAllConnectedNodes(nodeId: string): Promise<AgentNode[]> {
     const outgoing = await this.getOutgoingNodes(nodeId);
     const incoming = await this.getIncomingNodes(nodeId);
     return [...outgoing, ...incoming];
-  }
-
-  async getAllConnectedEdges(nodeId: string): Promise<AgentNodeEdge[]> {
-    const outgoing = await this.getOutgoingEdges(nodeId);
-    const incoming = await this.getIncomingEdges(nodeId);
-    return [...outgoing, ...incoming];
-  }
-
-  async nodeExists(id: string): Promise<boolean> {
-    return this.exists(id);
-  }
-
-  async edgeExists(id: string): Promise<boolean> {
-    const edge = await this.prisma.agentNodeEdge.findUnique({ where: { id } });
-    return edge !== null;
-  }
-
-  async createEdge(createInput: Prisma.AgentNodeEdgeCreateInput): Promise<AgentNodeEdge> {
-    return this.prisma.agentNodeEdge.create({
-      data: createInput,
-    });
-  }
-
-  async updateEdge(id: string, updateInput: Prisma.AgentNodeEdgeUpdateInput): Promise<AgentNodeEdge> {
-    return this.prisma.agentNodeEdge.update({
-      where: { id },
-      data: updateInput,
-    });
-  }
-
-  async getParent(nodeId: string): Promise<AgentNode | null> {
-    const edge = await this.prisma.agentNodeEdge.findFirst({
-      where: {
-        endNodeId: nodeId,
-      },
-      include: {
-        startNode: true,
-      },
-    })
-    return edge?.startNode || null
   }
 
   async log(actionId: string, messages: string[]) {

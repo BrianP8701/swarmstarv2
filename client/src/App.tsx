@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-react';
-import { TooltipProvider } from "@radix-ui/react-tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import './App.css';
 import HomePage from './views/HomePage';
 import { ApolloClientProvider } from "./providers/ApolloClientProvider";

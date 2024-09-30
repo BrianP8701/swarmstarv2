@@ -20,7 +20,7 @@ enum MessageRoleEnum {
   ASSISTANT
 }
 
-enum AgentNodeEdgeTypeEnum {
+enum AgentEdgeTypeEnum {
   SPAWN
   KILL
   RETURN
@@ -70,7 +70,7 @@ type InformationGraph {
   id: ID!
   title: String
   nodes: [InformationNode!]
-  edges: [InformationNodeEdge!]
+  edges: [informationEdge!]
 }
 
 type InformationNode {
@@ -78,7 +78,7 @@ type InformationNode {
   title: String
 }
 
-type InformationNodeEdge {
+type informationEdge {
   id: ID!
   startNodeId: ID!
   endNodeId: ID!
@@ -90,7 +90,7 @@ Agent Graph
 type AgentGraph {
   id: ID!
   nodes: [AgentNode!]
-  edges: [AgentNodeEdge!]
+  edges: [AgentEdge!]
 }
 
 type AgentNode {
@@ -98,9 +98,9 @@ type AgentNode {
   title: String
 }
 
-type AgentNodeEdge {
+type AgentEdge {
   id: ID!
-  type: AgentNodeEdgeTypeEnum
+  type: AgentEdgeTypeEnum
   startNodeId: ID!
   endNodeId: ID!
 }
@@ -111,7 +111,7 @@ Action Graph
 type ActionGraph {
   id: ID!
   nodes: [ActionNode!]
-  edges: [ActionNodeEdge!]
+  edges: [ActionEdge!]
 }
 
 type ActionNode {
@@ -120,7 +120,7 @@ type ActionNode {
   description: String
 }
 
-type ActionNodeEdge {
+type ActionEdge {
   id: ID!
   startNodeId: ID!
   endNodeId: ID!
@@ -132,7 +132,7 @@ Tool Graph
 type ToolGraph {
   id: ID!
   nodes: [ToolNode!]
-  edges: [ToolNodeEdge!]
+  edges: [ToolEdge!]
 }
 
 type ToolNode {
@@ -140,7 +140,7 @@ type ToolNode {
   title: String
 }
 
-type ToolNodeEdge {
+type ToolEdge {
   id: ID!
   startNodeId: ID!
   endNodeId: ID!

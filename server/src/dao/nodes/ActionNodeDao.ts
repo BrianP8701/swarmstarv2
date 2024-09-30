@@ -1,9 +1,9 @@
-import { ActionNode, Prisma, PrismaClient, ActionNodeEdge } from '@prisma/client'
+import { ActionNode, Prisma, PrismaClient } from '@prisma/client'
 import { inject, injectable } from 'inversify'
 import { AbstractNodeDao } from './AbstractNodeDao';
 
 @injectable()
-export class ActionNodeDao extends AbstractNodeDao<ActionNode, ActionNodeEdge, Prisma.ActionNodeCreateInput, Prisma.ActionNodeUpdateInput, Prisma.ActionNodeEdgeCreateInput, Prisma.ActionNodeEdgeUpdateInput, Prisma.ActionNodeInclude, Prisma.ActionNodeEdgeInclude> {
+export class ActionNodeDao extends AbstractNodeDao<ActionNode, Prisma.ActionNodeCreateInput, Prisma.ActionNodeUpdateInput, Prisma.ActionNodeInclude> {
   constructor(@inject(PrismaClient) prisma: PrismaClient) {
     super(prisma);
   }
@@ -37,12 +37,8 @@ export class ActionNodeDao extends AbstractNodeDao<ActionNode, ActionNodeEdge, P
   }
 
   // Node DAO methods
-  async getEdge(id: string): Promise<ActionNodeEdge> {
-    return this.prisma.actionNodeEdge.findUniqueOrThrow({ where: { id } });
-  }
-
   async getOutgoingNodes(nodeId: string): Promise<ActionNode[]> {
-    const edges = await this.prisma.actionNodeEdge.findMany({
+    const edges = await this.prisma.actionEdge.findMany({
       where: { startNodeId: nodeId },
       include: { endNode: true },
     });
@@ -50,57 +46,16 @@ export class ActionNodeDao extends AbstractNodeDao<ActionNode, ActionNodeEdge, P
   }
 
   async getIncomingNodes(nodeId: string): Promise<ActionNode[]> {
-    const edges = await this.prisma.actionNodeEdge.findMany({
+    const edges = await this.prisma.actionEdge.findMany({
       where: { endNodeId: nodeId },
       include: { startNode: true },
     });
     return edges.map(edge => edge.startNode);
   }
 
-  async getOutgoingEdges(nodeId: string): Promise<ActionNodeEdge[]> {
-    return this.prisma.actionNodeEdge.findMany({
-      where: { startNodeId: nodeId },
-    });
-  }
-
-  async getIncomingEdges(nodeId: string): Promise<ActionNodeEdge[]> {
-    return this.prisma.actionNodeEdge.findMany({
-      where: { endNodeId: nodeId },
-    });
-  }
-
   async getAllConnectedNodes(nodeId: string): Promise<ActionNode[]> {
     const outgoing = await this.getOutgoingNodes(nodeId);
     const incoming = await this.getIncomingNodes(nodeId);
     return [...outgoing, ...incoming];
-  }
-
-  async getAllConnectedEdges(nodeId: string): Promise<ActionNodeEdge[]> {
-    const outgoing = await this.getOutgoingEdges(nodeId);
-    const incoming = await this.getIncomingEdges(nodeId);
-    return [...outgoing, ...incoming];
-  }
-
-  async nodeExists(id: string): Promise<boolean> {
-    return this.exists(id);
-  }
-
-  async edgeExists(id: string): Promise<boolean> {
-    const edge = await this.prisma.actionNodeEdge.findUnique({ where: { id } });
-    return edge !== null;
-  }
-
-  async createEdge(createInput: Prisma.ActionNodeEdgeCreateInput, includeClauses?: Prisma.ActionNodeEdgeInclude): Promise<ActionNodeEdge> {
-    return this.prisma.actionNodeEdge.create({
-      data: createInput,
-      include: includeClauses
-    });
-  }
-
-  async updateEdge(id: string, updateInput: Prisma.ActionNodeEdgeUpdateInput): Promise<ActionNodeEdge> {
-    return this.prisma.actionNodeEdge.update({
-      where: { id },
-      data: updateInput,
-    });
   }
 }

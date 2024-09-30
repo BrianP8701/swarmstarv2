@@ -1,4 +1,4 @@
-import { ActionGraph, ActionNode, ActionNodeEdge, Prisma, PrismaClient } from '@prisma/client'
+import { ActionGraph, ActionNode, ActionEdge, Prisma, PrismaClient } from '@prisma/client'
 import { inject, injectable } from 'inversify'
 import { AbstractGraphDao } from './AbstractGraphDao'
 
@@ -6,7 +6,7 @@ import { AbstractGraphDao } from './AbstractGraphDao'
 export class ActionGraphDao extends AbstractGraphDao<
   ActionGraph,
   ActionNode,
-  ActionNodeEdge,
+  ActionEdge,
   Prisma.ActionGraphCreateInput,
   Prisma.ActionGraphUpdateInput,
   Prisma.ActionGraphInclude
@@ -44,7 +44,7 @@ export class ActionGraphDao extends AbstractGraphDao<
     await this.prisma.actionGraph.delete({ where: { id } });
   }
 
-  async getGraph(id: string): Promise<{ nodes: ActionNode[], edges: ActionNodeEdge[] }> {
+  async getGraph(id: string): Promise<{ nodes: ActionNode[], edges: ActionEdge[] }> {
     const graph = await this.prisma.actionGraph.findUnique({
       where: { id },
       include: {
@@ -67,7 +67,7 @@ export class ActionGraphDao extends AbstractGraphDao<
     return this.prisma.actionNode.findMany({ where: { actionGraphId: id } });
   }
 
-  async getEdges(id: string): Promise<ActionNodeEdge[]> {
-    return this.prisma.actionNodeEdge.findMany({ where: { actionGraphId: id } });
+  async getEdges(id: string): Promise<ActionEdge[]> {
+    return this.prisma.actionEdge.findMany({ where: { actionGraphId: id } });
   }
 }

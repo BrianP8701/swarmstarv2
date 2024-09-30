@@ -1,4 +1,4 @@
-import { ToolGraph, ToolNode, ToolNodeEdge, Prisma, PrismaClient } from '@prisma/client'
+import { ToolGraph, ToolNode, ToolEdge, Prisma, PrismaClient } from '@prisma/client'
 import { inject, injectable } from 'inversify'
 import { AbstractGraphDao } from './AbstractGraphDao'
 
@@ -6,7 +6,7 @@ import { AbstractGraphDao } from './AbstractGraphDao'
 export class ToolGraphDao extends AbstractGraphDao<
   ToolGraph,
   ToolNode,
-  ToolNodeEdge,
+  ToolEdge,
   Prisma.ToolGraphCreateInput,
   Prisma.ToolGraphUpdateInput,
   Prisma.ToolGraphInclude
@@ -44,7 +44,7 @@ export class ToolGraphDao extends AbstractGraphDao<
     await this.prisma.toolGraph.delete({ where: { id } });
   }
 
-  async getGraph(id: string): Promise<{ nodes: ToolNode[], edges: ToolNodeEdge[] }> {
+  async getGraph(id: string): Promise<{ nodes: ToolNode[], edges: ToolEdge[] }> {
     const graph = await this.prisma.toolGraph.findUnique({
       where: { id },
       include: {
@@ -67,7 +67,7 @@ export class ToolGraphDao extends AbstractGraphDao<
     return this.prisma.toolNode.findMany({ where: { toolGraphId: id } });
   }
 
-  async getEdges(id: string): Promise<ToolNodeEdge[]> {
-    return this.prisma.toolNodeEdge.findMany({ where: { toolGraphId: id } });
+  async getEdges(id: string): Promise<ToolEdge[]> {
+    return this.prisma.toolEdge.findMany({ where: { toolGraphId: id } });
   }
 }

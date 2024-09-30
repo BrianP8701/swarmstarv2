@@ -1,4 +1,4 @@
-import { InformationGraph, InformationNode, InformationNodeEdge, Prisma, PrismaClient } from '@prisma/client'
+import { InformationGraph, InformationNode, InformationEdge, Prisma, PrismaClient } from '@prisma/client'
 import { inject, injectable } from 'inversify'
 import { AbstractGraphDao } from './AbstractGraphDao'
 
@@ -6,7 +6,7 @@ import { AbstractGraphDao } from './AbstractGraphDao'
 export class InformationGraphDao extends AbstractGraphDao<
   InformationGraph,
   InformationNode,
-  InformationNodeEdge,
+  InformationEdge,
   Prisma.InformationGraphCreateInput,
   Prisma.InformationGraphUpdateInput,
   Prisma.InformationGraphInclude
@@ -44,7 +44,7 @@ export class InformationGraphDao extends AbstractGraphDao<
     await this.prisma.informationGraph.delete({ where: { id } });
   }
 
-  async getGraph(id: string): Promise<{ nodes: InformationNode[], edges: InformationNodeEdge[] }> {
+  async getGraph(id: string): Promise<{ nodes: InformationNode[], edges: InformationEdge[] }> {
     const graph = await this.prisma.informationGraph.findUnique({
       where: { id },
       include: {
@@ -74,7 +74,7 @@ export class InformationGraphDao extends AbstractGraphDao<
     return this.prisma.informationNode.findMany({ where: { informationGraphId: id } });
   }
 
-  async getEdges(id: string): Promise<InformationNodeEdge[]> {
-    return this.prisma.informationNodeEdge.findMany({ where: { informationGraphId: id } });
+  async getEdges(id: string): Promise<InformationEdge[]> {
+    return this.prisma.informationEdge.findMany({ where: { informationGraphId: id } });
   }
 }

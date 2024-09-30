@@ -27,7 +27,7 @@ interface RouterNode {
 @injectable()
 export abstract class AbstractRouter<
   T extends RouterNode,
-  D extends AbstractNodeDao<T, unknown, unknown, unknown, unknown, unknown, unknown, unknown>,
+  D extends AbstractNodeDao<T, unknown, unknown, unknown>,
   C extends RouterContext,
 > extends AbstractAction<C> {
   protected routerInstructor: RouterInstructor;

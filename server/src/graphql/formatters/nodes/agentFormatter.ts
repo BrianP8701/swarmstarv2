@@ -1,29 +1,29 @@
 import { 
-  AgentNodeEdge,
-  AgentNodeEdgeTypeEnum
+  AgentEdge,
+  AgentEdgeTypeEnum
 } from "@prisma/client"
 import { 
-  AgentNodeEdge as GqlAgentNodeEdge,
-  AgentNodeEdgeTypeEnum as GqlAgentNodeEdgeTypeEnum
+  AgentEdge as GqlAgentEdge,
+  AgentEdgeTypeEnum as GqlAgentEdgeTypeEnum
 } from "../../generated/graphql"
 
 
-export const formatAgentNodeEdgeToGqlAgentNodeEdge = (edge: AgentNodeEdge): GqlAgentNodeEdge => {
+export const formatAgentEdgeToGqlAgentEdge = (edge: AgentEdge): GqlAgentEdge => {
   return {
     id: edge.id,
-    type: formatAgentNodeEdgeTypeEnumToGqlAgentNodeEdgeTypeEnum(edge.type),
+    type: formatAgentEdgeTypeEnumToGqlAgentEdgeTypeEnum(edge.type),
     startNodeId: edge.startNodeId,
     endNodeId: edge.endNodeId,
   }
 }
 
-export const formatAgentNodeEdgeTypeEnumToGqlAgentNodeEdgeTypeEnum = (type: AgentNodeEdgeTypeEnum): GqlAgentNodeEdgeTypeEnum => {
+export const formatAgentEdgeTypeEnumToGqlAgentEdgeTypeEnum = (type: AgentEdgeTypeEnum): GqlAgentEdgeTypeEnum => {
   switch (type) {
-    case AgentNodeEdgeTypeEnum.SPAWN:
-      return GqlAgentNodeEdgeTypeEnum.Spawn
-    case AgentNodeEdgeTypeEnum.KILL:
-      return GqlAgentNodeEdgeTypeEnum.Kill
-    case AgentNodeEdgeTypeEnum.RETURN:
-      return GqlAgentNodeEdgeTypeEnum.Return
+    case AgentEdgeTypeEnum.SPAWN:
+      return GqlAgentEdgeTypeEnum.Spawn
+    case AgentEdgeTypeEnum.KILL:
+      return GqlAgentEdgeTypeEnum.Kill
+    case AgentEdgeTypeEnum.RETURN:
+      return GqlAgentEdgeTypeEnum.Return
   }
 }

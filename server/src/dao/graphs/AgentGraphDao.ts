@@ -1,4 +1,4 @@
-import { AgentGraph, AgentNode, AgentNodeEdge, Prisma, PrismaClient } from '@prisma/client'
+import { AgentGraph, AgentNode, AgentEdge, Prisma, PrismaClient } from '@prisma/client'
 import { inject, injectable } from 'inversify'
 import { AbstractGraphDao } from './AbstractGraphDao'
 
@@ -6,7 +6,7 @@ import { AbstractGraphDao } from './AbstractGraphDao'
 export class AgentGraphDao extends AbstractGraphDao<
   AgentGraph,
   AgentNode,
-  AgentNodeEdge,
+  AgentEdge,
   Prisma.AgentGraphCreateInput,
   Prisma.AgentGraphUpdateInput,
   Prisma.AgentGraphInclude
@@ -44,7 +44,7 @@ export class AgentGraphDao extends AbstractGraphDao<
     await this.prisma.agentGraph.delete({ where: { id } });
   }
 
-  async getGraph(id: string): Promise<{ nodes: AgentNode[], edges: AgentNodeEdge[] }> {
+  async getGraph(id: string): Promise<{ nodes: AgentNode[], edges: AgentEdge[] }> {
     const graph = await this.prisma.agentGraph.findUnique({
       where: { id },
       include: {
@@ -67,7 +67,7 @@ export class AgentGraphDao extends AbstractGraphDao<
     return this.prisma.agentNode.findMany({ where: { agentGraphId: id } });
   }
 
-  async getEdges(id: string): Promise<AgentNodeEdge[]> {
-    return this.prisma.agentNodeEdge.findMany({ where: { agentGraphId: id } });
+  async getEdges(id: string): Promise<AgentEdge[]> {
+    return this.prisma.agentEdge.findMany({ where: { agentGraphId: id } });
   }
 }

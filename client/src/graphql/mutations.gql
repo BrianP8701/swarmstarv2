@@ -1,0 +1,23 @@
+mutation CreateSwarm($input: CreateSwarmRequest!) {
+  swarmMutation {
+    createSwarm(input: $input) {
+      ...User
+    }
+  }
+}
+
+mutation CreateInformationGraph($input: CreateInformationGraphRequest!) {
+  informationGraphMutation {
+    createInformationGraph(input: $input) {
+      ...User
+    }
+  }
+}
+
+mutation SendMessage($input: SendMessageRequest!) {
+  chatMutation {
+    sendMessage(input: $input) {
+      ...Chat
+    }
+  }
+}

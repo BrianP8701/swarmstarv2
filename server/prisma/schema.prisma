@@ -64,7 +64,7 @@ model AgentGraph {
   id String @id @default(uuid()) @db.Uuid
 
   nodes AgentNode[]     @relation("AgentGraphToAgentNodes")
-  edges AgentNodeEdge[] @relation("AgentGraphToAgentNodeEdges")
+  edges AgentEdge[] @relation("AgentGraphToAgentEdges")
 
   swarm   Swarm  @relation("SwarmToAgentGraph", fields: [swarmId], references: [id])
   swarmId String @unique @db.Uuid
@@ -83,7 +83,7 @@ model InformationGraph {
   swarms Swarm[] @relation("SwarmToInformationGraph")
 
   nodes InformationNode[]     @relation("InformationGraphToInformationNodes")
-  edges InformationNodeEdge[] @relation("InformationGraphToInformationNodeEdges")
+  edges InformationEdge[] @relation("InformationGraphToInformationEdges")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -93,7 +93,7 @@ model ActionGraph {
   id String @id @default(uuid()) @db.Uuid
 
   nodes ActionNode[]     @relation("ActionGraphToActionNodes")
-  edges ActionNodeEdge[] @relation("ActionGraphToActionNodeEdges")
+  edges ActionEdge[] @relation("ActionGraphToActionEdges")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -103,7 +103,7 @@ model ToolGraph {
   id String @id @default(uuid()) @db.Uuid
 
   nodes ToolNode[]     @relation("ToolGraphToToolNodes")
-  edges ToolNodeEdge[] @relation("ToolGraphToToolNodeEdges")
+  edges ToolEdge[] @relation("ToolGraphToToolEdges")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -159,8 +159,8 @@ model AgentNode {
   killPolicyEnum KillPolicyEnum  @default(SIMPLE)
   actionEnum     ActionEnum
 
-  outgoingEdges AgentNodeEdge[] @relation("AgentNodeEdgeStart")
-  incomingEdges AgentNodeEdge[] @relation("AgentNodeEdgeEnd")
+  outgoingEdges AgentEdge[] @relation("AgentEdgeStart")
+  incomingEdges AgentEdge[] @relation("AgentEdgeEnd")
 
   operations Operation[] @relation("AgentNodeToOperations")
 
@@ -184,8 +184,8 @@ model InformationNode {
   description     String
   informationType InformationTypeEnum
 
-  outgoingEdges InformationNodeEdge[] @relation("InformationNodeEdgeStart")
-  incomingEdges InformationNodeEdge[] @relation("InformationNodeEdgeEnd")
+  outgoingEdges InformationEdge[] @relation("InformationEdgeStart")
+  incomingEdges InformationEdge[] @relation("InformationEdgeEnd")
 
   informationGraphId String           @db.Uuid
   informationGraph   InformationGraph @relation("InformationGraphToInformationNodes", fields: [informationGraphId], references: [id], onDelete: Cascade)
@@ -199,8 +199,8 @@ model ToolNode {
   description String
   toolType    ToolTypeEnum
 
-  outgoingEdges ToolNodeEdge[] @relation("ToolNodeEdgeStart")
-  incomingEdges ToolNodeEdge[] @relation("ToolNodeEdgeEnd")
+  outgoingEdges ToolEdge[] @relation("ToolEdgeStart")
+  incomingEdges ToolEdge[] @relation("ToolEdgeEnd")
 
   toolGraphId String    @db.Uuid
   toolGraph   ToolGraph @relation("ToolGraphToToolNodes", fields: [toolGraphId], references: [id], onDelete: Cascade)
@@ -214,8 +214,8 @@ model ActionNode {
   description String
   actionEnum  ActionEnum
 
-  outgoingEdges ActionNodeEdge[] @relation("ActionNodeEdgeStart")
-  incomingEdges ActionNodeEdge[] @relation("ActionNodeEdgeEnd")
+  outgoingEdges ActionEdge[] @relation("ActionEdgeStart")
+  incomingEdges ActionEdge[] @relation("ActionEdgeEnd")
 
   actionGraphId String      @db.Uuid
   actionGraph   ActionGraph @relation("ActionGraphToActionNodes", fields: [actionGraphId], references: [id], onDelete: Cascade)
@@ -253,68 +253,68 @@ model SearchContext {
   agentNodeId             String    @unique @db.Uuid
 }
 
-model AgentNodeEdge {
+model AgentEdge {
   id          String                @id @default(uuid()) @db.Uuid
   startNodeId String                @db.Uuid
   endNodeId   String                @db.Uuid
-  type        AgentNodeEdgeTypeEnum
+  type        AgentEdgeTypeEnum
 
   agentGraphId String     @db.Uuid
-  agentGraph   AgentGraph @relation("AgentGraphToAgentNodeEdges", fields: [agentGraphId], references: [id], onDelete: Cascade)
+  agentGraph   AgentGraph @relation("AgentGraphToAgentEdges", fields: [agentGraphId], references: [id], onDelete: Cascade)
 
-  startNode AgentNode @relation("AgentNodeEdgeStart", fields: [startNodeId], references: [id])
-  endNode   AgentNode @relation("AgentNodeEdgeEnd", fields: [endNodeId], references: [id])
+  startNode AgentNode @relation("AgentEdgeStart", fields: [startNodeId], references: [id])
+  endNode   AgentNode @relation("AgentEdgeEnd", fields: [endNodeId], references: [id])
 
   @@unique([startNodeId, endNodeId])
   @@index([startNodeId])
   @@index([endNodeId])
 }
 
-model InformationNodeEdge {
+model InformationEdge {
   id String @id @default(uuid()) @db.Uuid
 
   startNodeId String @db.Uuid
   endNodeId   String @db.Uuid
 
   informationGraphId String           @db.Uuid
-  informationGraph   InformationGraph @relation("InformationGraphToInformationNodeEdges", fields: [informationGraphId], references: [id], onDelete: Cascade)
+  informationGraph   InformationGraph @relation("InformationGraphToInformationEdges", fields: [informationGraphId], references: [id], onDelete: Cascade)
 
-  startNode InformationNode @relation("InformationNodeEdgeStart", fields: [startNodeId], references: [id])
-  endNode   InformationNode @relation("InformationNodeEdgeEnd", fields: [endNodeId], references: [id])
+  startNode InformationNode @relation("InformationEdgeStart", fields: [startNodeId], references: [id])
+  endNode   InformationNode @relation("InformationEdgeEnd", fields: [endNodeId], references: [id])
 
   @@unique([startNodeId, endNodeId])
   @@index([startNodeId])
   @@index([endNodeId])
 }
 
-model ToolNodeEdge {
+model ToolEdge {
   id String @id @default(uuid()) @db.Uuid
 
   startNodeId String @db.Uuid
   endNodeId   String @db.Uuid
 
-  startNode ToolNode @relation("ToolNodeEdgeStart", fields: [startNodeId], references: [id])
-  endNode   ToolNode @relation("ToolNodeEdgeEnd", fields: [endNodeId], references: [id])
+  startNode ToolNode @relation("ToolEdgeStart", fields: [startNodeId], references: [id])
+  endNode   ToolNode @relation("ToolEdgeEnd", fields: [endNodeId], references: [id])
 
   toolGraphId String    @db.Uuid
-  toolGraph   ToolGraph @relation("ToolGraphToToolNodeEdges", fields: [toolGraphId], references: [id], onDelete: Cascade)
+  toolGraph   ToolGraph @relation("ToolGraphToToolEdges", fields: [toolGraphId], references: [id], onDelete: Cascade)
 
   @@unique([startNodeId, endNodeId])
   @@index([startNodeId])
   @@index([endNodeId])
 }
 
-model ActionNodeEdge {
+model ActionEdge {
   id String @id @default(uuid()) @db.Uuid
 
   startNodeId String @db.Uuid
   endNodeId   String @db.Uuid
 
   actionGraphId String      @db.Uuid
-  actionGraph   ActionGraph @relation("ActionGraphToActionNodeEdges", fields: [actionGraphId], references: [id], onDelete: Cascade)
+  actionGraph   ActionGraph @relation("ActionGraphToActionEdges", fields: [actionGraphId], references: [id], onDelete: Cascade)
 
-  startNode ActionNode @relation("ActionNodeEdgeStart", fields: [startNodeId], references: [id])
-  endNode   ActionNode @relation("ActionNodeEdgeEnd", fields: [endNodeId], references: [id])
+  startNode ActionNode @relation("ActionEdgeStart", fields: [startNodeId], references: [id])
+  endNode   ActionNode @relation("ActionEdgeEnd", fields: [endNodeId], references: [id])
 
   @@unique([startNodeId, endNodeId])
   @@index([startNodeId])
@@ -392,7 +392,7 @@ enum InformationTypeEnum {
   STRING
 }
 
-enum AgentNodeEdgeTypeEnum {
+enum AgentEdgeTypeEnum {
   SPAWN
   KILL
   RETURN

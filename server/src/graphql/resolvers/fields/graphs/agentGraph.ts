@@ -1,7 +1,7 @@
 import { AgentGraphResolvers } from "../../../generated/graphql";
 import { container } from "../../../../utils/di/container";
 import { AgentGraphDao } from "../../../../dao/graphs/AgentGraphDao";
-import { formatAgentNodeEdgeToGqlAgentNodeEdge } from "../../../formatters/nodes/agentFormatter";
+import { formatAgentEdgeToGqlAgentEdge } from "../../../formatters/nodes/agentFormatter";
 
 export const AgentGraph: AgentGraphResolvers = {
   nodes: async (parent) => {
@@ -12,6 +12,6 @@ export const AgentGraph: AgentGraphResolvers = {
   edges: async (parent) => {
     const agentGraphDao = container.get(AgentGraphDao)
     const edges = await agentGraphDao.getEdges(parent.id)
-    return edges.map(edge => formatAgentNodeEdgeToGqlAgentNodeEdge(edge))
+    return edges.map(edge => formatAgentEdgeToGqlAgentEdge(edge))
   },
 }

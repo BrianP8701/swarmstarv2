@@ -17,7 +17,7 @@ export const PopoverButton = React.forwardRef<
     variant='outline'
     onClick={togglePopover}
   >
-    <div className='overflow-hidden max-w-[180px] truncate text-left'>{title}</div>
+    <div className='overflow-hidden max-w-[180px] truncate text-left font-normal'>{title}</div>
     <ChevronsUpDown className='w-4 h-4 ml-2 flex-shrink-0' />
   </Button>
 ))

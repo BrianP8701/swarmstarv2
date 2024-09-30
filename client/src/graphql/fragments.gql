@@ -38,7 +38,7 @@ fragment InformationGraph on InformationGraph {
     ...InformationNode
   }
   edges {
-    ...InformationNodeEdge
+    ...informationEdge
   }
 }
 
@@ -47,7 +47,7 @@ fragment InformationNode on InformationNode {
   title
 }
 
-fragment InformationNodeEdge on InformationNodeEdge {
+fragment informationEdge on informationEdge {
   id
   startNodeId
   endNodeId
@@ -59,7 +59,7 @@ fragment AgentGraph on AgentGraph {
     ...AgentNode
   }
   edges {
-    ...AgentNodeEdge
+    ...AgentEdge
   }
 }
 
@@ -68,7 +68,7 @@ fragment AgentNode on AgentNode {
   title
 }
 
-fragment AgentNodeEdge on AgentNodeEdge {
+fragment AgentEdge on AgentEdge {
   id
   type
   startNodeId
@@ -106,7 +106,7 @@ fragment ToolGraph on ToolGraph {
     ...ToolNode
   }
   edges {
-    ...ToolNodeEdge
+    ...ToolEdge
   }
 }
 
@@ -115,7 +115,7 @@ fragment ToolNode on ToolNode {
   title
 }
 
-fragment ToolNodeEdge on ToolNodeEdge {
+fragment ToolEdge on ToolEdge {
   id
   startNodeId
   endNodeId
@@ -127,11 +127,11 @@ fragment ActionGraph on ActionGraph {
     ...ActionNode
   }
   edges {
-    ...ActionNodeEdge
+    ...ActionEdge
   }
 }
 
-fragment ActionNodeEdge on ActionNodeEdge {
+fragment ActionEdge on ActionEdge {
   id
   startNodeId
   endNodeId

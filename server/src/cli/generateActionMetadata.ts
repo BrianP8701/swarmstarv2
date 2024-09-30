@@ -11,6 +11,7 @@ import { SecretService } from '../services/SecretService';
 import { ActionNodeDao } from '../dao/nodes/ActionNodeDao';
 import { ActionGraphDao } from '../dao/graphs/ActionGraphDao';
 import { v4 as uuidv4 } from 'uuid';
+import { ActionEdgeDao } from '../dao/edges/ActionEdgeDao';
 const abstractActionClassStrings = ["AbstractAction", "AbstractRouter"]
 
 interface ActionMetadataNodeData {
@@ -21,6 +22,7 @@ interface ActionMetadataNodeData {
 
 async function createActionMetadataNode(actionGraphId: string, nodeData: ActionMetadataNodeData): Promise<ActionNode> {
   const actionNodeDao = container.get(ActionNodeDao);
+  const actionEdgeDao = container.get(ActionEdgeDao);
   logger.info(nodeData);
 
   const createInput: Prisma.ActionNodeCreateInput = {
@@ -34,7 +36,7 @@ async function createActionMetadataNode(actionGraphId: string, nodeData: ActionM
   };
   const node = await actionNodeDao.create(createInput);
   if (nodeData.parentId) {
-    await actionNodeDao.createEdge({
+    await actionEdgeDao.create({
       startNode: {
         connect: {
           id: nodeData.parentId
