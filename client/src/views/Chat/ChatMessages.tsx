@@ -14,7 +14,7 @@ interface UserMessageProps {
 const UserMessage: React.FC<UserMessageProps> = ({ content }) => (
   <div className='self-center w-[90%] max-w-[700px]'>
     <div className='flex justify-end'>
-      <div className='inline-block bg-stone-700 rounded-3xl p-3 max-w-[77.78%] text-left'>{content}</div>
+      <div className='inline-block bg-muted rounded-3xl p-3 max-w-[77.78%] text-left'>{content}</div>
     </div>
   </div>
 )

@@ -38,8 +38,61 @@ model User {
   swarms            Swarm[]
   informationGraphs InformationGraph[]
 
+  // UI Config
+  userToPanelLayoutMappings UserToPanelLayoutMapping[]
+  theme ThemeEnum @default(MIDNIGHT)
+
   @@index([clerkId])
 }
+
+model UserToPanelLayoutMapping {
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id])
+
+  panelLayoutId String @db.Uuid
+  panelLayout PanelLayout @relation(fields: [panelLayoutId], references: [id])
+
+  lastUsed DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@id([userId, panelLayoutId])
+}
+
+model PanelLayout {
+  id String @id @default(uuid()) @db.Uuid
+  title String
+
+  userToPanelLayoutMappings UserToPanelLayoutMapping[]
+  panelNodes PanelNode[]
+  isEditable Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PanelNode {
+  id          String      @id @default(uuid()) @db.Uuid
+  panelLayout PanelLayout @relation(fields: [panelLayoutId], references: [id])
+  panelLayoutId String     @db.Uuid
+
+  content PanelContentEnum @default(EMPTY)
+  split   SplitDirectionEnum?
+
+  firstChild   PanelNode? @relation("FirstChildRelation", fields: [firstChildId], references: [id])
+  firstChildId String?    @unique @db.Uuid
+
+  secondChild   PanelNode? @relation("SecondChildRelation", fields: [secondChildId], references: [id])
+  secondChildId String?    @unique @db.Uuid
+
+  firstParent   PanelNode? @relation("FirstChildRelation")
+  firstParentId String?    @unique @db.Uuid
+  secondParent  PanelNode? @relation("SecondChildRelation")
+  secondParentId String?    @unique @db.Uuid
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 
 model Swarm {
   id    String @id @default(uuid()) @db.Uuid
@@ -402,6 +455,35 @@ enum AgentEdgeTypeEnum {
 enum ChatStatusEnum {
   ACTIVE
   COMPLETED
+}
+
+enum PanelContentEnum {
+  INFORMATION_GRAPH
+  ACTION_GRAPH
+  AGENT_GRAPH
+  TOOL_GRAPH
+  CHAT
+  EMPTY
+}
+
+enum SplitDirectionEnum {
+  HORIZONTAL
+  VERTICAL
+}
+
+enum ThemeEnum {
+  SNOW
+  MIDNIGHT
+  NEUTRAL
+  ICE
+  VOLCANO
+  GREEN
+  ELIXIR
+  FOREST
+  RED
+  BLUE
+  PURPLE
+  CONCRETE
 }
 
 //  ___________________________________________________________

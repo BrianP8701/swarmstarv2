@@ -5,6 +5,7 @@ import { CaretSortIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix
 import * as SelectPrimitive from '@radix-ui/react-select'
 
 import { cn } from '@/utils/cn'
+import { prettifyString } from '@/utils/strings'
 
 const Select = SelectPrimitive.Root
 
@@ -115,7 +116,7 @@ const SelectItem = React.forwardRef<
         <CheckIcon className='h-4 w-4' />
       </SelectPrimitive.ItemIndicator>
     </span>
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+    <SelectPrimitive.ItemText>{prettifyString(children as string)}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))
 SelectItem.displayName = SelectPrimitive.Item.displayName
