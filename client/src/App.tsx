@@ -5,8 +5,8 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import './App.css'
 import HomePage from './views/HomePage'
 import { ApolloClientProvider } from './providers/ApolloClientProvider'
-import MainLayout from '@/components/layouts/MainLayout'
 import AuthWrapper from './components/custom/AuthWrapper'
+import { ThemeProvider } from './providers/ThemeProvider'
 
 const App = () => {
   return (
@@ -29,12 +29,12 @@ const Providers = (props: PropsWithChildren<NonNullable<unknown>>) => {
     <ClerkProvider publishableKey={clerkPubKey}>
       <ClerkLoaded>
         <ApolloClientProvider url={import.meta.env.VITE_GRAPHQL_URL}>
+          <ThemeProvider>
           <TooltipProvider>
-            <MainLayout>
               {/* Remove the WebSocketHandler component from here */}
               {props.children}
-            </MainLayout>
           </TooltipProvider>
+          </ThemeProvider>
         </ApolloClientProvider>
       </ClerkLoaded>
     </ClerkProvider>

@@ -31,12 +31,33 @@ enum ChatStatusEnum {
   COMPLETED
 }
 
-enum WindowContentEnum {
+enum PanelContentEnum {
   INFORMATION_GRAPH
   ACTION_GRAPH
   AGENT_GRAPH
   TOOL_GRAPH
   CHAT
+  EMPTY
+}
+
+enum SplitDirectionEnum {
+  HORIZONTAL
+  VERTICAL
+}
+
+enum ThemeEnum {
+  SNOW
+  MIDNIGHT
+  NEUTRAL
+  ICE
+  VOLCANO
+  GREEN
+  ELIXIR
+  FOREST
+  RED
+  BLUE
+  PURPLE
+  CONCRETE
 }
 
 #  ___________________________________________________________
@@ -60,12 +81,29 @@ type User {
   id: ID!
   swarms: [Swarm!]
   informationGraphs: [InformationGraph!]
+  panelLayouts: [PanelLayout!]
+  theme: ThemeEnum
+}
+
+type PanelLayout {
+  id: ID!
+  isEditable: Boolean
+  title: String
+  panelNodes: [PanelNode!]
+}
+
+type PanelNode {
+  id: ID!
+  content: PanelContentEnum!
+  split: SplitDirectionEnum
+  firstChild: PanelNode
+  secondChild: PanelNode
+  parentId: ID
 }
 
 type Settings {
   id: ID!
   theme: String
-  
 }
 
 type Swarm {
@@ -225,6 +263,7 @@ type RootMutation {
   swarmMutation: SwarmMutation
   informationGraphMutation: InformationGraphMutation
   chatMutation: ChatMutation
+  userMutation: UserMutation
 }
 
 input CreateSwarmRequest {
@@ -252,6 +291,24 @@ input SendMessageRequest {
 
 type ChatMutation {
   sendMessage(input: SendMessageRequest!): Chat
+}
+
+input PanelLayoutCreateInput {
+  title: String
+  panelNodes: [PanelNodeCreateInput!]
+}
+
+input PanelNodeCreateInput {
+  id: ID
+  content: PanelContentEnum
+  split: SplitDirectionEnum
+  parentId: ID
+  firstChild: PanelNodeCreateInput
+  secondChild: PanelNodeCreateInput
+}
+
+type UserMutation {
+  createPanelLayout(input: PanelLayoutCreateInput!): User
 }
 
 #  ___________________________________________________________

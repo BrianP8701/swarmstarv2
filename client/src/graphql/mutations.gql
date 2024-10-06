@@ -21,3 +21,11 @@ mutation SendMessage($input: SendMessageRequest!) {
     }
   }
 }
+
+mutation CreatePanelLayout($input: PanelLayoutCreateInput!) {
+  userMutation {
+    createPanelLayout(input: $input) {
+      ...User
+    }
+  }
+}

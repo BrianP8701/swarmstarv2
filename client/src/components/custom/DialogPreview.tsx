@@ -11,7 +11,7 @@ interface DialogPreviewProps {
 
 export default function DialogPreview({ previewComponent, dialogContent, dialogProps }: DialogPreviewProps) {
   return (
-    <div className='relative w-full h-full bg-neutral-800 rounded-xl'>
+    <div className='relative w-full h-full  bg-secondary rounded-xl'>
       <div className='w-full h-full'>{previewComponent}</div>
       <Dialog>
         <DialogTrigger asChild>
@@ -19,7 +19,7 @@ export default function DialogPreview({ previewComponent, dialogContent, dialogP
             <Expand size={20} />
           </Button>
         </DialogTrigger>
-        <DialogContent className='w-[95vw] h-[95vh] max-w-[95vw] p-0 rounded-xl bg-neutral-800'>
+        <DialogContent className='w-[95vw] h-[95vh] max-w-[95vw] p-0 rounded-xl  bg-secondary'>
           {React.cloneElement(dialogContent, { ...dialogProps, isDialogMode: true })}
         </DialogContent>
       </Dialog>

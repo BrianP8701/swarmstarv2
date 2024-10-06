@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { PanelRightOpen, PanelRightClose } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ChatContent } from './ChatContent'
-import ChatSidebar from '@/views/Chat/ChatSidebar'
+import SlideSidebar from '@/components/custom/SlideSidebar'
 import { SwarmFragment, useSendMessageMutation } from '@/graphql/generated/graphql'
 
 export interface ChatProps {
@@ -35,7 +35,7 @@ export default function Chat({ swarm, isDialogMode, selectedChatId, setSelectedC
       <div
         className={`z-20 absolute top-0 left-0 h-full transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-0'} overflow-hidden`}
       >
-        <ChatSidebar options={chats} selectedChatId={selectedChatId} setSelectedChatId={setSelectedChatId} />
+        <SlideSidebar options={chats} selectedOptionId={selectedChatId} setSelectedOptionId={setSelectedChatId} />
       </div>
       <ChatContent
         swarm={swarm}
