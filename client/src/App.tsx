@@ -30,10 +30,10 @@ const Providers = (props: PropsWithChildren<NonNullable<unknown>>) => {
       <ClerkLoaded>
         <ApolloClientProvider url={import.meta.env.VITE_GRAPHQL_URL}>
           <ThemeProvider>
-          <TooltipProvider>
+            <TooltipProvider>
               {/* Remove the WebSocketHandler component from here */}
               {props.children}
-          </TooltipProvider>
+            </TooltipProvider>
           </ThemeProvider>
         </ApolloClientProvider>
       </ClerkLoaded>

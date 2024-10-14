@@ -60,10 +60,10 @@ model UserToPanelLayoutMapping {
 
 model PanelLayout {
   id String @id @default(uuid()) @db.Uuid
-  title String
 
   userToPanelLayoutMappings UserToPanelLayoutMapping[]
   panelNodes PanelNode[]
+  rootPanelNodeId String? @unique @db.Uuid
   isEditable Boolean @default(false)
 
   createdAt DateTime @default(now())
@@ -71,28 +71,24 @@ model PanelLayout {
 }
 
 model PanelNode {
-  id          String      @id @default(uuid()) @db.Uuid
-  panelLayout PanelLayout @relation(fields: [panelLayoutId], references: [id])
-  panelLayoutId String     @db.Uuid
+  id            String      @id @default(uuid()) @db.Uuid
+  panelLayoutId String      @db.Uuid
+  panelLayout   PanelLayout @relation(fields: [panelLayoutId], references: [id])
 
-  content PanelContentEnum @default(EMPTY)
-  split   SplitDirectionEnum?
+  content       PanelContentEnum @default(EMPTY)
+  split         SplitDirectionEnum?
 
-  firstChild   PanelNode? @relation("FirstChildRelation", fields: [firstChildId], references: [id])
-  firstChildId String?    @unique @db.Uuid
+  parentId      String?     @db.Uuid
+  parent        PanelNode?  @relation("PanelNodeToChildren", fields: [parentId], references: [id])
+  children      PanelNode[] @relation("PanelNodeToChildren")
 
-  secondChild   PanelNode? @relation("SecondChildRelation", fields: [secondChildId], references: [id])
-  secondChildId String?    @unique @db.Uuid
+  childPosition ChildPositionEnum?
 
-  firstParent   PanelNode? @relation("FirstChildRelation")
-  firstParentId String?    @unique @db.Uuid
-  secondParent  PanelNode? @relation("SecondChildRelation")
-  secondParentId String?    @unique @db.Uuid
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@index([panelLayoutId])
 }
-
 
 model Swarm {
   id    String @id @default(uuid()) @db.Uuid
@@ -469,6 +465,11 @@ enum PanelContentEnum {
 enum SplitDirectionEnum {
   HORIZONTAL
   VERTICAL
+}
+
+enum ChildPositionEnum {
+  FIRST_CHILD
+  SECOND_CHILD
 }
 
 enum ThemeEnum {

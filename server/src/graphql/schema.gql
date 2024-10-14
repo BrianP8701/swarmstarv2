@@ -88,13 +88,12 @@ type User {
 type PanelLayout {
   id: ID!
   isEditable: Boolean
-  title: String
-  panelNodes: [PanelNode!]
+  rootPanelNode: PanelNode
 }
 
 type PanelNode {
   id: ID!
-  content: PanelContentEnum!
+  content: PanelContentEnum
   split: SplitDirectionEnum
   firstChild: PanelNode
   secondChild: PanelNode
@@ -294,8 +293,7 @@ type ChatMutation {
 }
 
 input PanelLayoutCreateInput {
-  title: String
-  panelNodes: [PanelNodeCreateInput!]
+  panelNodeCreateInputs: [PanelNodeCreateInput!]
 }
 
 input PanelNodeCreateInput {
@@ -309,6 +307,8 @@ input PanelNodeCreateInput {
 
 type UserMutation {
   createPanelLayout(input: PanelLayoutCreateInput!): User
+  selectPanelLayout(panelLayoutId: ID!): User
+  selectTheme(theme: ThemeEnum!): User
 }
 
 #  ___________________________________________________________

@@ -1,0 +1,1 @@
+- Look at GCP query insights and optimize the most expensive queries

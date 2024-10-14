@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, Swarm, User, InformationGraph } from '@prisma/client'
+import { Prisma, PrismaClient, Swarm, User, InformationGraph, UserToPanelLayoutMapping } from '@prisma/client'
 import { inject, injectable } from 'inversify'
 import { AbstractDao } from './AbstractDao'
 
@@ -39,11 +39,27 @@ export class UserDao extends AbstractDao<User, Prisma.UserCreateInput, Prisma.Us
   }
 
   // Additional methods
-  async getWithData(id: string): Promise<User & { swarms: Swarm[]; informationGraphs: InformationGraph[] }> {
-    return this.prisma.user.findUniqueOrThrow({
+  async getWithData(id: string): Promise<
+    User & {
+      swarms: Swarm[]
+      informationGraphs: InformationGraph[]
+      userToPanelLayoutMappings: UserToPanelLayoutMapping[]
+    }
+  > {
+    const user = await this.prisma.user.findUniqueOrThrow({
       where: { id },
-      include: { swarms: true, informationGraphs: true },
+      include: {
+        swarms: true,
+        informationGraphs: true,
+        userToPanelLayoutMappings: {
+          orderBy: { lastUsed: 'desc' },
+          include: {
+            panelLayout: true,
+          },
+        },
+      },
     })
+    return user
   }
 
   async getSwarms(id: string): Promise<Swarm[]> {

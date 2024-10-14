@@ -1,28 +1,23 @@
-'use client';
+'use client'
 
-import { Palette } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { Palette } from 'lucide-react'
+import { useTheme } from 'next-themes'
 
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 export default function SelectTheme() {
-  const { setTheme } = useTheme();
+  const { setTheme } = useTheme()
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Palette className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100" />
-          <span className="sr-only">Toggle theme</span>
+        <Button variant='outline' size='icon'>
+          <Palette className='h-[1.2rem] w-[1.2rem] rotate-0 scale-100' />
+          <span className='sr-only'>Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align='end'>
         <DropdownMenuItem onClick={() => setTheme('snow')}>Snow</DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('midnight')}>Midnight</DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('neutral')}>Neutral</DropdownMenuItem>
@@ -37,5 +32,5 @@ export default function SelectTheme() {
         <DropdownMenuItem onClick={() => setTheme('concrete')}>Concrete</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }
