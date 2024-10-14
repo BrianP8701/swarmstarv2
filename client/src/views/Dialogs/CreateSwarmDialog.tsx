@@ -40,7 +40,7 @@ export function CreateSwarmDialog({ open, onOpenChange }: { open: boolean; onOpe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='border-secondary border-2 rounded-2xl bg-background w-[60vw] min-w-[600px] min-h-[40vh] max-h-[90vh]'>
+      <DialogContent className='border-secondary border-2 rounded-2xl bg-background w-[50vw] min-w-[600px] min-h-[40vh] max-h-[90vh]'>
         <div className='grid w-full items-start h-full overflow-auto gap-6 p-2 mt-4'>
           <div className='grid grid-cols-2 gap-6'>
             <Input

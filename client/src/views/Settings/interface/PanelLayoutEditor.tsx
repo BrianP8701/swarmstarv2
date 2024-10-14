@@ -1,71 +1,85 @@
 // src/views/Settings/interface/PanelLayoutEditor.tsx
 import { useState } from 'react'
 import { PanelLayout } from '@/components/custom/PanelLayout'
-import { PanelContentEnum, SplitDirectionEnum, PanelNodeCreateInput } from '@/graphql/generated/graphql'
+import {
+  PanelContentEnum,
+  SplitDirectionEnum,
+  PanelNodeCreateInput,
+  useCreatePanelLayoutMutation,
+} from '@/graphql/generated/graphql'
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
+import { prettifyString } from '@/utils/strings'
 
 export function PanelLayoutEditor() {
-  const [rootNode, setRootNode] = useState<PanelNodeCreateInput>({
-    id: 'root',
-    content: PanelContentEnum.Empty,
-    split: null,
-    firstChild: null,
-    secondChild: null,
-  })
+  const [nodes, setNodes] = useState<PanelNodeCreateInput[]>([])
+  const [rootNodeId, setRootNodeId] = useState<string>('root')
+
+  const [createPanelLayout] = useCreatePanelLayoutMutation()
+
+  // Initialize root node if not already present
+  if (!nodes.find(node => node.id === rootNodeId)) {
+    setNodes([
+      ...nodes,
+      {
+        id: rootNodeId,
+        content: PanelContentEnum.Empty,
+        split: null,
+        parentId: null,
+        firstChildId: null,
+        secondChildId: null,
+      },
+    ])
+  }
 
   const addNode = (nodeId: string, split: SplitDirectionEnum) => {
-    const newNode1: PanelNodeCreateInput = {
-      id: `${Date.now()}-1`,
-      content: PanelContentEnum.Empty,
-      split: null,
-      firstChild: null,
-      secondChild: null,
-    }
-    const newNode2: PanelNodeCreateInput = {
-      id: `${Date.now()}-2`,
-      content: PanelContentEnum.Empty,
-      split: null,
-      firstChild: null,
-      secondChild: null,
-    }
+    const newFirstChildId = `${Date.now()}-1`
+    const newSecondChildId = `${Date.now()}-2`
 
-    const updateNode = (node: PanelNodeCreateInput): PanelNodeCreateInput => {
-      if (node.id === nodeId) {
-        return {
-          ...node,
-          split,
-          firstChild: newNode1,
-          secondChild: newNode2,
+    setNodes(prevNodes => {
+      // Update the current node with the split and child IDs
+      const updatedNodes = prevNodes.map(node => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            split,
+            firstChildId: newFirstChildId,
+            secondChildId: newSecondChildId,
+          }
         }
-      }
-      return {
-        ...node,
-        firstChild: node.firstChild ? updateNode(node.firstChild) : null,
-        secondChild: node.secondChild ? updateNode(node.secondChild) : null,
-      }
-    }
+        return node
+      })
 
-    setRootNode(prevNode => updateNode(prevNode))
+      // Add the new child nodes
+      const newNodes: PanelNodeCreateInput[] = [
+        {
+          id: newFirstChildId,
+          content: PanelContentEnum.Empty,
+          split: null,
+          parentId: nodeId,
+          firstChildId: null,
+          secondChildId: null,
+        },
+        {
+          id: newSecondChildId,
+          content: PanelContentEnum.Empty,
+          split: null,
+          parentId: nodeId,
+          firstChildId: null,
+          secondChildId: null,
+        },
+      ]
+
+      return [...updatedNodes, ...newNodes]
+    })
   }
 
   const setContent = (nodeId: string, content: PanelContentEnum) => {
-    const updateNode = (node: PanelNodeCreateInput): PanelNodeCreateInput => {
-      if (node.id === nodeId) {
-        return { ...node, content }
-      }
-      return {
-        ...node,
-        firstChild: node.firstChild ? updateNode(node.firstChild) : null,
-        secondChild: node.secondChild ? updateNode(node.secondChild) : null,
-      }
-    }
-
-    setRootNode(prevNode => updateNode(prevNode))
+    setNodes(prevNodes => prevNodes.map(node => (node.id === nodeId ? { ...node, content } : node)))
   }
 
   const renderContent = (node: PanelNodeCreateInput) => {
-    if (!node.firstChild && !node.secondChild) {
+    if (!node.firstChildId && !node.secondChildId) {
       // Leaf node
       return (
         <div className='absolute inset-0 flex flex-col items-center justify-center'>
@@ -81,8 +95,11 @@ export function PanelLayoutEditor() {
             </SelectContent>
           </Select>
           {/* Content Select */}
-          <Select onValueChange={value => setContent(node.id ?? '', value as PanelContentEnum)}>
-            <SelectTrigger>Set Content</SelectTrigger>
+          <Select
+            onValueChange={value => setContent(node.id ?? '', value as PanelContentEnum)}
+            value={node.content ?? PanelContentEnum.Empty}
+          >
+            <SelectTrigger>{prettifyString(node.content ?? PanelContentEnum.Empty)}</SelectTrigger>
             <SelectContent>
               {Object.values(PanelContentEnum).map(option => (
                 <SelectItem key={option} value={option}>
@@ -98,27 +115,48 @@ export function PanelLayoutEditor() {
   }
 
   const clearLayout = () => {
-    setRootNode({
-      id: 'root',
-      content: PanelContentEnum.Empty,
-      split: null,
-      firstChild: null,
-      secondChild: null,
-    })
+    setNodes([
+      {
+        id: 'root',
+        content: PanelContentEnum.Empty,
+        split: null,
+        parentId: null,
+        firstChildId: null,
+        secondChildId: null,
+      },
+    ])
+    setRootNodeId('root')
+  }
+
+  const handleSave = async () => {
+    try {
+      await createPanelLayout({
+        variables: {
+          input: {
+            panelNodeCreateInputs: nodes,
+          },
+        },
+      })
+      // Handle successful save (e.g., show a success message)
+    } catch (error) {
+      console.error('Error creating panel layout:', error)
+    }
   }
 
   return (
     <div className='flex flex-col'>
       <div className='flex justify-center items-center'>
         <div className='h-[50vh] w-[50vw] border-2 rounded-2xl flex overflow-hidden'>
-          <PanelLayout node={rootNode} renderContent={renderContent} />
+          <PanelLayout nodes={nodes} rootNodeId={rootNodeId} renderContent={renderContent} />
         </div>
       </div>
       <div className='flex justify-center items-center space-x-4 mt-4'>
         <Button variant='outline' onClick={clearLayout}>
           Clear
         </Button>
-        <Button variant='outline'>Save</Button>
+        <Button variant='outline' onClick={handleSave}>
+          Save
+        </Button>
       </div>
     </div>
   )

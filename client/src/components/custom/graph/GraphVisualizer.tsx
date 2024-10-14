@@ -132,7 +132,7 @@ export const GraphVisualizer: React.FC<GraphVisualizerProps> = ({ nodes, edges, 
   }, [])
 
   return (
-    <div ref={containerRef} className='w-full h-full rounded-xl'>
+    <div ref={containerRef} className='relative flex flex-col h-full rounded-xl bg-secondary'>
       {graphData.nodes.length > 0 && (
         <Graph key={key} graph={graphData} options={options} style={{ width: '100%', height: '100%' }} />
       )}

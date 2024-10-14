@@ -1,8 +1,9 @@
+// src/services/PanelLayoutService.ts
 import { inject, injectable } from 'inversify'
 import { PanelLayoutDao } from '../dao/PanelLayoutDao'
-import { PanelLayoutCreateInput, PanelNodeCreateInput } from '../graphql/generated/graphql'
 import { PanelNodeDao } from '../dao/PanelNodeDao'
-import { ChildPositionEnum } from '@prisma/client'
+import { PanelLayoutCreateInput } from '../graphql/generated/graphql'
+import { ChildPositionEnum, PanelContentEnum, Prisma } from '@prisma/client'
 
 @injectable()
 export class PanelLayoutService {
@@ -23,67 +24,75 @@ export class PanelLayoutService {
     })
 
     const panelLayoutId = panelLayout.id
+    const panelNodesInput = gqlPanelLayoutCreateInput.panelNodeCreateInputs ?? []
+    const rootNodeId = 'root'
 
-    // Process the root node
-    const panelNodeCreateInputs = gqlPanelLayoutCreateInput.panelNodeCreateInputs
+    // Map of old IDs to new IDs
+    const idMap = new Map<string, string>()
 
-    if (panelNodeCreateInputs?.length !== 1) {
-      throw new Error('Exactly one root PanelNode is required.')
+    // Step 1: Create all nodes without parent or childPosition
+    for (const nodeInput of panelNodesInput) {
+      const data = {
+        panelLayout: {
+          connect: {
+            id: panelLayoutId,
+          },
+        },
+        content: nodeInput.content || PanelContentEnum.EMPTY,
+        split: nodeInput.split || null,
+        // Do not set parent or childPosition yet
+      }
+
+      const panelNode = await this.panelNodeDao.create(data)
+      idMap.set(nodeInput.id!, panelNode.id)
     }
 
-    const rootPanelNodeInput = panelNodeCreateInputs[0]
+    // Step 2: Update parent and childPosition
+    for (const nodeInput of panelNodesInput) {
+      const nodeId = idMap.get(nodeInput.id!)
+      if (!nodeId) {
+        throw new Error(`Node ID not found in idMap for nodeInput.id: ${nodeInput.id}`)
+      }
 
-    const rootPanelNodeId = await this.createPanelNodesRecursively(rootPanelNodeInput, panelLayoutId, null, null)
+      const updates: Prisma.PanelNodeUpdateInput = {}
+
+      // Update parentId
+      if (nodeInput.parentId) {
+        const parentId = idMap.get(nodeInput.parentId)
+        if (!parentId) {
+          throw new Error(`Parent ID not found in idMap for parentId: ${nodeInput.parentId}`)
+        }
+        updates.parent = {
+          connect: {
+            id: parentId,
+          },
+        }
+      }
+
+      // Update childPosition
+      if (nodeInput.parentId) {
+        const parentNodeInput = panelNodesInput.find(n => n.id === nodeInput.parentId)
+        if (parentNodeInput) {
+          if (parentNodeInput.firstChildId === nodeInput.id) {
+            updates.childPosition = ChildPositionEnum.FIRST_CHILD
+          } else if (parentNodeInput.secondChildId === nodeInput.id) {
+            updates.childPosition = ChildPositionEnum.SECOND_CHILD
+          }
+        }
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await this.panelNodeDao.update(nodeId, updates)
+      }
+    }
 
     // Update the PanelLayout with rootPanelNodeId
-    await this.panelLayoutDao.update(panelLayoutId, { rootPanelNodeId: rootPanelNodeId })
-  }
-
-  private async createPanelNodesRecursively(
-    gqlPanelNodeCreateInput: PanelNodeCreateInput,
-    panelLayoutId: string,
-    parentId: string | null,
-    childPosition: ChildPositionEnum | null
-  ): Promise<string> {
-    const panelNode = await this.panelNodeDao.create({
-      panelLayout: {
-        connect: {
-          id: panelLayoutId,
-        },
-      },
-      content: gqlPanelNodeCreateInput.content || 'EMPTY',
-      split: gqlPanelNodeCreateInput.split || null,
-      parent: parentId
-        ? {
-            connect: {
-              id: parentId,
-            },
-          }
-        : undefined,
-      childPosition: childPosition,
+    const rootPanelNodeId = idMap.get(rootNodeId)
+    if (!rootPanelNodeId) {
+      throw new Error(`Root node ID not found in idMap for rootNodeId: ${rootNodeId}`)
+    }
+    await this.panelLayoutDao.update(panelLayoutId, {
+      rootPanelNodeId: rootPanelNodeId,
     })
-
-    const panelNodeId = panelNode.id
-
-    // Recursively process children
-    if (gqlPanelNodeCreateInput.firstChild) {
-      await this.createPanelNodesRecursively(
-        gqlPanelNodeCreateInput.firstChild,
-        panelLayoutId,
-        panelNodeId,
-        ChildPositionEnum.FIRST_CHILD
-      )
-    }
-
-    if (gqlPanelNodeCreateInput.secondChild) {
-      await this.createPanelNodesRecursively(
-        gqlPanelNodeCreateInput.secondChild,
-        panelLayoutId,
-        panelNodeId,
-        ChildPositionEnum.SECOND_CHILD
-      )
-    }
-
-    return panelNodeId
   }
 }

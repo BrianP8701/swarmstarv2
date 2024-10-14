@@ -8,7 +8,17 @@ import {
   UserFragment,
 } from '../graphql/generated/graphql'
 
-export function useSwarmData(initialSelectedSwarmId: string | undefined, user: UserFragment | null) {
+export type AppState = {
+  swarm: SwarmFragment | undefined
+  actionGraph: ActionGraphFragment | undefined
+  agentGraph: AgentGraphFragment | undefined
+  selectedChatId: string | null
+  setSelectedChatId: (id: string | null) => void
+  selectedSwarmId: string | undefined
+  setSelectedSwarmId: (id: string | undefined) => void
+}
+
+export function useSwarmData(initialSelectedSwarmId: string | undefined, user: UserFragment | null): AppState {
   const [fetchSwarm, { data: fetchSwarmQuery }] = useFetchSwarmLazyQuery()
   const [fetchActionGraph, { data: fetchActionGraphQuery }] = useFetchActionGraphLazyQuery()
 

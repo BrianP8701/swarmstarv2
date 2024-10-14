@@ -6,6 +6,27 @@ fragment User on User {
   informationGraphs {
     ...InformationGraphPreview
   }
+  panelLayouts {
+    ...PanelLayout
+  }
+}
+
+fragment PanelLayout on PanelLayout {
+  id
+  isEditable
+  rootPanelNodeId
+  panelNodes {
+    ...PanelNode
+  }
+}
+
+fragment PanelNode on PanelNode {
+  id
+  content
+  split
+  firstChildId
+  secondChildId
+  parentId
 }
 
 fragment SwarmPreview on Swarm {

@@ -11,55 +11,42 @@ import {
   SplitDirectionEnum as GqlSplitDirectionEnum,
 } from '../generated/graphql'
 
-export const formatPrismaPanelNodesToGqlPanelNode = (panelNodes: PrismaPanelNode[]): GqlPanelNode => {
+export const formatPrismaPanelNodesToGqlPanelNodes = (panelNodes: PrismaPanelNode[]): GqlPanelNode[] => {
   // Build a mapping from node IDs to PrismaPanelNode
   const nodeMap = new Map<string, PrismaPanelNode>()
   panelNodes.forEach(node => {
     nodeMap.set(node.id, node)
   })
 
-  // Build child mapping: parentId -> { FIRST_CHILD: node, SECOND_CHILD: node }
-  const childrenMap = new Map<string, { FIRST_CHILD?: PrismaPanelNode; SECOND_CHILD?: PrismaPanelNode }>()
+  // Convert PrismaPanelNode to GqlPanelNode
+  const gqlNodeMap = new Map<string, GqlPanelNode>()
   panelNodes.forEach(node => {
-    if (node.parentId) {
-      if (!childrenMap.has(node.parentId)) {
-        childrenMap.set(node.parentId, {})
-      }
-      const childMap = childrenMap.get(node.parentId)!
-      if (node.childPosition === ChildPositionEnum.FIRST_CHILD) {
-        childMap.FIRST_CHILD = node
-      } else if (node.childPosition === ChildPositionEnum.SECOND_CHILD) {
-        childMap.SECOND_CHILD = node
+    gqlNodeMap.set(node.id, {
+      id: node.id,
+      content: convertPrismaContentToGqlContent(node.content),
+      split: convertPrismaSplitToGqlSplit(node.split),
+      parentId: node.parentId,
+      firstChildId: null,
+      secondChildId: null,
+    })
+  })
+
+  // Set firstChildId and secondChildId
+  panelNodes.forEach(node => {
+    if (node.parentId && node.childPosition) {
+      const parentNode = gqlNodeMap.get(node.parentId)
+      if (parentNode) {
+        if (node.childPosition === ChildPositionEnum.FIRST_CHILD) {
+          parentNode.firstChildId = node.id
+        } else if (node.childPosition === ChildPositionEnum.SECOND_CHILD) {
+          parentNode.secondChildId = node.id
+        }
       }
     }
   })
 
-  // Find the root node (node without a parent)
-  const rootNodes = panelNodes.filter(node => node.parentId === null)
-
-  if (rootNodes.length !== 1) {
-    throw new Error('Expected exactly one root node')
-  }
-
-  const rootNode = rootNodes[0]
-
-  // Recursive function to build GqlPanelNode tree
-  const buildGqlPanelNode = (node: PrismaPanelNode): GqlPanelNode => {
-    const childMap = childrenMap.get(node.id) || {}
-    const firstChildNode = childMap.FIRST_CHILD
-    const secondChildNode = childMap.SECOND_CHILD
-
-    return {
-      id: node.id,
-      content: convertPrismaContentToGqlContent(node.content),
-      split: convertPrismaSplitToGqlSplit(node.split),
-      parentId: node.parentId || null,
-      firstChild: firstChildNode ? buildGqlPanelNode(firstChildNode) : null,
-      secondChild: secondChildNode ? buildGqlPanelNode(secondChildNode) : null,
-    }
-  }
-
-  return buildGqlPanelNode(rootNode)
+  // Return the list of GqlPanelNode
+  return Array.from(gqlNodeMap.values())
 }
 
 // Helper functions to convert enums

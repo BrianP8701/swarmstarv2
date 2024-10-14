@@ -29,3 +29,19 @@ mutation CreatePanelLayout($input: PanelLayoutCreateInput!) {
     }
   }
 }
+
+mutation SelectPanelLayout($panelLayoutId: ID!) {
+  userMutation {
+    selectPanelLayout(panelLayoutId: $panelLayoutId) {
+      ...User
+    }
+  }
+}
+
+mutation SelectTheme($theme: ThemeEnum!) {
+  userMutation {
+    selectTheme(theme: $theme) {
+      ...User
+    }
+  }
+}

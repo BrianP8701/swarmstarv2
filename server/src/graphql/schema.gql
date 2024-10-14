@@ -88,21 +88,17 @@ type User {
 type PanelLayout {
   id: ID!
   isEditable: Boolean
-  rootPanelNode: PanelNode
+  rootPanelNodeId: ID
+  panelNodes: [PanelNode!]
 }
 
 type PanelNode {
   id: ID!
   content: PanelContentEnum
   split: SplitDirectionEnum
-  firstChild: PanelNode
-  secondChild: PanelNode
+  firstChildId: ID
+  secondChildId: ID
   parentId: ID
-}
-
-type Settings {
-  id: ID!
-  theme: String
 }
 
 type Swarm {
@@ -301,8 +297,8 @@ input PanelNodeCreateInput {
   content: PanelContentEnum
   split: SplitDirectionEnum
   parentId: ID
-  firstChild: PanelNodeCreateInput
-  secondChild: PanelNodeCreateInput
+  firstChildId: ID
+  secondChildId: ID
 }
 
 type UserMutation {
