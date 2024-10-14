@@ -46,7 +46,7 @@ export function CreateInformationDialog({ open, onOpenChange }: CreateInformatio
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='bg-background border-secondary border-2 rounded-2xl'>
+      <DialogContent className='bg-background border-secondary border-2 rounded-2xl w-[50vw] min-h-[8vh]'>
         <form onSubmit={handleSubmit}>
           <div className='grid gap-4 py-4 px-20 mt-2'>
             <Input

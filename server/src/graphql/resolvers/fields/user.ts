@@ -19,4 +19,12 @@ export const User: UserResolvers = {
       id: informationGraph.id,
     }))
   },
+  panelLayouts: async (_, __, { req }: ResolverContext) => {
+    assert(req.user?.id, 'User is not authenticated')
+    const userDao = container.get(UserDao)
+    const user = await userDao.getWithData(req.user.id)
+    return user.userToPanelLayoutMappings.map(mapping => ({
+      id: mapping.panelLayoutId,
+    }))
+  },
 }

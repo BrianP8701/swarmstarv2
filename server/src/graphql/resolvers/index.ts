@@ -13,6 +13,8 @@ import { ChatMutation } from './mutations/chatMutation'
 import { Chat } from './fields/chat'
 import { InformationGraphMutation } from './mutations/informationGraphMutation'
 import { RootQuery } from './queries'
+import { UserMutation } from './mutations/userMutation'
+import { PanelLayout } from './fields/panelLayout'
 
 export const resolvers = {
   // Root
@@ -28,9 +30,11 @@ export const resolvers = {
   ToolGraph,
   AgentGraph,
   ActionGraph,
+  PanelLayout,
 
   // Mutations
   SwarmMutation,
   ChatMutation,
   InformationGraphMutation,
+  UserMutation,
 }

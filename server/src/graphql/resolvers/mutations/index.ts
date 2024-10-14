@@ -10,4 +10,7 @@ export const RootMutation: RootMutationResolvers = {
   chatMutation: async () => {
     return {}
   },
+  userMutation: async () => {
+    return {}
+  },
 }

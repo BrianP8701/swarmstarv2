@@ -38,7 +38,56 @@ model User {
   swarms            Swarm[]
   informationGraphs InformationGraph[]
 
+  // UI Config
+  userToPanelLayoutMappings UserToPanelLayoutMapping[]
+  theme ThemeEnum @default(MIDNIGHT)
+
   @@index([clerkId])
+}
+
+model UserToPanelLayoutMapping {
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id])
+
+  panelLayoutId String @db.Uuid
+  panelLayout PanelLayout @relation(fields: [panelLayoutId], references: [id])
+
+  lastUsed DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@id([userId, panelLayoutId])
+}
+
+model PanelLayout {
+  id String @id @default(uuid()) @db.Uuid
+
+  userToPanelLayoutMappings UserToPanelLayoutMapping[]
+  panelNodes PanelNode[]
+  rootPanelNodeId String? @unique @db.Uuid
+  isEditable Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PanelNode {
+  id            String      @id @default(uuid()) @db.Uuid
+  panelLayoutId String      @db.Uuid
+  panelLayout   PanelLayout @relation(fields: [panelLayoutId], references: [id])
+
+  content       PanelContentEnum @default(EMPTY)
+  split         SplitDirectionEnum?
+
+  parentId      String?     @db.Uuid
+  parent        PanelNode?  @relation("PanelNodeToChildren", fields: [parentId], references: [id])
+  children      PanelNode[] @relation("PanelNodeToChildren")
+
+  childPosition ChildPositionEnum?
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([panelLayoutId])
 }
 
 model Swarm {
@@ -402,6 +451,40 @@ enum AgentEdgeTypeEnum {
 enum ChatStatusEnum {
   ACTIVE
   COMPLETED
+}
+
+enum PanelContentEnum {
+  INFORMATION_GRAPH
+  ACTION_GRAPH
+  AGENT_GRAPH
+  TOOL_GRAPH
+  CHAT
+  EMPTY
+}
+
+enum SplitDirectionEnum {
+  HORIZONTAL
+  VERTICAL
+}
+
+enum ChildPositionEnum {
+  FIRST_CHILD
+  SECOND_CHILD
+}
+
+enum ThemeEnum {
+  SNOW
+  MIDNIGHT
+  NEUTRAL
+  ICE
+  VOLCANO
+  GREEN
+  ELIXIR
+  FOREST
+  RED
+  BLUE
+  PURPLE
+  CONCRETE
 }
 
 //  ___________________________________________________________
