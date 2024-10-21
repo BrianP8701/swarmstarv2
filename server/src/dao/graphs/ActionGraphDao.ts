@@ -64,7 +64,7 @@ export class ActionGraphDao extends AbstractGraphDao<
   }
 
   async getNodes(id: string): Promise<ActionNode[]> {
-    return this.prisma.actionNode.findMany({ where: { actionGraphId: id } })
+    return this.prisma.actionNode.findMany({ where: { actionGraphId: id }, orderBy: { createdAt: 'desc' } })
   }
 
   async getEdges(id: string): Promise<ActionEdge[]> {

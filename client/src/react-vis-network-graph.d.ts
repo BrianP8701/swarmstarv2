@@ -26,6 +26,8 @@ declare module 'react-vis-network-graph' {
     graph: GraphData
     options: GraphOptions
     style?: React.CSSProperties
+    getNetwork?: (network: Network) => void
+    network?: Network
   }
 
   export default class Graph extends Component<GraphProps> {}

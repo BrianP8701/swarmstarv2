@@ -4,7 +4,7 @@ import { useState } from 'react'
 import SlideSidebar from '../../components/custom/SlideSidebar'
 import { Button } from '@/components/ui/button'
 import { PanelRightClose, PanelRightOpen } from 'lucide-react'
-import { InterfaceSettings } from './interface/InterfaceSettings'
+import { InterfaceSettings } from './InterfaceSettings/InterfaceSettings'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 export enum SettingsTabs {
