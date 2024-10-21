@@ -60,6 +60,18 @@ enum ThemeEnum {
   CONCRETE
 }
 
+enum InformationTypeEnum {
+  FOLDER
+  GITHUB_REPOSITORY_LINK
+  PYTHON_FILE
+  TYPESCRIPT_FILE
+  STRING
+}
+
+enum ToolTypeEnum {
+  GITHUB_CLONE
+}
+
 #  ___________________________________________________________
 # /                                                           \
 # |                                                           |
@@ -123,7 +135,7 @@ type InformationGraph {
 type InformationNode {
   id: ID!
   title: String
-  type: String
+  type: InformationTypeEnum
 }
 
 type informationEdge {
@@ -144,7 +156,7 @@ type AgentGraph {
 type AgentNode {
   id: ID!
   title: String
-  type: String
+  type: ActionEnum
 }
 
 type AgentEdge {
@@ -167,7 +179,7 @@ type ActionNode {
   id: ID!
   title: String
   description: String
-  type: String
+  type: ActionEnum
 }
 
 type ActionEdge {
@@ -188,7 +200,7 @@ type ToolGraph {
 type ToolNode {
   id: ID!
   title: String
-  type: String
+  type: ToolTypeEnum
 }
 
 type ToolEdge {
